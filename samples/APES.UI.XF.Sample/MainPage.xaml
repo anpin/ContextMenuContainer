@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APES.UI.XF.Sample.MainPage"
+             xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels"
+             xmlns:c="http://apes.ge"
+             x:DataType="vm:MainViewModel"
+             >
+    <ContentPage.BindingContext>
+        <vm:MainViewModel/>
+    </ContentPage.BindingContext>
+    <NavigationPage.TitleView>
+        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+            <Label Text="Context menu example" FontSize="Title" TextColor="White" Grid.Column="0" HorizontalOptions="StartAndExpand" VerticalOptions="Center"/>
+            <c:ContextMenuContainer x:Name="container3" MenuItems="{Binding ImageContextItems}" HorizontalOptions="End" VerticalOptions="Center">
+                <c:ContextMenuContainer.Content>
+                    <Label Text="☢" FontSize="Title" Padding="10,10,10,10"/>
+                </c:ContextMenuContainer.Content>
+            </c:ContextMenuContainer>
+        </StackLayout>
+    </NavigationPage.TitleView>
+    <StackLayout>
+        <c:ContextMenuContainer x:Name="container1">
+            <c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuItem Text="Action 1" Command="{Binding FirstCommand}" CommandParameter="Action 1 pressed!" />
+            </c:ContextMenuContainer.MenuItems>
+            <c:ContextMenuContainer.Content>
+                <Frame BackgroundColor="ForestGreen" Padding="24" CornerRadius="0" >
+
+                    <Label Text="{Binding Text}" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
+
+                </Frame>
+            </c:ContextMenuContainer.Content>
+        </c:ContextMenuContainer>
+
+        <c:ContextMenuContainer x:Name="container2" MenuItems="{Binding ImageContextItems}">
+            <c:ContextMenuContainer.Content>
+                <Frame BackgroundColor="BurlyWood" Padding="24" CornerRadius="0" >
+                    <Image Source="{Binding LogoIconSource}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"/>
+                </Frame>
+            </c:ContextMenuContainer.Content>
+        </c:ContextMenuContainer>
+    </StackLayout>
+
+</ContentPage>

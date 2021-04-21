@@ -1,0 +1,8 @@
+﻿<forms:WindowsPage
+    x:Class="APES.UI.XF.Sample.UWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:forms="using:Xamarin.Forms.Platform.UWP"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:APES.UI.XF.Sample.UWP"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+</forms:WindowsPage>

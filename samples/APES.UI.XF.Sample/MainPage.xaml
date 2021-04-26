@@ -5,20 +5,11 @@
              xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels"
              xmlns:c="http://apes.ge"
              x:DataType="vm:MainViewModel"
+             Title="Context menu example"
              >
     <ContentPage.BindingContext>
         <vm:MainViewModel/>
     </ContentPage.BindingContext>
-    <NavigationPage.TitleView>
-        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-            <Label Text="Context menu example" FontSize="Title" TextColor="White" Grid.Column="0" HorizontalOptions="StartAndExpand" VerticalOptions="Center"/>
-            <c:ContextMenuContainer x:Name="container3" MenuItems="{Binding ImageContextItems}" HorizontalOptions="End" VerticalOptions="Center">
-                <c:ContextMenuContainer.Content>
-                    <Label Text="☢" FontSize="Title" Padding="10,10,10,10"/>
-                </c:ContextMenuContainer.Content>
-            </c:ContextMenuContainer>
-        </StackLayout>
-    </NavigationPage.TitleView>
     <StackLayout>
         <c:ContextMenuContainer x:Name="container1">
             <c:ContextMenuContainer.MenuItems>

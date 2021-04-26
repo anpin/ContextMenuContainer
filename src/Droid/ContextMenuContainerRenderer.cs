@@ -150,8 +150,7 @@ namespace APES.UI.XF.Droid
         private void ContextMenu_MenuItemClick(object sender, PopupMenu.MenuItemClickEventArgs e)
         {
             var item = Element.MenuItems.FirstOrDefault(x => x.Text == e.Item.TitleFormatted?.ToString());
-            if (item != null && item.Command.CanExecute(item.CommandParameter))
-                item.Command.Execute(item.CommandParameter);
+            item?.InvokeCommand();
         }
         public override bool DispatchTouchEvent(MotionEvent e)
         {

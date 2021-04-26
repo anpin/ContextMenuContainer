@@ -13,7 +13,6 @@ namespace APES.UI.XF.iOS
     {
         ContextMenuDelegate? contextMenuDelegate;
         UIContextMenuInteraction? contextMenu;
-        ContextMenuContainer CurrentElement => (ContextMenuContainer)Element;
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
@@ -28,9 +27,9 @@ namespace APES.UI.XF.iOS
             var childRenderer = Platform.CreateRenderer(Element.Content);
             var nativeView = childRenderer.NativeView;
 
-            if (CurrentElement?.MenuItems.Count > 0)
+            if (Element?.MenuItems.Count > 0)
             {
-                contextMenuDelegate = new ContextMenuDelegate(CurrentElement.MenuItems);
+                contextMenuDelegate = new ContextMenuDelegate(Element.MenuItems, ()=> TraitCollection.UserInterfaceStyle);
                 contextMenu = new UIContextMenuInteraction(contextMenuDelegate);
                 nativeView.AddInteraction(contextMenu);
             }

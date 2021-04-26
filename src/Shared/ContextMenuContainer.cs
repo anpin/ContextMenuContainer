@@ -3,7 +3,6 @@ using Xamarin.Forms;
 using System.Collections.Generic;
 namespace APES.UI.XF
 {
-
     public class ContextMenuContainer : ContentView
     {
         public static readonly BindableProperty MenuItemsProperty =

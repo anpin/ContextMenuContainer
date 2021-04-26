@@ -65,6 +65,9 @@
   <ItemGroup>
     <Compile Include="Shared\*.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
+  </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
   </ItemGroup>
@@ -98,17 +101,12 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
     <Compile Include="iOS\*.cs" />
-    <Compile Include="**\*.ios.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Shared\ContextMenuItems.cs" />
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+    <Compile Include="Mac\*.cs" />
   </ItemGroup>
-
   <!--Additional item groups-->
   <!--
   <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.TVOS')) ">
@@ -121,9 +119,6 @@
   </ItemGroup>
 
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.Mac')) ">
-    <Compile Include="**\*.mac.cs" />
-  </ItemGroup>
 
   
    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
@@ -139,4 +134,9 @@
     <Compile Include="**\*.dotnet.cs" />
   </ItemGroup>
   -->
+  <ItemGroup>
+    <Compile Update="Shared\ContextMenuContainer %28copy%29.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

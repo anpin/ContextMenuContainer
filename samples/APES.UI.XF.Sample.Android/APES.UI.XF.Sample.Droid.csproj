@@ -16,7 +16,6 @@
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
     <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidUseAapt2>true</AndroidUseAapt2>
@@ -147,7 +146,7 @@
       <Name>APES.UI.XF</Name>
     </ProjectReference>
     <ProjectReference Include="..\APES.UI.XF.Sample\APES.UI.XF.Sample.csproj">
-      <Project>{D44ADAB2-86B9-4549-AE54-8225DE77D082}</Project>
+      <Project>{63FBC12E-B6E2-466C-9A71-CEE149B125C0}</Project>
       <Name>APES.UI.XF.Sample</Name>
     </ProjectReference>
   </ItemGroup>

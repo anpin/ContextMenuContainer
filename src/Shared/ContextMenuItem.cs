@@ -48,5 +48,13 @@ namespace APES.UI.XF
             get => (FileImageSource)GetValue(IconProperty);
             set => SetValue(IconProperty, value);
         }
+
+        public void InvokeCommand()
+        {
+            if(Command?.CanExecute(CommandParameter) ?? false)
+            {
+                Command.Execute(CommandParameter);
+            }
+        }
     }
 }

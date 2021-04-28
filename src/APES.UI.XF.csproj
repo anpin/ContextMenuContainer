@@ -10,7 +10,7 @@
     -->
     <AssemblyName>APES.UI.XF</AssemblyName>
     <RootNamespace>APES.UI.XF</RootNamespace>
-    <PackageId>APES.UI.XF</PackageId>
+    <PackageId>ContextMenuContainer</PackageId>
     
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -27,23 +27,21 @@
 
     <LangVersion>latest</LangVersion>
     <DebugType>portable</DebugType>
+
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/anpin/ContextMenuContainer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/anpin/ContextMenuContainer</RepositoryUrl>
+    <PackageReleaseNotes>Initial version</PackageReleaseNotes>
+    <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, context menu, </PackageTags>
     
-    <!--TODO: Fill these in-->
-    <PackageLicenseUrl>LINK TO LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>LINK TO PROJECT</PackageProjectUrl>
-    <RepositoryUrl>LINK TO PROJECT</RepositoryUrl>
-    <PackageReleaseNotes>RELEASE NOTES</PackageReleaseNotes>
-    <PackageIconUrl>ICON URL</PackageIconUrl>
-    <PackageTags>xamarin, windows, ios, android, xamarin.forms, plugin, APES.UI.XF</PackageTags>
-    
-    <Title>APES.UI.XF Plugin for Xamarin and Windows</Title>
-    <Summary>Summary of nuget</Summary>
-    <Description>Plugin Description</Description>
+    <Title>ContextMenuContainer Plugin for Xamarin.Forms</Title>
+    <Summary>Add native context menu to any Xamarin.Forms View</Summary>
+    <Description>Add native context menu to any Xamarin.Forms View</Description>
     
     
-    <Owners>YOU</Owners>
-    <Authors>YOU</Authors>
-    <Copyright>Copyright 2019</Copyright>
+    <Owners>Pavel Anpin</Owners>
+    <Authors>Pavel Anpin</Authors>
+    <Copyright>Copyright 2021</Copyright>
 
     <!--When built in 2019 will remove extra references on pack-->
     <DisableExtraReferences>true</DisableExtraReferences>
@@ -65,6 +63,10 @@
   <ItemGroup>
     <Compile Include="Shared\*.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
   </ItemGroup>
@@ -106,6 +108,11 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
     <Compile Include="Mac\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE" Pack="true" PackagePath=""/>
+    <!-- <None Include="icon.png" Pack="true" Visible="false" PackagePath="" /> -->
   </ItemGroup>
   <!--Additional item groups-->
   <!--

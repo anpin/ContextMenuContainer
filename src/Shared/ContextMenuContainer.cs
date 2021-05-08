@@ -5,34 +5,68 @@ namespace APES.UI.XF
 {
     public class ContextMenuContainer : ContentView
     {
+        
         public static readonly BindableProperty MenuItemsProperty =
             BindableProperty.Create(nameof(MenuItems),
                                     typeof(ContextMenuItems),
                                     typeof(VisualElement),
-                                    defaultValueCreator: (s) => new ContextMenuItems(),
+                                    defaultValueCreator: DefaulfMenuItemsCreator,
                                     propertyChanged: OnMenuItemsChanged);
+        static object DefaulfMenuItemsCreator(BindableObject bindableObject)
+        {
+            var menuItems = new ContextMenuItems();
+            menuItems.CollectionChanged += (s,e) =>
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (ContextMenuItem item in e.OldItems)
+                    {
+                        item.RemoveBinding(ContextMenuItem.BindingContextProperty);
+                    }
+                }
+                if (e.NewItems != null)
+                {
+                    foreach (ContextMenuItem item in e.NewItems)
+                    {
+                        BindableObject.SetInheritedBindingContext(item, bindableObject.BindingContext);
+                    }
+                }
+            };
+            return menuItems;
+        }
         static void OnMenuItemsChanged(BindableObject bindableObject, object newValue, object oldValue)
         {
             if (oldValue is ContextMenuItems oldItems)
-                oldItems.CollectionChanged -= MenuItems_CollectionChanged;
-            if (newValue is ContextMenuItems newItems)
-                newItems.CollectionChanged += MenuItems_CollectionChanged;
-        }
-
-        private static void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.OldItems != null)
             {
-                foreach (ContextMenuItem item in e.OldItems)
+                foreach (ContextMenuItem item in oldItems)
                 {
-                    item.RemoveBinding(ContextMenuItem.BindingContextProperty);
+                    item.RemoveBinding(ContextMenuContainer.BindingContextProperty);
+                }
+                //oldItems.CollectionChanged -= MenuItems_CollectionChanged;
+            }
+            if (newValue is ContextMenuItems newItems)
+            {
+                foreach (ContextMenuItem item in newItems)
+                {
+                    BindableObject.SetInheritedBindingContext(item, bindableObject.BindingContext);
                 }
             }
-            if (e.NewItems != null)
-            {
-                ((ContextMenuContainer)sender).SetBindingContextForItems((IList<ContextMenuItem>)e.NewItems);
-            }
         }
+
+        //private static void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        //{
+        //    if (e.OldItems != null)
+        //    {
+        //        foreach (ContextMenuItem item in e.OldItems)
+        //        {
+        //            item.RemoveBinding(ContextMenuItem.BindingContextProperty);
+        //        }
+        //    }
+        //    if (e.NewItems != null)
+        //    {
+        //        ((ContextMenuContainer)sender).SetBindingContextForItems((IList<ContextMenuItem>)e.NewItems);
+        //    }
+        //}
 
         public ContextMenuItems MenuItems
         {
@@ -55,6 +89,10 @@ namespace APES.UI.XF
         void SetBindingContextForItem(ContextMenuItem item)
         {
             BindableObject.SetInheritedBindingContext(item, BindingContext);
+        }
+        public ContextMenuContainer()
+        {
+            //GestureRecognizers.Add();
         }
     }
 }

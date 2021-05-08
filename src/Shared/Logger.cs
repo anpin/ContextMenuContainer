@@ -8,6 +8,17 @@ namespace APES.UI.XF
 {
     internal static class Logger
     {
+        public static bool DebugEnabled { get; set; } =
+#if DEBUG
+                true;
+#else
+                false;
+#endif
+        public static void Debug(string format, params object[] parameters)
+        {
+            if(DebugEnabled)
+                DiagnosticLog("DEBUG " + format, parameters);
+        }
 
         public static void Error(string format, params object[] parameters)
         {

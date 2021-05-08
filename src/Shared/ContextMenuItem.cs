@@ -51,7 +51,7 @@ namespace APES.UI.XF
 
         public void InvokeCommand()
         {
-            if(Command?.CanExecute(CommandParameter) ?? false)
+             if(Command?.CanExecute(CommandParameter) ?? false)
             {
                 Command.Execute(CommandParameter);
             }

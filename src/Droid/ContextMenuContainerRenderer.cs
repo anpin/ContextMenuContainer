@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
@@ -25,32 +26,26 @@ namespace APES.UI.XF.Droid
     {
         IVisualElementRenderer? childRenderer;
         PopupMenu? contextMenu;
+        //ViewCellRenderer? _listViewparent;
         public ContextMenuContainerRenderer(Context context) : base(context)
         {
         }
-
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
-            if (e.OldElement != null)
+            if (e.OldElement is ContextMenuContainer old)
             {
-                e.OldElement.BindingContextChanged -= Element_BindingContextChanged;
-                e.OldElement.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+                old.BindingContextChanged -= Element_BindingContextChanged;
+                old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
             }
             if (e.NewElement == null || e.NewElement.Content == null)
             {
                 return;
             }
-            if (childRenderer != null)
-            {
-                childRenderer.Dispose();
-            }
             childRenderer = Platform.CreateRendererWithContext(Element.Content, Context);
-            Platform.SetRenderer(Element.Content, childRenderer);
+            this.childRenderer.View.Background = null;
             SetNativeControl(childRenderer.View);
         }
-
-
         void ConstructNativeMenu()
         {
             if (childRenderer == null)
@@ -103,9 +98,12 @@ namespace APES.UI.XF.Droid
         }
         void FillMenuItems()
         {
-            foreach (var item in Element.MenuItems)
+            if (Element != null && Element.MenuItems?.Count > 0)
             {
-                AddMenuItem(item);
+                foreach (var item in Element.MenuItems)
+                {
+                    AddMenuItem(item);
+                }
             }
         }
         void RefillMenuItems()
@@ -115,7 +113,7 @@ namespace APES.UI.XF.Droid
             contextMenu.Dismiss();
             contextMenu.Menu.Clear();
             FillMenuItems();
-        }
+        } 
         PopupMenu? GetContextMenu()
         {
             if (contextMenu != null)
@@ -152,28 +150,83 @@ namespace APES.UI.XF.Droid
             var item = Element.MenuItems.FirstOrDefault(x => x.Text == e.Item.TitleFormatted?.ToString());
             item?.InvokeCommand();
         }
-        public override bool DispatchTouchEvent(MotionEvent e)
+        bool enabled => Element.MenuItems.Count > 0;
+        MyTimer timer;
+        bool timerFired = false;
+ 
+        public override bool OnTouchEvent(MotionEvent ev)
         {
-            var handled = base.DispatchTouchEvent(e);
-            if (!handled)
+            Logger.Debug("ContextMEnuContainer DispatchToucEvent fired {0}", ev.Action);
+            if (enabled && ev.Action == MotionEventActions.Down)
             {
-                handled = HoldGestureDetector.OnTouchEvent(e);
+                //You can change the timespan of the long press
+                timerFired = false;
+                timer = new MyTimer(TimeSpan.FromMilliseconds(1500), () =>
+                {
+                    timerFired = true;
+                    OpenContextMenu();
+                });
+                timer.Start();
             }
-            return handled;
+            if(timerFired)
+            {
+                return true;
+            }
+            else if (ev.Action == MotionEventActions.Up || ev.Action == MotionEventActions.Cancel)
+            {
+                timer?.Stop();
+                return base.OnTouchEvent(ev);
+            }
+            else
+            {
+                return base.OnTouchEvent(ev);
+            }
+        }
+        public override bool OnInterceptTouchEvent(MotionEvent ev)
+        {
+
+            if (enabled)
+            {
+                switch (ev.Action)
+                {
+                    case MotionEventActions.Down:
+                    case MotionEventActions.Up:
+                    case MotionEventActions.Cancel:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            else
+            { 
+                return base.OnInterceptTouchEvent(ev);
+            }
         }
 
-        GestureDetector? holdGestureDetector;
-        GestureDetector HoldGestureDetector
-        {
-            get
-            {
-                if (holdGestureDetector == null)
-                {
-                    holdGestureDetector = new GestureDetector(Context, new HoldGestureRecognizer(OpenContextMenu));
-                }
-                return holdGestureDetector;
-            }
-        }
+        //TouchListner? touchListner;
+        //TouchListner TouchListner
+        //{
+        //    get
+        //    {
+        //        if (touchListner == null)
+        //        {
+        //            touchListner = new TouchListner(HoldGestureDetector);
+        //        }
+        //        return touchListner;
+        //    }
+        //}
+        //GestureDetector? holdGestureDetector;
+        //GestureDetector HoldGestureDetector
+        //{
+        //    get
+        //    {
+        //        if (holdGestureDetector == null)
+        //        {
+        //            holdGestureDetector = new GestureDetector(Context, new HoldGestureRecognizer(OpenContextMenu));
+        //        }
+        //        return holdGestureDetector;
+        //    }
+        //}
         void OpenContextMenu()
         {
             if (GetContextMenu() == null)
@@ -183,6 +236,36 @@ namespace APES.UI.XF.Droid
 
             }
             contextMenu?.Show();
+        }
+        public class MyTimer
+        {
+            private readonly TimeSpan timespan;
+            private readonly Action callback;
+
+            private CancellationTokenSource cancellation;
+
+            public MyTimer(TimeSpan timespan, Action callback)
+            {
+                this.timespan = timespan;
+                this.callback = callback;
+                this.cancellation = new CancellationTokenSource();
+            }
+            public void Start()
+            {
+                CancellationTokenSource cts = this.cancellation; // safe copy
+                Device.StartTimer(this.timespan,
+                    () =>
+                    {
+                        if (cts.IsCancellationRequested) return false;
+                        this.callback.Invoke();
+                        return false; // or true for periodic behavior
+                    });
+            }
+
+            public void Stop()
+            { 
+                Interlocked.Exchange(ref this.cancellation, new CancellationTokenSource()).Cancel();
+            }
         }
     }
 }

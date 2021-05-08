@@ -69,7 +69,8 @@ namespace APES.UI.XF.UWP
                 return;
             try
             {
-                OpenContextMenu();
+                if (Element.HasMenuOptions())
+                    OpenContextMenu();
             }
             catch (Exception ex)
             {

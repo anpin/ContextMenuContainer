@@ -2,23 +2,29 @@
 using Android.Views;
 namespace APES.UI.XF.Droid
 {
-    class HoldGestureRecognizer : Java.Lang.Object, GestureDetector.IOnGestureListener
-    {
+    class HoldGestureRecognizer : Java.Lang.Object, GestureDetector.IOnGestureListener //GestureDetector.SimpleOnGestureListener
+	{
         readonly Action justDoIt;
-        public HoldGestureRecognizer(Action toDo)
+        //readonly Action justDoItShortly;
+		public HoldGestureRecognizer(Action toDo) //, Action click)
         {
             justDoIt = toDo;
+			//justDoItShortly = click;
         }
 
-        public void OnLongPress(MotionEvent? e)
+        public  void OnLongPress(MotionEvent? e)
         {
             justDoIt();
         }
-
-        public bool OnDown(MotionEvent? e)
+        //public override bool OnSingleTapUp(MotionEvent? e)
+        //{
+        //    return true;
+        //}
+        public  bool OnDown(MotionEvent? e)
         {
             return true;
         }
+
 
         public bool OnFling(MotionEvent? e1, MotionEvent? e2, float velocityX, float velocityY)
         {
@@ -37,6 +43,7 @@ namespace APES.UI.XF.Droid
 
         public bool OnSingleTapUp(MotionEvent? e)
         {
+            //justDoItShortly();
             return false;
         }
     }

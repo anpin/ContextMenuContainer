@@ -28,19 +28,26 @@ namespace APES.UI.XF.iOS
             var iconColor = GetCurrentTheme() == UIUserInterfaceStyle.Dark ? UIColor.White : UIColor.Black;
             foreach (var item in sharedDefenitions)
             {
-                UIImage? nativeImage = null;
-                if (item.Icon != null && !string.IsNullOrWhiteSpace(item.Icon.File))
+                if (!string.IsNullOrEmpty(item.Text))
                 {
-                    nativeImage = new UIImage(item.Icon.File);
-                    nativeImage = nativeImage.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    nativeImage.ApplyTintColor(item.IsDestructive ? UIColor.Red : iconColor);
+                    UIImage? nativeImage = null;
+                    if (item.Icon != null && !string.IsNullOrWhiteSpace(item.Icon.File))
+                    {
+                        nativeImage = new UIImage(item.Icon.File);
+                        nativeImage = nativeImage.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        nativeImage.ApplyTintColor(item.IsDestructive ? UIColor.Red : iconColor);
+                    }
+                    var nativeItem = UIAction.Create(item.Text, nativeImage, item.Text, ActionDelegate);
+                    if (!item.IsEnabled)
+                        nativeItem.Attributes |= UIMenuElementAttributes.Disabled;
+                    if (item.IsDestructive)
+                        nativeItem.Attributes |= UIMenuElementAttributes.Destructive;
+                    yield return nativeItem;
                 }
-                var nativeItem = UIAction.Create(item.Text, nativeImage, item.Text, ActionDelegate);
-                if (!item.IsEnabled)
-                    nativeItem.Attributes |= UIMenuElementAttributes.Disabled;
-                if (item.IsDestructive)
-                    nativeItem.Attributes |= UIMenuElementAttributes.Destructive;
-                yield return nativeItem;
+                else
+                {
+                    Logger.Error("ContextMenuItem text should not be empty!");
+                }
             }
         }
         void ActionDelegate(UIAction action)

@@ -35,7 +35,7 @@ namespace APES.UI.XF
 #if DEBUG
             System.Diagnostics.Debug.WriteLine(formatWithHeader, parameters);
 #else
-            Console.WriteLine(DateTime.Now.ToString(formatWithHeader, parameters);
+            Console.WriteLine(formatWithHeader, parameters);
 #endif
         }
     }

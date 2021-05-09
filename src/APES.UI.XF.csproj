@@ -112,7 +112,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE" Pack="true" PackagePath=""/>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <!-- <None Include="icon.png" Pack="true" Visible="false" PackagePath="" /> -->
   </ItemGroup>
   <!--Additional item groups-->

@@ -13,15 +13,22 @@ iOS | Android | macOs | UWP
 //Inline
 <apes:ContextMenuContainer x:Name="ActionsInline">
     <apes:ContextMenuContainer.MenuItems>
-        <apes:ContextMenuItem Text="My action" Command="{Binding MyCommand}" CommandParameter="{Binding .}" />
-         <apes:ContextMenuItem Text="My destructive action" Command="{Binding MyDestructiveCommand}" CommandParameter="{Binding .}" IsDestructive="True" Icon="{Binding DestructiveIconSource}"/>
+        <apes:ContextMenuItem Text="My action" 
+                Command="{Binding MyCommand}" 
+                CommandParameter="{Binding .}" />
+        <apes:ContextMenuItem Text="My destructive action" 
+                Command="{Binding MyDestructiveCommand}" 
+                CommandParameter="{Binding .}" 
+                IsDestructive="True" 
+                Icon="{Binding DestructiveIconSource}"/>
     </apes:ContextMenuContainer.MenuItems>
     <apes:ContextMenuContainer.Content>
         <Label Text="Hold me!"/>
     </apes:ContextMenuContainer.Content>
 </apes:ContextMenuContainer>
 //From binding
-<apes:ContextMenuContainer x:Name="ContextActionsWithBinding" MenuItems="{Binding ImageContextItems}">
+<apes:ContextMenuContainer x:Name="ContextActionsWithBinding" 
+                            MenuItems="{Binding ImageContextItems}">
     <apes:ContextMenuContainer.Content>
         <Frame>
             <Image Source="{Binding IconSource}"/>

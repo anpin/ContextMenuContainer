@@ -13,55 +13,39 @@ namespace APES.UI.XF.iOS
     {
         ContextMenuDelegate? contextMenuDelegate;
         UIContextMenuInteraction? contextMenu;
-        UIView? nativeView;
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
             if (e.OldElement != null)
             {
-
+                //do something with old element
             }
             if (e.NewElement == null || e.NewElement.Content == null)
             {
                 return;
             }
-            e.NewElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
             var childRenderer = Platform.CreateRenderer(Element.Content);
-            nativeView = childRenderer.NativeView;
-            constructInteraction();
-            SetNativeControl(nativeView);
-        }
-        private void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (sender is ContextMenuItems menuItems)
-            {
-                if (contextMenu == null && menuItems.Count > 0)
-                {
-                    constructInteraction();
-                }
-                else if (menuItems.Count == 0 && contextMenu != null)
-                {
-                    deconstructIntercation();
-                }
-            }
+            SetNativeControl(childRenderer.NativeView);
+            constructInteraction(e.NewElement.MenuItems);
+
         }
         void deconstructIntercation()
         {
-            if (contextMenu != null)
+            if (Control != null && contextMenu != null)
             {
-                nativeView?.RemoveInteraction(contextMenu);
+                Control.RemoveInteraction(contextMenu);
+                //contextMenuDelegate?.Dispose();
+                //contextMenu?.Dispose();
             }
         }
-        void constructInteraction()
+        void constructInteraction(ContextMenuItems menuItems)
         {
-            if (nativeView == null)
-                return;
             deconstructIntercation();
-            if (Element?.MenuItems.Count > 0)
+            if (menuItems?.Count > 0)
             {
-                contextMenuDelegate = new ContextMenuDelegate(Element.MenuItems, () => TraitCollection.UserInterfaceStyle);
+                contextMenuDelegate = new ContextMenuDelegate(menuItems, () => TraitCollection.UserInterfaceStyle);
                 contextMenu = new UIContextMenuInteraction(contextMenuDelegate);
-                nativeView.AddInteraction(contextMenu);
+                Control.AddInteraction(contextMenu);
             }
         }
     }

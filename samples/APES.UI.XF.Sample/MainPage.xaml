@@ -14,6 +14,7 @@
         <c:ContextMenuContainer x:Name="container1">
             <c:ContextMenuContainer.MenuItems>
                 <c:ContextMenuItem Text="Action 1" Command="{Binding FirstCommand}" CommandParameter="Action 1 pressed!" />
+                <c:ContextMenuItem Text="Action with icon" Command="{Binding FirstCommand}" CommandParameter="Action with icon pressed!" Icon="{Binding SettingsIconSource}"/>
             </c:ContextMenuContainer.MenuItems>
             <c:ContextMenuContainer.Content>
                 <Frame BackgroundColor="ForestGreen" Padding="24" CornerRadius="0" >
@@ -29,6 +30,14 @@
                 <Frame BackgroundColor="BurlyWood" Padding="24" CornerRadius="0" >
                     <Image Source="{Binding LogoIconSource}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"/>
                 </Frame>
+            </c:ContextMenuContainer.Content>
+        </c:ContextMenuContainer>
+        <c:ContextMenuContainer x:Name="container3">
+            <c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuItem Text="Start the loop!" IsDestructive="True" Command="{Binding NeverEndingCommand}"/>
+            </c:ContextMenuContainer.MenuItems>
+            <c:ContextMenuContainer.Content>
+                <Label Text="{Binding NeverEndingCounter, StringFormat='This has never ending command which fired {0} times'}" FontSize="Large"/>
             </c:ContextMenuContainer.Content>
         </c:ContextMenuContainer>
     </StackLayout>

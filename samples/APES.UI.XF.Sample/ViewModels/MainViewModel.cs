@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -26,32 +27,13 @@ namespace APES.UI.XF.Sample.ViewModels
             get => text;
             set => SetField(ref text, value);
         }
-        ICommand firstCommand;
-        public ICommand FirstCommand
-        {
-            get => firstCommand;
-            set => SetField(ref firstCommand, value);
-        }
-        ICommand secondCommand;
-        public ICommand SecondCommand
-        {
-            get => secondCommand;
-            set => SetField(ref secondCommand, value);
-        }
+        public ICommand FirstCommand { get; }
+        public ICommand SecondCommand { get; }
 
-        ICommand destructiveCommand;
-        public ICommand DestructiveCommand
-        {
-            get => destructiveCommand;
-            set => SetField(ref destructiveCommand, value);
-        }
+        public ICommand DestructiveCommand { get; }
 
-        ICommand constructiveCommand;
-        public ICommand ConstructiveCommand
-        {
-            get => constructiveCommand;
-            set => SetField(ref constructiveCommand, value);
-        }
+        public ICommand ConstructiveCommand { get; }
+        public ICommand NeverEndingCommand { get; }
         ContextMenuItems imageContextItems = new ContextMenuItems();
         public ContextMenuItems ImageContextItems
         {
@@ -62,10 +44,11 @@ namespace APES.UI.XF.Sample.ViewModels
         public MainViewModel()
         {
             Text = "Welcome to Xamarin.Forms!\nHold or right-click to see context menu";
-            firstCommand = new Command<string>((s) => OnFirstCommandExecuted(s));
-            secondCommand = new Command(OnSecondCommandExecuted);
-            destructiveCommand = new Command(DestructiveHandler);
-            constructiveCommand = new Command(ConstructiveHandler);
+            FirstCommand = new Command<string>((s) => OnFirstCommandExecuted(s));
+            SecondCommand = new Command(OnSecondCommandExecuted);
+            DestructiveCommand = new Command(DestructiveHandler);
+            ConstructiveCommand = new Command(ConstructiveHandler);
+            NeverEndingCommand = new AsyncCommand(NeverendingTask);
             switch (Device.RuntimePlatform)
             {
                 case Device.Android:
@@ -113,6 +96,7 @@ namespace APES.UI.XF.Sample.ViewModels
             ImageContextItems.Clear();
             FillAllImageActions();
         }
+
         void FillAllImageActions()
         {
             for (var i = 1; i < 5; i++)
@@ -134,6 +118,22 @@ namespace APES.UI.XF.Sample.ViewModels
             });
             NotifyPropertyChanged(nameof(ImageContextItems));
         }
+        async Task NeverendingTask()
+        {
+            while(true)
+            {
+
+                NeverEndingCounter++;
+                await Task.Delay(5000);
+            }
+        }
+        long neverEndingCounter;
+        public long NeverEndingCounter
+        {
+            get => neverEndingCounter;
+            set => SetField(ref neverEndingCounter, value);
+        }
+
 
         readonly FileImageSource logoIconSource;
         public FileImageSource LogoIconSource => logoIconSource;

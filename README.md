@@ -5,8 +5,8 @@ Add native context menu to any Xamarin.Forms view. Supports UWP, Android, iOS an
 
 ## How to use
 1. Add namespace to your XAML file 
-    xmlns:c="http://apes.ge"
-2. Wrap your view with ContextMenuContainer, define your context actions inline or bind from your ViewModel
+    `xmlns:c="http://apes.ge"`
+2. Wrap your view with `ContextMenuContainer`, define your context actions inline or bind from your ViewModel
 ```
 //Inline
 <apes:ContextMenuContainer x:Name="ActionsInline">
@@ -29,19 +29,19 @@ Add native context menu to any Xamarin.Forms view. Supports UWP, Android, iOS an
 ```
 
 ## Icons 
-Cross-platform icons are really messy at this point, but you can put your assets to the coresponding folder on each platform and then bind to a FileIconImageSource from your ViewModel. Please refer to the sample folder for example. SVG is preferable.
+Cross-platform icons are really messy at this point, but you can put your assets to the coresponding folder on each platform and then bind to a `FileIconImageSource` from your ViewModel. Please refer to the sample folder for example. SVG is preferable.
 ## Known issues 
-- Using it in a ViewCell template of ListView might lead to issues with recognizing tap/select events from the list itself, so you might consider using TapGestureRecognizer on the template instead
+- Using it in a `ViewCell` template of `ListView` might lead to issues with recognizing tap/select events from the list itself, so you might consider using TapGestureRecognizer on the template instead
 
 ## To-Do
--[] Cover it all with tests
--[] Configure build scripts
--[] Add visibility property 
--[] Add highlight property 
--[] Add support for shortcuts 
--[] Add support of accessability features
--[] Add support for submenus and separators
--[] Add font icons
+- [ ] Cover it all with tests
+- [ ] Configure build scripts
+- [ ] Add visibility property 
+- [ ] Add highlight property 
+- [ ] Add support for shortcuts 
+- [ ] Add support of accessability features
+- [ ] Add support for submenus and separators
+- [ ] Add font icons
 
 
 

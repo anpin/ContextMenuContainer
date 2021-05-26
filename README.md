@@ -3,6 +3,10 @@
 
 Add native context menu to any Xamarin.Forms view. Supports UWP, Android, iOS and macOS.
 
+![iOS](img/ios.gif)
+![Android](img/android.gif)
+![Mac](img/macos.gif)
+![UWP](img/uwp.png)
 ## How to use
 1. Add namespace to your XAML file 
     `xmlns:c="http://apes.ge"`

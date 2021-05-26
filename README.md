@@ -4,7 +4,7 @@
 Add native context menu to any Xamarin.Forms view. Supports UWP, Android, iOS and macOS.
 iOS | Android | macOs | UWP
 :-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-![iOS](img/ios.gif) | ![Android](img/android.gif) | ![Mac](img/macos.gif) | ![UWP](img/uwp.png)
+![iOS](img/ios.gif) | ![Android](img/android.gif) | ![Mac](img/macos.gif) | ![UWP](img/uwp.png) (UWP doesn't support capturing of the context menu for some reason) 
 ## How to use
 1. Add namespace to your XAML file 
     `xmlns:c="http://apes.ge"`
@@ -36,7 +36,6 @@ Cross-platform icons are really messy at this point, but you can put your assets
 - Using it in a `ViewCell` template of `ListView` might lead to issues with recognizing tap/select events from the list itself, so you might consider using TapGestureRecognizer on the template instead
 
 ## To-Do
-- [ ] Less hacky Android implementation
 - [ ] Cover it all with tests
 - [ ] Configure build scripts
 - [ ] Add visibility property 

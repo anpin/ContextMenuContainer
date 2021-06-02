@@ -76,9 +76,14 @@ namespace APES.UI.XF.Droid
             if (item.IsDestructive)
                 title.SetSpan(new ForegroundColorSpan(AColor.Red), 0, title.Length(), 0);
             var contextAction = contextMenu.Menu.Add(title);
-            if (contextAction != null && item.Icon != null)
+            if (contextAction == null)
             {
-                contextAction.SetEnabled(item.IsEnabled);
+                Logger.Error("We couldn't create IMenuItem with title {0}", item.Text);
+                return;
+            }
+            contextAction.SetEnabled(item.IsEnabled);
+            if (item.Icon != null)
+            {
                 var name = Path.GetFileNameWithoutExtension(item.Icon.File);
                 var id = Context.GetDrawableId(name);
                 if (id != 0)
@@ -113,7 +118,7 @@ namespace APES.UI.XF.Droid
             contextMenu.Dismiss();
             contextMenu.Menu.Clear();
             FillMenuItems();
-        } 
+        }
         PopupMenu? GetContextMenu()
         {
             if (contextMenu != null)
@@ -153,7 +158,7 @@ namespace APES.UI.XF.Droid
         bool enabled => Element.MenuItems.Count > 0;
         MyTimer timer;
         bool timerFired = false;
- 
+
         public override bool OnTouchEvent(MotionEvent ev)
         {
             Logger.Debug("ContextMEnuContainer DispatchToucEvent fired {0}", ev.Action);
@@ -168,7 +173,7 @@ namespace APES.UI.XF.Droid
                 });
                 timer.Start();
             }
-            if(timerFired)
+            if (timerFired)
             {
                 return true;
             }
@@ -198,7 +203,7 @@ namespace APES.UI.XF.Droid
                 }
             }
             else
-            { 
+            {
                 return base.OnInterceptTouchEvent(ev);
             }
         }
@@ -237,7 +242,7 @@ namespace APES.UI.XF.Droid
             }
             contextMenu?.Show();
         }
-        public class MyTimer
+        class MyTimer
         {
             private readonly TimeSpan timespan;
             private readonly Action callback;
@@ -263,7 +268,7 @@ namespace APES.UI.XF.Droid
             }
 
             public void Stop()
-            { 
+            {
                 Interlocked.Exchange(ref this.cancellation, new CancellationTokenSource()).Cancel();
             }
         }

@@ -16,6 +16,7 @@ namespace APES.UI.XF.iOS
         readonly Func<UIViewController>? Preview;
         readonly ContextMenuItems MenuItems;
         readonly Func<UIUserInterfaceStyle> GetCurrentTheme;
+        UIMenu? nativeMenu;
         public ContextMenuDelegate(ContextMenuItems items, Func<UIUserInterfaceStyle> getCurrentTheme, INSCopying? identifier = null, Func<UIViewController>? preview = null)
         {
             MenuItems = items ?? throw new ArgumentNullException(nameof(items));
@@ -23,6 +24,7 @@ namespace APES.UI.XF.iOS
             this.Preview = preview;
             GetCurrentTheme = getCurrentTheme;
         }
+
         IEnumerable<UIAction> ToNativeActions(IEnumerable<ContextMenuItem> sharedDefenitions)
         {
             var iconColor = GetCurrentTheme() == UIUserInterfaceStyle.Dark ? UIColor.White : UIColor.Black;
@@ -52,12 +54,15 @@ namespace APES.UI.XF.iOS
         }
         void ActionDelegate(UIAction action)
         {
-            var item = MenuItems.FirstOrDefault(item => item.Text == action.Identifier);
-            item?.InvokeCommand();
+            MenuItems[action.Identifier].InvokeCommand();
         }
         UIMenu ContructMenuFromItems(UIMenuElement[] suggestedActions)
         {
-            return UIMenu.Create(ToNativeActions(MenuItems).ToArray());
+            if (nativeMenu == null)
+                nativeMenu = UIMenu.Create(ToNativeActions(MenuItems).ToArray());
+            else
+                nativeMenu = nativeMenu.GetMenuByReplacingChildren(ToNativeActions(MenuItems).ToArray());
+            return nativeMenu;
         }
 
         UIViewController? PreviewDelegate()

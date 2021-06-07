@@ -9,7 +9,7 @@ namespace APES.UI.XF.Sample
         public App()
         {
             InitializeComponent();
-
+            APES.UI.XF.ContextMenuContainer.Init();
             MainPage = new NavPage(new MainPage());
         }
 

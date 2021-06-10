@@ -126,7 +126,7 @@ namespace APES.UI.XF.Mac
 			//that seems to have no effect 
 			if (nsMenuItem.Enabled)
 			{
-				MenuItems[(int)nsMenuItem.Tag].InvokeCommand();
+				MenuItems[(int)nsMenuItem.Tag].OnItemTapped();
 			}
 		}
 	}

@@ -15,10 +15,10 @@
     <PackageId>ContextMenuContainer</PackageId>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <AssemblyVersion>1.0.5.0</AssemblyVersion>
-    <AssemblyFileVersion>1.0.5.0</AssemblyFileVersion>
-    <Version>1.0.5.0</Version>
-    <PackageVersion>1.0.5.0</PackageVersion>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <AssemblyFileVersion>1.0.6.0</AssemblyFileVersion>
+    <Version>1.0.6.0</Version>
+    <PackageVersion>1.0.6.0</PackageVersion>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
@@ -33,7 +33,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/anpin/ContextMenuContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/anpin/ContextMenuContainer</RepositoryUrl>
-    <PackageReleaseNotes>Fixed issues with namespace reference in XAML</PackageReleaseNotes>
+    <PackageReleaseNotes>Added event when menu item tapped</PackageReleaseNotes>
     <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, context menu, </PackageTags>
     
     <Title>ContextMenuContainer Plugin for Xamarin.Forms</Title>

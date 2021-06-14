@@ -23,12 +23,13 @@ using WBinding = Windows.UI.Xaml.Data.Binding;
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.UWP
 {
+    [Preserve(AllMembers = true)]
     public class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, ContentControl>
     {
         FrameworkElement? content;
         public ContextMenuContainerRenderer()
         {
-            AutoPackage = false;
+          AutoPackage = false;
         }
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {

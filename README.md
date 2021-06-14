@@ -12,7 +12,15 @@ iOS | Android | macOs | UWP
 ```
     APES.UI.XF.ContextMenuContainer.Init();
 ```
-3. Wrap your view with `ContextMenuContainer`, define your context actions inline or bind from your ViewModel
+3. Extra step for UWP: add our assembly to Xamarin.Forms external assemblies in your UWP `App.xaml.cs` 
+```
+    using System.Reflection;
+    ...
+    var extraAssemblies = new List<Assembly>();
+    extraAssemblies.Add(typeof(APES.UI.XF.ContextMenuContainer).GetTypeInfo().Assembly);
+    Xamarin.Forms.Forms.Init(e, extraAssemblies);
+```
+4. Wrap your view with `ContextMenuContainer`, define your context actions inline or bind from your ViewModel
 ```
 //Inline
 <apes:ContextMenuContainer x:Name="ActionsInline">

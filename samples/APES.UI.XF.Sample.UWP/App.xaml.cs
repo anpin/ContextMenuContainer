@@ -56,7 +56,9 @@ namespace APES.UI.XF.Sample.UWP
                 rootFrame = new Frame();
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
-                Xamarin.Forms.Forms.Init(e);
+                var extraAssembly = new List<Assembly>();
+                extraAssembly.Add(typeof(APES.UI.XF.ContextMenuContainer).GetTypeInfo().Assembly);
+                Xamarin.Forms.Forms.Init(e, extraAssembly);
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using UIKit;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.iOS;
 using APES.UI.XF;
 using APES.UI.XF.iOS;
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.iOS
 {
+    [Preserve(AllMembers = true)]
     class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
     {
         ContextMenuDelegate? contextMenuDelegate;

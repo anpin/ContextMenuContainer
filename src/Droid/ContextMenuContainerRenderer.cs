@@ -5,7 +5,6 @@ using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Text;
 using Android.Text.Style;
@@ -14,6 +13,7 @@ using AndroidX.AppCompat.Widget;
 using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapper;
 using Java.Lang.Reflect;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.Android;
 using APES.UI.XF;
 using APES.UI.XF.Droid;
@@ -22,6 +22,7 @@ using AColor = Android.Graphics.Color;
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.Droid
 {
+    [Preserve(AllMembers = true)]
     public class ContextMenuContainerRenderer : ViewRenderer
     {
         PopupMenu? contextMenu;
@@ -162,6 +163,7 @@ namespace APES.UI.XF.Droid
 
         public override bool DispatchTouchEvent(MotionEvent e)
         {
+            bool result;
             Logger.Debug("ContextMEnuContainer DispatchTouchEvent fired {0}", e.Action);
             if (enabled && e.Action == MotionEventActions.Down)
             {
@@ -176,18 +178,22 @@ namespace APES.UI.XF.Droid
             }
             if (timerFired)
             {
-                return true;
+                result = true;
             }
             else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel)
             {
                 timer?.Stop();
-                return base.DispatchTouchEvent(e);
+                result = base.DispatchTouchEvent(e);
             }
             else
             {
-                return base.DispatchTouchEvent(e);
+                result =  base.DispatchTouchEvent(e);
+                if(!result && enabled)
+                {
+                    result = true;
+                }
             }
-
+            return result;
         }
         void OpenContextMenu()
         {

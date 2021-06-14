@@ -69,10 +69,12 @@ namespace APES.UI.XF.Tests
         }
 
         [Fact]
-        public void Create()
+        public void CreateAndRun()
         {
             var vm = new vm();
             var item = new ContextMenuItem();
+            var eventFired = false;
+            var eventHadArg = false;
             Assert.NotNull(item);
             item.BindingContext = vm;
             item.SetBinding(ContextMenuItem.TextProperty, nameof(vm.Text));
@@ -80,13 +82,23 @@ namespace APES.UI.XF.Tests
             item.SetBinding(ContextMenuItem.CommandParameterProperty, nameof(vm.CmdParam));
             item.SetBinding(ContextMenuItem.IsEnabledProperty, nameof(vm.Enabled));
             item.SetBinding(ContextMenuItem.IconProperty, nameof(vm.Icon));
+            item.ItemTapped += (s, e) =>
+            {
+                eventFired = true;
+                var item = s as ContextMenuItem;
+#pragma warning disable CS0252 // Possible unintended reference comparison; left hand side needs cast
+                eventHadArg = item?.CommandParameter == vm.CmdParam;
+#pragma warning restore CS0252 // Possible unintended reference comparison; left hand side needs cast
+            };
             Assert.Equal(item.Text, vm.Text);
             Assert.Equal(item.Command, vm.Cmd);
             Assert.Equal(item.CommandParameter, vm.CmdParam);
             Assert.Equal(item.IsEnabled, vm.Enabled);
             Assert.Equal(item.Icon, vm.Icon);
-            item.Command.Execute(item.CommandParameter);
+            item.OnItemTapped();
             Assert.Equal(item.Text, vm.CmdParam);
+            Assert.True(eventFired);
+            Assert.True(eventHadArg);
         }
     }
 }

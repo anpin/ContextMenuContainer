@@ -135,15 +135,15 @@ namespace APES.UI.XF.UWP
                 Path = new PropertyPath(nameof(ContextMenuItem.Text)),
             });
 
-            nativeItem.SetBinding(MenuFlyoutItem.CommandProperty, new WBinding()
-            {
-                Path = new PropertyPath(nameof(ContextMenuItem.Command)),
-            });
+            //nativeItem.SetBinding(MenuFlyoutItem.CommandProperty, new WBinding()
+            //{
+            //    Path = new PropertyPath(nameof(ContextMenuItem.Command)),
+            //});
 
-            nativeItem.SetBinding(MenuFlyoutItem.CommandParameterProperty, new WBinding()
-            {
-                Path = new PropertyPath(nameof(ContextMenuItem.CommandParameter)),
-            });
+            //nativeItem.SetBinding(MenuFlyoutItem.CommandParameterProperty, new WBinding()
+            //{
+            //    Path = new PropertyPath(nameof(ContextMenuItem.CommandParameter)),
+            //});
 
             nativeItem.SetBinding(MenuFlyoutItem.IconProperty, new WBinding()
             {
@@ -159,9 +159,28 @@ namespace APES.UI.XF.UWP
             {
                 Path = new PropertyPath(nameof(ContextMenuItem.IsEnabled)),
             });
+            nativeItem.Click += NativeItem_Click;
             nativeItem.DataContext = item;
             contextMenu.Items.Add(nativeItem);
         }
+
+        private void NativeItem_Click(object sender, RoutedEventArgs e)
+        {
+            var item = sender as MenuFlyoutItem;
+            if(item == null)
+            {
+                Logger.Error("Couldn't cast to MenuFlyoutItem");
+                return;
+            }
+            var context = item.DataContext as ContextMenuItem;
+            if (context == null)
+            {
+                Logger.Error("Couldn't cast MenuFlyoutItem.DataContext to ContextMenuItem");
+                return;
+            }
+            context.OnItemTapped();
+        }
+
         static Style DestructiveStyle { get; } = new Style()
         {
             TargetType = typeof(MenuFlyoutItem),

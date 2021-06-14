@@ -5,7 +5,7 @@ using Xamarin.Forms;
 using System.Windows.Input;
 namespace APES.UI.XF
 {
-    public class ContextMenuItem : Element
+    public partial class ContextMenuItem : Element
     {
         public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(ContextMenuItem));
         public string Text
@@ -49,12 +49,15 @@ namespace APES.UI.XF
             set => SetValue(IconProperty, value);
         }
 
-        public void InvokeCommand()
+        internal void OnItemTapped()
         {
+
+            ItemTapped?.Invoke(this, new EventArgs());
             if (Command?.CanExecute(CommandParameter) ?? false && IsEnabled)
             {
                 Command.Execute(CommandParameter);
             }
         }
+        public event EventHandler? ItemTapped;
     }
 }

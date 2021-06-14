@@ -5,7 +5,14 @@ namespace APES.UI.XF
 {
     public class ContextMenuContainer : ContentView
     {
-        
+        /// <summary>
+        /// Call this in order to preserve our code during linking and allow namespace resolution in XAML
+        /// </summary>
+        public static void Init()
+        {
+            //maybe do something here later
+        }
+
         public static readonly BindableProperty MenuItemsProperty =
             BindableProperty.Create(nameof(MenuItems),
                                     typeof(ContextMenuItems),
@@ -15,7 +22,7 @@ namespace APES.UI.XF
         static object DefaulfMenuItemsCreator(BindableObject bindableObject)
         {
             var menuItems = new ContextMenuItems();
-            menuItems.CollectionChanged += (s,e) =>
+            menuItems.CollectionChanged += (s, e) =>
             {
                 if (e.OldItems != null)
                 {

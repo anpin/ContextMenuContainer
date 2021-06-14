@@ -25,7 +25,7 @@ namespace APES.UI.XF.Droid
     public class ContextMenuContainerRenderer : ViewRenderer
     {
         PopupMenu? contextMenu;
-        
+
         public ContextMenuContainerRenderer(Context context) : base(context)
         {
         }
@@ -154,7 +154,7 @@ namespace APES.UI.XF.Droid
         {
 
             var item = ((ContextMenuContainer)Element).MenuItems.FirstOrDefault(x => x.Text == e.Item.TitleFormatted?.ToString());
-            item?.InvokeCommand();
+            item?.OnItemTapped();
         }
         bool enabled => Element is ContextMenuContainer element && element.MenuItems.Count > 0;
         MyTimer timer;

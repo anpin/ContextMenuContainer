@@ -54,7 +54,7 @@ namespace APES.UI.XF.iOS
         }
         void ActionDelegate(UIAction action)
         {
-            MenuItems[action.Identifier].InvokeCommand();
+            MenuItems[action.Identifier].OnItemTapped();
         }
         UIMenu ContructMenuFromItems(UIMenuElement[] suggestedActions)
         {

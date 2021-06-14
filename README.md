@@ -7,8 +7,12 @@ iOS | Android | macOs | UWP
 ![iOS](img/ios.gif) | ![Android](img/android.gif) | ![Mac](img/macos.gif) | ![UWP](img/uwp.png) (UWP doesn't support capturing of the context menu for some reason) 
 ## How to use
 1. Add namespace to your XAML file 
-    `xmlns:c="http://apes.ge"`
-2. Wrap your view with `ContextMenuContainer`, define your context actions inline or bind from your ViewModel
+    `xmlns:apes="http://apes.ge"`
+2. Add following line of code to your `App.xaml.cs` in order to preserve component during linking and resolve our namespace schema in XAML
+```
+    APES.UI.XF.ContextMenuContainer.Init();
+```
+3. Wrap your view with `ContextMenuContainer`, define your context actions inline or bind from your ViewModel
 ```
 //Inline
 <apes:ContextMenuContainer x:Name="ActionsInline">

@@ -1,7 +1,10 @@
 # ContextMenuContainer
 [![NuGet](https://img.shields.io/nuget/v/ContextMenuContainer.svg?style=flat)](https://www.nuget.org/packages/ContextMenuContainer/)
+[![Coinbase](https://img.shields.io/badge/Donate%20with-Crypto-red)](https://commerce.coinbase.com/checkout/68c42319-c494-47b5-8755-2fad731a3547)
+[![Paypal](https://img.shields.io/badge/Donate%20with-PayPal-blue)](https://paypal.me/APEngineeringLLC?locale.x=en_US)
 
-Add native context menu to any Xamarin.Forms view. Supports UWP, Android, iOS and macOS.
+Xamarin.Forms plugin to add native context menu to any view. Supports UWP, Android, iOS and macOS.
+
 iOS | Android | macOs | UWP
 :-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
 ![iOS](img/ios.gif) | ![Android](img/android.gif) | ![Mac](img/macos.gif) | ![UWP](img/uwp.png) (UWP doesn't support capturing of the context menu for some reason) 
@@ -64,5 +67,8 @@ Cross-platform icons are really messy at this point, but you can put your assets
 - [ ] Add support for submenus and separators
 - [ ] Add font icons
 
+## If this plugin saves you time please consider donating via buttons below, so I can make it even better
+[![Coinbase](https://img.shields.io/badge/Donate%20with-Crypto-red)](https://commerce.coinbase.com/checkout/68c42319-c494-47b5-8755-2fad731a3547)
+[![Paypal](https://img.shields.io/badge/Donate%20with-PayPal-blue)](https://paypal.me/APEngineeringLLC?locale.x=en_US)
 
 

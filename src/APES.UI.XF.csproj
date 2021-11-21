@@ -34,7 +34,7 @@
     <PackageProjectUrl>https://github.com/anpin/ContextMenuContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/anpin/ContextMenuContainer</RepositoryUrl>
     <PackageReleaseNotes>Updated UWP docs, fixed bugs on Android</PackageReleaseNotes>
-    <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, context menu, </PackageTags>
+    <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, contextmenu, rightmenu</PackageTags>
     
     <Title>ContextMenuContainer Plugin for Xamarin.Forms</Title>
     <Summary>Add native context menu to any Xamarin.Forms View</Summary>
@@ -69,7 +69,7 @@
     <Compile Include="Shared\*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -80,7 +80,8 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('uap10.0')) ">
     <Compile Include="UWP\*.cs" />
-    <PackageReference Include="Microsoft.UI.Xaml" Version="2.5.0" />
+    <PackageReference Include="Microsoft.UI.Xaml" Version="2.7.0" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
     <!--
     If you need to add sdk references:
      <SDKReference Include="WindowsMobile, Version=10.0.16299.0">
@@ -92,13 +93,12 @@
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Compile Include="Droid\*.cs" />
     <Reference Include="Mono.Android" />
-    <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources" Version="1.2.0.7" />
-    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.3.0.1" />
-    <PackageReference Include="Xamarin.AndroidX.Legacy.Support.V4" Version="1.0.0.7" />
-    <PackageReference Include="Xamarin.AndroidX.MediaRouter" Version="1.2.2.1" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1" />
-    <PackageReference Include="Xamarin.AndroidX.Browser" Version="1.3.0.5" />
-    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.3.0.1" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources" Version="1.3.1.3" />
+    <PackageReference Include="Xamarin.AndroidX.Legacy.Support.V4" Version="1.0.0.10" />
+    <PackageReference Include="Xamarin.AndroidX.MediaRouter" Version="1.2.5.2" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.3" />
+    <PackageReference Include="Xamarin.AndroidX.Browser" Version="1.3.0.8" />
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.4.0.4" />
     
   </ItemGroup>
 

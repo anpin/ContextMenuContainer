@@ -15,10 +15,10 @@
     <PackageId>ContextMenuContainer</PackageId>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <AssemblyFileVersion>1.0.7.0</AssemblyFileVersion>
-    <Version>1.0.7.0</Version>
-    <PackageVersion>1.0.7.0</PackageVersion>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <AssemblyFileVersion>1.0.8.0</AssemblyFileVersion>
+    <Version>1.0.8.0</Version>
+    <PackageVersion>1.0.8.0</PackageVersion>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
@@ -37,8 +37,8 @@
     <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, contextmenu, rightmenu</PackageTags>
     
     <Title>ContextMenuContainer Plugin for Xamarin.Forms</Title>
-    <Summary>Add native context menu to any Xamarin.Forms View</Summary>
-    <Description>Add native context menu to any Xamarin.Forms View</Description>
+    <Summary>Xamarin.Forms multi-platform context menu plugin </Summary>
+    <Description>Xamarin.Forms plugin to add native context menu to any view. Supports UWP, Android, iOS and macOS.</Description>
     
     
     <Owners>Pavel Anpin</Owners>
@@ -74,14 +74,13 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
   </ItemGroup>
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) == false">
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac20'))">
     <Reference Include="netstandard" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('uap10.0')) ">
     <Compile Include="UWP\*.cs" />
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.7.0" />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
     <!--
     If you need to add sdk references:
      <SDKReference Include="WindowsMobile, Version=10.0.16299.0">

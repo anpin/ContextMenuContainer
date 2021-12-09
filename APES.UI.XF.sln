@@ -134,6 +134,7 @@ Global
 		{E14A0543-9A1B-4740-9461-E71BE55382AB}.MonoDroid10|x86.ActiveCfg = Release|iPhone
 		{E14A0543-9A1B-4740-9461-E71BE55382AB}.MonoDroid10|x86.Build.0 = Release|iPhone
 		{E14A0543-9A1B-4740-9461-E71BE55382AB}.Release|Any CPU.ActiveCfg = Release|iPhoneSimulator
+		{E14A0543-9A1B-4740-9461-E71BE55382AB}.Release|Any CPU.Build.0 = Release|iPhoneSimulator
 		{E14A0543-9A1B-4740-9461-E71BE55382AB}.Release|ARM.ActiveCfg = Release|iPhoneSimulator
 		{E14A0543-9A1B-4740-9461-E71BE55382AB}.Release|ARM64.ActiveCfg = Release|iPhone
 		{E14A0543-9A1B-4740-9461-E71BE55382AB}.Release|iPhone.ActiveCfg = Release|iPhone
@@ -345,6 +346,8 @@ Global
 		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.MonoDroid10|x86.Build.0 = Release|x86
 		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.MonoDroid10|x86.Deploy.0 = Release|x86
 		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.Release|Any CPU.ActiveCfg = Release|x86
+		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.Release|Any CPU.Build.0 = Release|x86
+		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.Release|Any CPU.Deploy.0 = Release|x86
 		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.Release|ARM.ActiveCfg = Release|ARM
 		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.Release|ARM.Build.0 = Release|ARM
 		{BC47ADDA-6CF9-44E5-ADCF-494F7A198E44}.Release|ARM.Deploy.0 = Release|ARM

@@ -1,9 +1,12 @@
 ﻿using System;
+#if MAUI
+using Microsoft.UI.Xaml.Data;
+#else
 using Xamarin.Forms.Platform.UWP;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls;
-
+#endif
 namespace APES.UI.XF.UWP
 {
     class GenericBoolConverter<T> : IValueConverter

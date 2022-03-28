@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\APES.UI.XF.csproj" />
+    <ProjectReference Include="..\APES.UI.Samples.Shared\APES.UI.Sample.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

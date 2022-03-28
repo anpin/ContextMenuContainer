@@ -1,8 +1,9 @@
-<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
 
   <PropertyGroup>
     <!--Work around so the conditions work below-->
-    <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;monoandroid10.0;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;monoandroid10.0;net6.0;net6.0-android;net6.0-ios;net6.0-maccatalyst;net6.0-macos</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.17763</TargetFrameworks>
   </PropertyGroup>
     <!--Feel free to add as many targets as you need below
@@ -17,8 +18,8 @@
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <AssemblyVersion>1.0.8.0</AssemblyVersion>
     <AssemblyFileVersion>1.0.8.0</AssemblyFileVersion>
-    <Version>1.0.8.0</Version>
-    <PackageVersion>1.0.8.0</PackageVersion>
+    <Version>1.1.0.0</Version>
+    <PackageVersion>1.1.0.0</PackageVersion>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
@@ -33,12 +34,12 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/anpin/ContextMenuContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/anpin/ContextMenuContainer</RepositoryUrl>
-    <PackageReleaseNotes>Updated UWP docs, fixed bugs on Android</PackageReleaseNotes>
-    <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, contextmenu, rightmenu</PackageTags>
+    <PackageReleaseNotes>Added MAUI targets</PackageReleaseNotes>
+    <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, contextmenu, rightmenu, MAUI</PackageTags>
     
-    <Title>ContextMenuContainer Plugin for Xamarin.Forms</Title>
-    <Summary>Xamarin.Forms multi-platform context menu plugin </Summary>
-    <Description>Xamarin.Forms plugin to add native context menu to any view. Supports UWP, Android, iOS and macOS.</Description>
+    <Title>ContextMenuContainer Plugin for Xamarin.Forms and MAUI</Title>
+    <Summary>Xamarin.Forms and MAUI multi-platform context menu plugin </Summary>
+    <Description>Xamarin.Forms and MAUI plugin to add native context menu to any view. Supports UWP, Android, iOS and macOS and MAUI.</Description>
     
     
     <Owners>Pavel Anpin</Owners>
@@ -64,11 +65,14 @@
   <PropertyGroup Condition="$(TargetFramework.StartsWith('uap')) And '$(OS)' == 'Windows_NT'">
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
   </PropertyGroup>
-  
+    <PropertyGroup Condition="$(TargetFramework.StartsWith('net6.0'))">
+		<DefineConstants>$(DefineConstants);MAUI</DefineConstants>
+	    <UseMaui>true</UseMaui>
+    </PropertyGroup>
   <ItemGroup>
     <Compile Include="Shared\*.cs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="!$(TargetFramework.StartsWith('net6.0'))">
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
   </ItemGroup>
 
@@ -88,7 +92,9 @@
     </SDKReference>
     -->
   </ItemGroup>
-
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
+	  <PackageReference Include="Microsoft.UI.Xaml" Version="2.7.0" />
+  </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Compile Include="Droid\*.cs" />
     <Reference Include="Mono.Android" />
@@ -109,8 +115,22 @@
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
     <Compile Include="Mac\*.cs" />
   </ItemGroup>
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-android')) ">
+	    <Compile Include="Droid\*.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="$(TargetFramework.StartsWith('net6.0-ios')) or $(TargetFramework.StartsWith('net6.0-maccatalyst'))">
+	    <Compile Include="iOS\*.cs" />
+    </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-macos')) ">
+	    <Compile Include="Mac\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
+	    <Compile Include="UWP\*.cs" />
+    </ItemGroup>
+	<ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <!-- <None Include="icon.png" Pack="true" Visible="false" PackagePath="" /> -->
   </ItemGroup>
@@ -141,9 +161,4 @@
     <Compile Include="**\*.dotnet.cs" />
   </ItemGroup>
   -->
-  <ItemGroup>
-    <Compile Update="Shared\ContextMenuContainer %28copy%29.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
 </Project>

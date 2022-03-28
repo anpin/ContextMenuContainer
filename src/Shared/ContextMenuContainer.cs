@@ -1,6 +1,11 @@
 ﻿using System;
-using Xamarin.Forms;
 using System.Collections.Generic;
+#if MAUI
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+#else
+using Xamarin.Forms;
+#endif
 namespace APES.UI.XF
 {
     public class ContextMenuContainer : ContentView

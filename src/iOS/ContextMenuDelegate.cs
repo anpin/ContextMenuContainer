@@ -4,8 +4,18 @@ using System.Collections.Generic;
 using System.Text;
 using UIKit;
 using Foundation;
+#if MAUI
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
+using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Handlers;
+#else
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
+#endif
 using CoreGraphics;
 
 namespace APES.UI.XF.iOS

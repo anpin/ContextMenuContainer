@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Xamarin.Forms;
 using System.Windows.Input;
+#if MAUI
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+#else
+using Xamarin.Forms;
+#endif
 namespace APES.UI.XF
 {
     public partial class ContextMenuItem : Element

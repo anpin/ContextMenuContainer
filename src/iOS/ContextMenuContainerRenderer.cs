@@ -2,9 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 using UIKit;
+#if MAUI 
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
+using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Handlers;
+#else
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.iOS;
+#endif 
 using APES.UI.XF;
 using APES.UI.XF.iOS;
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]

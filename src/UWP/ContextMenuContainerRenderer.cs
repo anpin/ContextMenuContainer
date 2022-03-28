@@ -6,6 +6,29 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+#if MAUI
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Platform.UWP;
+using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Handlers;
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using WColors = Microsoft.UI.Colors;
+using WBinding = Microsoft.UI.Xaml.Data.Binding;
+using MenuFlyoutItem = Microsoft.UI.Xaml.Controls.MenuFlyoutItem;
+using Setter = Microsoft.UI.Xaml.Setter;
+using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
+using Style = Microsoft.UI.Xaml.Style;
+#else
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation.Peers;
@@ -16,10 +39,12 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.UWP;
-using APES.UI.XF;
-using APES.UI.XF.UWP;
 using WColors = Windows.UI.Colors;
 using WBinding = Windows.UI.Xaml.Data.Binding;
+#endif
+using APES.UI.XF;
+using APES.UI.XF.UWP;
+
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.UWP
 {

@@ -1,4 +1,10 @@
 ﻿using System;
+#if MAUI
+using Microsoft.Maui.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using IValueConverter = Microsoft.UI.Xaml.Data.IValueConverter;
+#else
 using Xamarin.Forms.Platform.UWP;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls;
@@ -6,6 +12,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Xamarin.Forms.PlatformConfiguration.WindowsSpecific;
 using IOPath = System.IO.Path;
 using FileImageSource = Xamarin.Forms.FileImageSource;
+#endif
 namespace APES.UI.XF.UWP
 {
     class FileImageSourceToBitmapIconSourceConverter : IValueConverter

@@ -4,12 +4,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Windows.Input;
+#if MAUI
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Essentials;
+#else
 using Xamarin.Forms;
+#endif
 namespace APES.UI.XF.Sample.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -21,7 +27,7 @@ namespace APES.UI.XF.Sample.ViewModels
             NotifyPropertyChanged(propertyName);
             return true;
         }
-        string text;
+        string text = "";
         public string Text
         {
             get => text;
@@ -49,6 +55,7 @@ namespace APES.UI.XF.Sample.ViewModels
             DestructiveCommand = new Command(DestructiveHandler);
             ConstructiveCommand = new Command(ConstructiveHandler);
             NeverEndingCommand = new AsyncCommand(NeverendingTask);
+#if !MAUI
             switch (Device.RuntimePlatform)
             {
                 case Device.Android:
@@ -68,6 +75,31 @@ namespace APES.UI.XF.Sample.ViewModels
                     settingsIconSource = @"Assets\outline_settings_black_24.png";
                     break;
             }
+#else
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                logoIconSource = "logo.png";
+                deleteIconSource = "outline_delete_24.xml";
+                settingsIconSource = "outline_settings_black_24.png";
+            }
+            else if (DeviceInfo.Platform == DevicePlatform.iOS || 
+                     DeviceInfo.Platform == DevicePlatform.macOS ||
+                     DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+            {
+
+                logoIconSource = "logo.png";
+                deleteIconSource = "outline_delete_black_24.png";
+                settingsIconSource = "outline_settings_black_24.png";
+            }
+
+            else if (DeviceInfo.Platform == DevicePlatform.WinUI)
+            {
+                logoIconSource = @"Assets\logo.png";
+                deleteIconSource = @"Assets\outline_delete_black_24.png";
+                settingsIconSource = @"Assets\outline_settings_black_24.png";
+            }
+#endif
+
             FillAllImageActions();
         }
         void OnFirstCommandExecuted(string s)

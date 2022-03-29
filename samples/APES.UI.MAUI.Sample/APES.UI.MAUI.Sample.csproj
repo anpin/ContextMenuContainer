@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.18362</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>APES.UI.MAUI.Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -14,7 +14,7 @@
 		<ApplicationTitle>APES.UI.MAUI.Sample</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.apes.ui.maui.sample</ApplicationId>
+		<ApplicationId>com.apes.ui.maui.sample</ApplicationId>
 		<ApplicationId Condition="$(TargetFramework.Contains('-windows'))">381762DE-A6AE-4986-8C37-3A067AE03B2E</ApplicationId>
 
 		<!-- Versions -->
@@ -27,8 +27,8 @@
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-ios'">14.2</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">14.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.18362.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.18362.0</TargetPlatformMinVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -51,18 +51,24 @@
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<!-- Required - WinUI does not yet have buildTransitive for everything -->
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0">
+			<!--<IncludeAssets>build</IncludeAssets>-->
+		</PackageReference>
 		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.0.30" />
+		<PackageReference Include="Microsoft.Maui.Graphics.Win2D.WinUI.Desktop">
+			<Version>6.0.200-preview.14.1092</Version>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\APES.UI.XF.csproj" />
-	  <ProjectReference Include="..\APES.UI.Samples.Shared\APES.UI.Sample.Shared.csproj" />
+		<ProjectReference Include="..\..\src\APES.UI.XF.csproj" />
+		<ProjectReference Include="..\APES.UI.Samples.Shared\APES.UI.Sample.Shared.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<OutputType>WinExe</OutputType>
 		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+		<DefineConstants>__WINDOWS__</DefineConstants>
 	</PropertyGroup>
 	
 </Project>

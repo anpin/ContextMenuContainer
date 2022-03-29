@@ -1,4 +1,5 @@
-﻿namespace APES.UI.MAUI.Sample;
+﻿using APES.UI.XF;
+namespace APES.UI.MAUI.Sample;
 
 public static class MauiProgram
 {
@@ -10,7 +11,8 @@ public static class MauiProgram
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-			});
+			})
+			.ConfigureContextMenuContainer();
 
 		return builder.Build();
 	}

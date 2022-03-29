@@ -13,76 +13,38 @@ using AndroidX.AppCompat.Widget;
 using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapper;
 using Java.Lang.Reflect;
 #if MAUI
-using Java.Interop;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui;
+//using Microsoft.Maui.Platform;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Handlers;
+using XView = Microsoft.Maui.Controls.View;
 #else
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.Android;
+using XView = Xamarin.Forms.View;
 #endif
 using APES.UI.XF;
 using APES.UI.XF.Droid;
 using Path = System.IO.Path;
 using AColor = Android.Graphics.Color;
-using AView = Android.Views.View;
-#if !MAUI
-[assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
-#endif
 
+[assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.Droid
 {
     [Preserve(AllMembers = true)]
-    public class ContextMenuContainerRenderer
-#if MAUI
-        : ViewHandler<ContextMenuContainer, AView>
-#else
-        : ViewRenderer
-#endif
+    public class ContextMenuContainerRenderer : ViewRenderer
     {
         PopupMenu? contextMenu;
-
-#if MAUI
-        public ContextMenuContainerRenderer(IPropertyMapper mapper, CommandMapper? commandMapper) : base(mapper,
-            commandMapper)
-        {
-
-        }
-
-        protected override AView CreatePlatformView()
-        {
-            var v = new AView(Context);
-            v.SetOnTouchListener(new TouchListner(() => enabled, OpenContextMenu));
-            return v;
-        }
-
-        public override void SetVirtualView(IView view)
-        {
-            if (VirtualView is ContextMenuContainer old)
-            {
-                old.BindingContextChanged -= Element_BindingContextChanged;
-                old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
-
-            }
-
-            if (view is ContextMenuContainer newElement)
-            {
-                newElement.BindingContextChanged += Element_BindingContextChanged;
-                newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
-
-            }
-
-            base.SetVirtualView(view);
-        }
-#else
+        IVisualElementRenderer? childRenderer;
         public ContextMenuContainerRenderer(Context context) : base(context)
         {
         }
-
-        protected override void OnElementChanged(ElementChangedEventArgs<Xamarin.Forms.View> e)
+        protected override void OnElementChanged(ElementChangedEventArgs<XView> e)
         {
             base.OnElementChanged(e);
             if (e.OldElement is ContextMenuContainer old)
@@ -91,20 +53,25 @@ namespace APES.UI.XF.Droid
                 old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
             }
             if (e.NewElement is ContextMenuContainer newElement)
-            {
-
+            { 
+                #if MAUI
+                if(Control == null)
+                {
+                    //var m = newElement.Content .ToHandler(this.MauiContext);
+                    childRenderer = newElement.Content.GetRenderer() ?? Platform.CreateRendererWithContext(newElement.Content, Context);
+                    //Platform.SetRenderer(newElement.Content, childRenderer);
+                    SetNativeControl(childRenderer.View);
+                }
+                #endif
                 newElement.BindingContextChanged += Element_BindingContextChanged;
                 newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
             }
         }
-#endif
+
+
         void ConstructNativeMenu()
         {
-#if MAUI
-            var child = ((ViewGroup?) PlatformView.Parent)?.GetChildAt(0);
-#else
             var child = GetChildAt(0);
-#endif
             if (child == null)
                 return;
             contextMenu = new PopupMenu(Context, child);
@@ -112,11 +79,9 @@ namespace APES.UI.XF.Droid
             Field field = contextMenu.Class.GetDeclaredField("mPopup");
             field.Accessible = true;
             Java.Lang.Object? menuPopupHelper = field.Get(contextMenu);
-            Method? setForceIcons =
-                menuPopupHelper?.Class.GetDeclaredMethod("setForceShowIcon", Java.Lang.Boolean.Type);
+            Method? setForceIcons = menuPopupHelper?.Class.GetDeclaredMethod("setForceShowIcon", Java.Lang.Boolean.Type);
             setForceIcons?.Invoke(menuPopupHelper, true);
         }
-
         void DeconstructNativeMenu()
         {
             if (contextMenu == null)
@@ -125,7 +90,6 @@ namespace APES.UI.XF.Droid
             contextMenu.Dispose();
             contextMenu = null;
         }
-
         void AddMenuItem(ContextMenuItem item)
         {
             if (contextMenu == null)
@@ -139,7 +103,6 @@ namespace APES.UI.XF.Droid
                 Logger.Error("We couldn't create IMenuItem with title {0}", item.Text);
                 return;
             }
-
             contextAction.SetEnabled(item.IsEnabled);
             if (item.Icon != null)
             {
@@ -147,9 +110,9 @@ namespace APES.UI.XF.Droid
                 var id = Context.GetDrawableId(name);
                 if (id != 0)
                 {
-                    Drawable? drawable = (int) Build.VERSION.SdkInt >= 21
-                        ? Context?.GetDrawable(id)
-                        : Context?.GetDrawable(name);
+                    Drawable? drawable = (int)Build.VERSION.SdkInt >= 21 ?
+                                                 Context?.GetDrawable(id) :
+                                                 Context?.GetDrawable(name);
                     if (drawable != null)
                     {
                         var wrapper = new DrawableWrapperX(drawable);
@@ -160,15 +123,9 @@ namespace APES.UI.XF.Droid
                 }
             }
         }
-
         void FillMenuItems()
         {
-#if MAUI
-            if (VirtualView is ContextMenuContainer element)
-#else
             if (Element is ContextMenuContainer element)
-#endif
-
             {
                 if (element.MenuItems.Count > 0)
                 {
@@ -179,7 +136,6 @@ namespace APES.UI.XF.Droid
                 }
             }
         }
-
         void RefillMenuItems()
         {
             if (contextMenu == null)
@@ -188,14 +144,9 @@ namespace APES.UI.XF.Droid
             contextMenu.Menu.Clear();
             FillMenuItems();
         }
-
         PopupMenu? GetContextMenu()
         {
-#if MAUI
-            if (contextMenu != null && VirtualView is ContextMenuContainer element)
-#else
             if (contextMenu != null && Element is ContextMenuContainer element)
-#endif
             {
                 if (element.MenuItems.Count != contextMenu.Menu.Size())
                 {
@@ -213,12 +164,9 @@ namespace APES.UI.XF.Droid
                     }
                 }
             }
-
             return contextMenu;
         }
-
-        private void MenuItems_CollectionChanged(object sender,
-            System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             RefillMenuItems();
         }
@@ -227,105 +175,50 @@ namespace APES.UI.XF.Droid
         {
             RefillMenuItems();
         }
-
         private void ContextMenu_MenuItemClick(object sender, PopupMenu.MenuItemClickEventArgs e)
         {
-#if MAUI
-            var virt = ((ContextMenuContainer) VirtualView);
-#else
-            var virt = ((ContextMenuContainer)Element);
-#endif
-            var item = virt.MenuItems.FirstOrDefault(x => x.Text == e.Item.TitleFormatted?.ToString());
+
+            var item = ((ContextMenuContainer)Element).MenuItems.FirstOrDefault(x => x.Text == e.Item.TitleFormatted?.ToString());
             item?.OnItemTapped();
         }
-#if MAUI
-        bool enabled => VirtualView is ContextMenuContainer element && element.MenuItems.Count > 0;
-#else
         bool enabled => Element is ContextMenuContainer element && element.MenuItems.Count > 0;
-#endif
-        const int LongPressWaitTime = 1500;
-#if MAUI
-        class TouchListner : Java.Lang.Object, AView.IOnTouchListener
-        {
-            readonly Func<bool> _enabled;
-            readonly Action _onHold;
-
-            MyTimer timer;
-            bool timerFired = false;
-
-            public TouchListner(Func<bool> enabled, Action onHold)
-            {
-                _enabled = enabled;
-                _onHold = onHold;
-            }
-            public bool OnTouch(AView? v, MotionEvent? e)
-            {
-                bool result = false;
-                Logger.Debug("TouchListner OnTouch fired {0}", e.Action);
-                if (_enabled() && e.Action == MotionEventActions.Down)
-                {
-                    //You can change the timespan of the long press
-                    timerFired = false;
-                    timer = new MyTimer(TimeSpan.FromMilliseconds(LongPressWaitTime), () =>
-                    {
-                        timerFired = true;
-                        _onHold.Invoke();
-                    });
-                    timer.Start();
-                }
-
-                if (timerFired)
-                {
-                    result = true;
-                }
-                else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel)
-                {
-                    timer?.Stop();
-                    result = false;
-                }
-                return result;
-            }
-        }
-#else
-        MyTimer timer;
+        MyTimer? timer;
         bool timerFired = false;
+
         public override bool DispatchTouchEvent(MotionEvent e)
         {
-                bool result;
-                Logger.Debug("ContextMenuContainer DispatchTouchEvent fired {0}", e.Action);
-                if (enabled && e.Action == MotionEventActions.Down)
+            bool result;
+            Logger.Debug("ContextMEnuContainer DispatchTouchEvent fired {0}", e.Action);
+            if (enabled && e.Action == MotionEventActions.Down)
+            {
+                //You can change the timespan of the long press
+                timerFired = false;
+                timer = new MyTimer(TimeSpan.FromMilliseconds(1500), () =>
                 {
-                    //You can change the timespan of the long press
-                    timerFired = false;
-                    timer = new MyTimer(TimeSpan.FromMilliseconds(LongPressWaitTime), () =>
-                    {
-                        timerFired = true;
-                        OpenContextMenu();
-                    });
-                    timer.Start();
-                }
-
-                if (timerFired)
+                    timerFired = true;
+                    OpenContextMenu();
+                });
+                timer.Start();
+            }
+            if (timerFired)
+            {
+                result = true;
+            }
+            else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel)
+            {
+                timer?.Stop();
+                result = base.DispatchTouchEvent(e);
+            }
+            else
+            {
+                result = base.DispatchTouchEvent(e);
+                if (!result && enabled)
                 {
                     result = true;
                 }
-                else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel)
-                {
-                    timer?.Stop();
-                    result = base.DispatchTouchEvent(e);
-                }
-                else
-                {
-                    result = base.DispatchTouchEvent(e);
-                    if (!result && enabled)
-                    {
-                        result = true;
-                    }
-                }
-
-                return result;
             }
-#endif
+            return result;
+        }
         void OpenContextMenu()
         {
             if (GetContextMenu() == null)
@@ -334,10 +227,8 @@ namespace APES.UI.XF.Droid
                 FillMenuItems();
 
             }
-
             contextMenu?.Show();
         }
-
         class MyTimer
         {
             private readonly TimeSpan timespan;
@@ -351,7 +242,6 @@ namespace APES.UI.XF.Droid
                 this.callback = callback;
                 this.cancellation = new CancellationTokenSource();
             }
-
             public void Start()
             {
                 CancellationTokenSource cts = this.cancellation; // safe copy

@@ -19,7 +19,7 @@
             <c:ContextMenuContainer.Content>
                 <Frame BackgroundColor="ForestGreen" Padding="24" CornerRadius="0" >
 
-                    <Label Text="{Binding Text}" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
+                    <Label Text="{Binding Text}" HorizontalTextAlignment="Center" TextColor="White" FontSize="36" HorizontalOptions="FillAndExpand" VerticalOptions="Center" MinimumHeightRequest="30" MinimumWidthRequest="100"/>
 
                 </Frame>
             </c:ContextMenuContainer.Content>
@@ -28,7 +28,7 @@
         <c:ContextMenuContainer x:Name="container2" MenuItems="{Binding ImageContextItems}">
             <c:ContextMenuContainer.Content>
                 <Frame BackgroundColor="BurlyWood" Padding="24" CornerRadius="0" >
-                    <Image Source="{Binding LogoIconSource}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"/>
+                    <Image Source="{Binding LogoIconSource}" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" MaximumWidthRequest="100"/>
                 </Frame>
             </c:ContextMenuContainer.Content>
         </c:ContextMenuContainer>

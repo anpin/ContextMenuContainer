@@ -27,7 +27,7 @@ namespace APES.UI.XF.Sample.ViewModels
             NotifyPropertyChanged(propertyName);
             return true;
         }
-        string text = "";
+        string text = "Default text";
         public string Text
         {
             get => text;
@@ -94,9 +94,9 @@ namespace APES.UI.XF.Sample.ViewModels
 
             else if (DeviceInfo.Platform == DevicePlatform.WinUI)
             {
-                logoIconSource = @"Assets\logo.png";
-                deleteIconSource = @"Assets\outline_delete_black_24.png";
-                settingsIconSource = @"Assets\outline_settings_black_24.png";
+                logoIconSource = @"logo.png";
+                deleteIconSource = @"outline_delete_black_24.png";
+                settingsIconSource = @"outline_settings_black_24.png";
             }
 #endif
 

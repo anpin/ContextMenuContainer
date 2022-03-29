@@ -76,28 +76,28 @@ namespace APES.UI.XF.Sample.ViewModels
                     break;
             }
 #else
-            if (DeviceInfo.Platform == DevicePlatform.Android)
-            {
-                logoIconSource = "logo.png";
-                deleteIconSource = "outline_delete_24.xml";
-                settingsIconSource = "outline_settings_black_24.png";
-            }
-            else if (DeviceInfo.Platform == DevicePlatform.iOS || 
-                     DeviceInfo.Platform == DevicePlatform.macOS ||
-                     DeviceInfo.Platform == DevicePlatform.MacCatalyst)
-            {
-
+            //
+            // {
+            //     logoIconSource = "logo.png";
+            //     deleteIconSource = "outline_delete_24.xml";
+            //     settingsIconSource = "outline_settings_black_24.png";
+            // }
+            // else if (DeviceInfo.Platform == DevicePlatform.iOS || 
+            //          DeviceInfo.Platform == DevicePlatform.macOS ||
+            //          DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+            // {
+            //
+            //     logoIconSource = "logo.png";
+            //     deleteIconSource = "outline_delete_black_24.png";
+            //     settingsIconSource = "outline_settings_black_24.png";
+            // }
+            //
+            // else if (DeviceInfo.Platform == DevicePlatform.WinUI)
+            // {
                 logoIconSource = "logo.png";
                 deleteIconSource = "outline_delete_black_24.png";
                 settingsIconSource = "outline_settings_black_24.png";
-            }
-
-            else if (DeviceInfo.Platform == DevicePlatform.WinUI)
-            {
-                logoIconSource = @"logo.png";
-                deleteIconSource = @"outline_delete_black_24.png";
-                settingsIconSource = @"outline_settings_black_24.png";
-            }
+            // }
 #endif
 
             FillAllImageActions();

@@ -25,12 +25,31 @@
 		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">True</UseInterpreter>
 
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-ios'">14.2</SupportedOSPlatformVersion>
+		<RuntimeIdentifier Condition="'$(TargetFramework)' == 'net6.0-ios'">ios-arm64</RuntimeIdentifier>
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">14.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.18362.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.18362.0</TargetPlatformMinVersion>
 	</PropertyGroup>
-
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<OutputType>WinExe</OutputType>
+		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+		<DefineConstants>__WINDOWS__</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(TargetFramework)' == 'Debug|net6.0-ios' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<MonoSymbolArchive>True</MonoSymbolArchive>
+		<CodesignExtraArgs />
+		<CodesignResourceRules />
+		<MtouchLink>SdkOnly</MtouchLink>
+		<MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<MtouchFastDev>true</MtouchFastDev>
+		<MtouchUseLlvm>true</MtouchUseLlvm>
+		<RunCodeAnalysis>true</RunCodeAnalysis>
+	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" />
@@ -64,11 +83,4 @@
 		<ProjectReference Include="..\..\src\APES.UI.XF.csproj" />
 		<ProjectReference Include="..\APES.UI.Samples.Shared\APES.UI.Sample.Shared.csproj" />
 	</ItemGroup>
-
-	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
-		<OutputType>WinExe</OutputType>
-		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>
-		<DefineConstants>__WINDOWS__</DefineConstants>
-	</PropertyGroup>
-	
 </Project>

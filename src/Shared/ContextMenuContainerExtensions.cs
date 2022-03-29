@@ -28,7 +28,8 @@ namespace APES.UI.XF
                 handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
                 
 #elif __IOS__ || __MACCATALYST__
-                 handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
+                 //handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
+                 handlers.AddHandler<ContextMenuContainer, ContextMenuContainerRenderer>();
 #elif NET6_0_WINDOWS10_0_17763_0
                  handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
 #endif

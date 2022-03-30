@@ -20,7 +20,6 @@ using Xamarin.Forms.Platform.iOS;
 #endif 
 using APES.UI.XF;
 using APES.UI.XF.iOS;
-using Microsoft.Maui.Platform;
 #if !MAUI
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 #endif
@@ -81,6 +80,7 @@ namespace APES.UI.XF.iOS
             constructInteraction(e.NewElement.MenuItems);
 
         }
+        ContextMenuContainer VirtualView => Element;
 #endif
         void deconstructIntercation()
         {

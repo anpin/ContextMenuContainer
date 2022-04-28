@@ -69,6 +69,10 @@
 		<DefineConstants>$(DefineConstants);MAUI</DefineConstants>
 	    <UseMaui>true</UseMaui>
     </PropertyGroup>
+
+	<PropertyGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
+		<DefineConstants>$(DefineConstants);__WINDOWS__</DefineConstants>
+	</PropertyGroup>
   <ItemGroup>
     <Compile Include="Shared\*.cs" />
   </ItemGroup>

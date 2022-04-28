@@ -7,7 +7,7 @@ using Microsoft.Maui.Controls.Compatibility;
 using APES.UI.XF.Droid;
 #elif __IOS__ || __MACCATALYST__
 using APES.UI.XF.iOS;
-#elif NET6_0_WINDOWS10_0_17763_0
+#elif __WINDOWS__
 using APES.UI.XF.UWP;
 #endif
 #endif
@@ -17,7 +17,7 @@ namespace APES.UI.XF
     public static class ContextMenuContainerExtensions
     {
         public static bool HasMenuOptions(this ContextMenuContainer container) => container.MenuItems.Count > 0;
-#if MAUI && (__ANDROID__ || __IOS__ || __MACCATALYST__ || NET6_0_WINDOWS10_0_17763_0)
+#if MAUI && (__ANDROID__ || __IOS__ || __MACCATALYST__ || __WINDOWS__)
         public static MauiAppBuilder ConfigureContextMenuContainer(this MauiAppBuilder mauiAppBuilder)
         {
             
@@ -30,7 +30,7 @@ namespace APES.UI.XF
 #elif __IOS__ || __MACCATALYST__
                  //handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
                  handlers.AddHandler<ContextMenuContainer, ContextMenuContainerRenderer>();
-#elif NET6_0_WINDOWS10_0_17763_0
+#elif __WINDOWS__
                  handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
 #endif
              });

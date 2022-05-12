@@ -98,7 +98,7 @@
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
 	  <!--<PackageReference Include="Microsoft.UI.Xaml" Version="2.7.0" />-->
-	  <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0"/>
+	  <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.3"/>
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Compile Include="Droid\*.cs" />

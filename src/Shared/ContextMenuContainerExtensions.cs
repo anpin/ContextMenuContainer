@@ -3,6 +3,7 @@ using System.Collections.Generic;
 #if MAUI
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Hosting;
 #if __ANDROID__
 using APES.UI.XF.Droid;
 #elif __IOS__ || __MACCATALYST__
@@ -17,7 +18,7 @@ namespace APES.UI.XF
     public static class ContextMenuContainerExtensions
     {
         public static bool HasMenuOptions(this ContextMenuContainer container) => container.MenuItems.Count > 0;
-#if MAUI && (__ANDROID__ || __IOS__ || __MACCATALYST__ || __WINDOWS__)
+#if MAUI 
         public static MauiAppBuilder ConfigureContextMenuContainer(this MauiAppBuilder mauiAppBuilder)
         {
             

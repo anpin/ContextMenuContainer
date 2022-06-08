@@ -5,7 +5,7 @@ using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
 #if __ANDROID__
-using APES.UI.XF.Droid;
+//using APES.UI.XF.Droid;
 #elif __IOS__ || __MACCATALYST__
 using APES.UI.XF.iOS;
 #elif __WINDOWS__
@@ -26,11 +26,10 @@ namespace APES.UI.XF
              {
 
 #if __ANDROID__
-                handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
+                handlers.AddHandler<ContextMenuContainer, ContextMenuContainerHandler>();
                 
 #elif __IOS__ || __MACCATALYST__
-                 //handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
-                 handlers.AddHandler<ContextMenuContainer, ContextMenuContainerRenderer>();
+                 handlers.AddHandler<ContextMenuContainer, ContextMenuContainerHandler>();
 #elif __WINDOWS__
                  handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
 #endif

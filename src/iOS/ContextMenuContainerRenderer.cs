@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UIKit;
@@ -20,47 +20,25 @@ using Xamarin.Forms.Platform.iOS;
 #endif 
 using APES.UI.XF;
 using APES.UI.XF.iOS;
-#if !MAUI
-[assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
-#endif
-namespace APES.UI.XF.iOS
-{
-    [Preserve(AllMembers = true)]
-    #if MAUI
-    class ContextMenuContainerRenderer : ContentViewHandler  //ViewHandler<ContextMenuContainer, ContentView>
+#if MAUI
+namespace APES.UI.XF
+
 #else
+[assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
+namespace APES.UI.XF.iOS
+#endif
+{
+
+#if MAUI
+    sealed partial class ContextMenuContainerHandler : ContentViewHandler  //ViewHandler<ContextMenuContainer, ContentView>
+#else
+    [Preserve(AllMembers = true)
     class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
 #endif
     {
         ContextMenuDelegate? contextMenuDelegate;
         UIContextMenuInteraction? contextMenu;
-        #if MAUI 
-        //TODO: not sure if this is really needed, will test when debug is available for MAUI 
-        bool wasSetOnce = false;
-        public override void SetVirtualView(IView view)
-        {
-            if (wasSetOnce) 
-            { 
-                var old = VirtualView as ContextMenuContainer;
-                old.BindingContextChanged -= Element_BindingContextChanged;
-                old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
-            }
-
-            base.SetVirtualView(view);
-
-            if (VirtualView is ContextMenuContainer newElement)
-            {
-                newElement.BindingContextChanged += Element_BindingContextChanged;
-                newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
-                
-                //PlatformView.AddSubview(newElement.Content.ToContainerView(MauiContext));
-                //SetContent();
-                //PlatformView.View = newElement;
-                RefillMenuItems();
-                wasSetOnce = true;
-            }
-        }
-
+        #if MAUI
         UIView Control => PlatformView;
         UITraitCollection TraitCollection => UITraitCollection.CurrentTraitCollection;
 #else
@@ -91,26 +69,27 @@ namespace APES.UI.XF.iOS
                 //contextMenu?.Dispose();
             }
         }
-        void constructInteraction(ContextMenuItems menuItems)
+        void constructInteraction(ContextMenuContainer container)
         {
             deconstructIntercation();
-            if (menuItems?.Count > 0)
+            if (container.MenuItems?.Count > 0)
             {
-                contextMenuDelegate = new ContextMenuDelegate(menuItems, () => TraitCollection.UserInterfaceStyle);
+                contextMenuDelegate = new ContextMenuDelegate(container.MenuItems, () => TraitCollection.UserInterfaceStyle);
                 contextMenu = new UIContextMenuInteraction(contextMenuDelegate);
                 Control.AddInteraction(contextMenu);
             }
         }
-
+#if !MAUI
         void RefillMenuItems() => constructInteraction(((ContextMenuContainer)VirtualView).MenuItems);
-        private void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             RefillMenuItems();
         }
 
-        private void Element_BindingContextChanged(object sender, EventArgs e)
+        void Element_BindingContextChanged(object sender, EventArgs e)
         {
             RefillMenuItems();
         }
+#endif
     }
 }

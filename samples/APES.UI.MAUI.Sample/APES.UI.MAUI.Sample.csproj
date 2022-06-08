@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
@@ -70,13 +70,13 @@
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<!-- Required - WinUI does not yet have buildTransitive for everything -->
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0">
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0">
 			<!--<IncludeAssets>build</IncludeAssets>-->
 		</PackageReference>
-		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.0.30" />
+		<!--<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.0.30" />
 		<PackageReference Include="Microsoft.Maui.Graphics.Win2D.WinUI.Desktop">
 			<Version>6.0.200-preview.14.1092</Version>
-		</PackageReference>
+		</PackageReference>-->
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.ComponentModel;
 using System.Numerics;
@@ -8,10 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 #if MAUI
 using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Platform;
-using Microsoft.Maui.Controls.Compatibility;
-using Microsoft.Maui.Controls.Compatibility.Platform.UWP;
+using Microsoft.Maui.Platform;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Handlers;
 using Microsoft.UI.Input;
@@ -28,6 +25,26 @@ using MenuFlyoutItem = Microsoft.UI.Xaml.Controls.MenuFlyoutItem;
 using Setter = Microsoft.UI.Xaml.Setter;
 using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
 using Style = Microsoft.UI.Xaml.Style;
+using APES.UI.XF.UWP;
+
+namespace APES.UI.XF;
+[Preserve(AllMembers = true)]
+sealed partial class ContextMenuContainerRenderer : ContentViewHandler
+{
+    private ContextMenuContainer Element => (ContextMenuContainer)VirtualView;
+
+    protected override ContentPanel CreatePlatformView()
+    {
+        var result =base.CreatePlatformView();
+        result.PointerReleased += PlatformViewPointerReleased;
+        return result;
+    }
+
+    public override void SetVirtualView(IView view)
+    {
+        base.SetVirtualView(view);
+        
+    }
 #else
 using Windows.UI.Input;
 using Windows.UI.Xaml;
@@ -41,17 +58,18 @@ using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.UWP;
 using WColors = Windows.UI.Colors;
 using WBinding = Windows.UI.Xaml.Data.Binding;
-#endif
 using APES.UI.XF;
 using APES.UI.XF.UWP;
 
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.UWP
+
 {
     [Preserve(AllMembers = true)]
     public class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, ContentControl>
     {
-        FrameworkElement? content;
+
+        FrameworkElement? PlatformView;
         public ContextMenuContainerRenderer()
         {
           AutoPackage = false;
@@ -73,8 +91,7 @@ namespace APES.UI.XF.UWP
             }
             Pack();
         }
-
-        void Pack()
+     void Pack()
         {
             if (Element.Content == null)
             {
@@ -82,15 +99,17 @@ namespace APES.UI.XF.UWP
             }
 
             IVisualElementRenderer renderer = Element.Content.GetOrCreateRenderer();
-            content = renderer.ContainerElement;
-            content.PointerReleased += Content_PointerReleased;
-            //content.Holding += FrameworkElement_Holding;
-            Control.Content = content;
+            PlatformView = renderer.ContainerElement;
+            PlatformView.PointerReleased += PlatformViewPointerReleased;
+            //PlatformView.Holding += FrameworkElement_Holding;
+            Control.Content = PlatformView;
         }
+#endif
+       
 
-        private void Content_PointerReleased(object sender, PointerRoutedEventArgs e)
+        private void PlatformViewPointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            PointerPoint point = e.GetCurrentPoint(content);
+            PointerPoint point = e.GetCurrentPoint(PlatformView);
             if (point.Properties.PointerUpdateKind != PointerUpdateKind.RightButtonReleased)
                 return;
             try
@@ -105,7 +124,7 @@ namespace APES.UI.XF.UWP
         }
         MenuFlyout? GetContextMenu()
         {
-            if (FlyoutBase.GetAttachedFlyout(content) is MenuFlyout flyout)
+            if (FlyoutBase.GetAttachedFlyout(PlatformView) is MenuFlyout flyout)
             {
                 var actions = Element.MenuItems;
                 if (flyout.Items.Count != actions.Count)
@@ -129,10 +148,10 @@ namespace APES.UI.XF.UWP
 
                 Element.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
 
-                FlyoutBase.SetAttachedFlyout(content, flyout);
+                FlyoutBase.SetAttachedFlyout(PlatformView, flyout);
             }
 
-            FlyoutBase.ShowAttachedFlyout(content);
+            FlyoutBase.ShowAttachedFlyout(PlatformView);
         }
 
         private void MenuItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -226,4 +245,6 @@ namespace APES.UI.XF.UWP
         static FileImageSourceToBitmapIconSourceConverter ImageConverter { get; } = new FileImageSourceToBitmapIconSourceConverter();
         static GenericBoolConverter<Style> BoolToStytleConverter { get; } = new(DestructiveStyle, NondDestructiveStyle);
     }
+#if !MAUI 
 }
+#endif

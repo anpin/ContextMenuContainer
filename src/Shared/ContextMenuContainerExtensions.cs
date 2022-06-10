@@ -4,13 +4,6 @@ using System.Collections.Generic;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
-#if __ANDROID__
-//using APES.UI.XF.Droid;
-#elif __IOS__ || __MACCATALYST__
-using APES.UI.XF.iOS;
-#elif __WINDOWS__
-using APES.UI.XF.UWP;
-#endif
 #endif
 
 namespace APES.UI.XF
@@ -24,15 +17,8 @@ namespace APES.UI.XF
             
             return mauiAppBuilder.ConfigureMauiHandlers(handlers =>
              {
+                 handlers.AddHandler<ContextMenuContainer, ContextMenuContainerRenderer>();
 
-#if __ANDROID__
-                handlers.AddHandler<ContextMenuContainer, ContextMenuContainerHandler>();
-                
-#elif __IOS__ || __MACCATALYST__
-                 handlers.AddHandler<ContextMenuContainer, ContextMenuContainerHandler>();
-#elif __WINDOWS__
-                 handlers.AddCompatibilityRenderer<ContextMenuContainer, ContextMenuContainerRenderer>();
-#endif
              });
         }
 #endif

@@ -14,11 +14,129 @@ using Android.Util;
 using AndroidX.AppCompat.Widget;
 using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapper;
 using Java.Lang.Reflect;
+using APES.UI.XF;
+using Path = System.IO.Path;
+using AColor = Android.Graphics.Color;
 #if MAUI
+using Microsoft.Maui;
 using Microsoft.Maui.Platform;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Handlers;
 using JetBrains.Annotations;
+
+namespace APES.UI.XF;
+sealed partial class ContextMenuContainerRenderer : ContentViewHandler
+{
+    //TODO: not sure if this is really needed, will test when debug is available for MAUI 
+    bool wasSetOnce = false;
+    public override void SetVirtualView(IView view)
+    {
+        if (wasSetOnce)
+        {
+            var old = VirtualView as ContextMenuContainer;
+            old.BindingContextChanged -= Element_BindingContextChanged;
+            old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+        }
+
+        base.SetVirtualView(view);
+
+        if (VirtualView is ContextMenuContainer newElement)
+        {
+            newElement.BindingContextChanged += Element_BindingContextChanged;
+            newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+
+            //PlatformView.AddSubview(newElement.Content.ToContainerView(MauiContext));
+            //SetContent();
+            //PlatformView.View = newElement;
+            RefillMenuItems();
+            wasSetOnce = true;
+        }
+    }
+
+
+    void RefillMenuItems()
+    {
+        if (VirtualView is ContextMenuContainer container)
+        {
+            constructInteraction(container);
+        }
+    }
+
+    void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        RefillMenuItems();
+    }
+
+    void Element_BindingContextChanged(object sender, EventArgs e)
+    {
+        RefillMenuItems();
+    }
+
+    void constructInteraction(ContextMenuContainer menuItems)
+    {
+        ((ContainerViewGroup)PlatformView).SetupMenu(menuItems);
+        //deconstructIntercation();
+        //if (menuItems?.Count > 0)
+        //{
+        //    foreach (var item in menuItems)
+        //    {
+        //        AddMenuItem(item);
+        //    }
+        //}
+    }
+
+    protected override ContentViewGroup CreatePlatformView()
+    {
+        if (VirtualView == null)
+        {
+            throw new InvalidOperationException($"{nameof(VirtualView)} must be set to create a ContentViewGroup");
+        }
+        if (VirtualView is not ContextMenuContainer)
+        {
+            throw new InvalidOperationException($"{nameof(VirtualView)} must be of type ContextMenuContainer, but was {VirtualView.GetType()} ");
+        }
+
+        var viewGroup = new ContainerViewGroup(Context);
+        //{
+        //    CrossPlatformMeasure = VirtualView.CrossPlatformMeasure,
+        //    CrossPlatformArrange = VirtualView.CrossPlatformArrange
+        //};
+        return viewGroup;
+    }
+
+    class ContainerViewGroup : ContentViewGroup
+    {
+
+
+        private ContextMenuContainer? Element;
+        public ContainerViewGroup([NotNull] Context context) : base(context)
+        {
+
+        }
+
+        public ContainerViewGroup(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        {
+        }
+
+        public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs) : base(context, attrs)
+        {
+        }
+
+        public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs, int defStyleAttr) :
+            base(context, attrs, defStyleAttr)
+        {
+        }
+
+        public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs, int defStyleAttr,
+            int defStyleRes) : base(context, attrs, defStyleAttr, defStyleRes)
+        {
+        }
+
+        public void SetupMenu(ContextMenuContainer? container)
+        {
+            deconstructIntercation();
+            Element = container;
+        }
 #else
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
@@ -26,60 +144,14 @@ using Xamarin.Forms.Platform.Android;
 using APES.UI.XF.Droid;
 using XView = Xamarin.Forms.View;
 using PreserveAttribute = Xamarin.Forms.Internals.PreserveAttribute;
-#endif
-using APES.UI.XF;
-using Path = System.IO.Path;
-using AColor = Android.Graphics.Color;
-#if MAUI
-namespace APES.UI.XF
-#else
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.Droid
-#endif
 {
-#if MAUI
-    sealed partial class ContextMenuContainerHandler : ContentViewHandler
-#else
     [Preserve(AllMembers = true)]
     class ContextMenuContainerRenderer : ViewRenderer
-#endif
 
     {
-#if MAUI
-        //private IContentView Element => VirtualView;
-        
-        void constructInteraction(ContextMenuContainer menuItems)
-        {
-            ((ContainerViewGroup)PlatformView).SetupMenu(menuItems);
-            //deconstructIntercation();
-            //if (menuItems?.Count > 0)
-            //{
-            //    foreach (var item in menuItems)
-            //    {
-            //        AddMenuItem(item);
-            //    }
-            //}
-        }
-        
-        protected override ContentViewGroup CreatePlatformView()
-        {
-            if (VirtualView == null)
-            {
-                throw new InvalidOperationException($"{nameof(VirtualView)} must be set to create a ContentViewGroup");
-            }
-            if (VirtualView is not ContextMenuContainer)
-            {
-                throw new InvalidOperationException($"{nameof(VirtualView)} must be of type ContextMenuContainer, but was {VirtualView.GetType()} ");
-            }
-
-            var viewGroup = new ContainerViewGroup(Context);
-            //{
-            //    CrossPlatformMeasure = VirtualView.CrossPlatformMeasure,
-            //    CrossPlatformArrange = VirtualView.CrossPlatformArrange
-            //};
-            return viewGroup;
-        }
-#else
+    
         public ContextMenuContainerRenderer(Context context) : base(context)
         {
 
@@ -129,52 +201,11 @@ namespace APES.UI.XF.Droid
         }
 #endif
 
-
-#if MAUI
-
-        class ContainerViewGroup : ContentViewGroup
-        {
-            
-
-            private ContextMenuContainer? Element;
-#endif
-
         PopupMenu? contextMenu;
         MyTimer? timer;
         bool timerFired = false;
 
         private bool enabled => Element is ContextMenuContainer element && element.MenuItems.Count > 0;
-#if MAUI
-            public ContainerViewGroup([NotNull] Context context) : base(context)
-            {
-
-            }
-
-            public ContainerViewGroup(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-            {
-            }
-
-            public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs) : base(context, attrs)
-            {
-            }
-
-            public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs, int defStyleAttr) :
-                base(context, attrs, defStyleAttr)
-            {
-            }
-
-            public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs, int defStyleAttr,
-                int defStyleRes) : base(context, attrs, defStyleAttr, defStyleRes)
-            {
-            }
-
-            public void SetupMenu(ContextMenuContainer? container)
-            {
-                deconstructIntercation();
-                Element = container;
-            }
-#endif
-
 
         void deconstructIntercation()
             {
@@ -182,8 +213,6 @@ namespace APES.UI.XF.Droid
                 {
                     contextMenu.Dismiss();
                     contextMenu.Menu.Clear();
-                    //contextMenuDelegate?.Dispose();
-                    //contextMenu?.Dispose();
                 }
             }
             public override bool DispatchTouchEvent(MotionEvent e)
@@ -381,4 +410,6 @@ namespace APES.UI.XF.Droid
             }
         }
     }
+#if !MAUI
 }
+#endif

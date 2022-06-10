@@ -1,47 +1,74 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UIKit;
 #if MAUI 
 using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Platform;
-using Microsoft.Maui.Controls.Compatibility;
-using Microsoft.Maui.Controls.Compatibility.Platform;
-using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
-using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Handlers;
-using Microsoft.Maui.Platform;
-using ContentView = Microsoft.Maui.Platform.ContentView;
+using APES.UI.XF.iOS;
+
+namespace APES.UI.XF;
+
+sealed partial class ContextMenuContainerRenderer : ContentViewHandler
+{
+UIView Control => PlatformView;
+UITraitCollection TraitCollection => UITraitCollection.CurrentTraitCollection;
+
+//TODO: not sure if this is really needed, will test when debug is available for MAUI 
+bool wasSetOnce = false;
+public override void SetVirtualView(IView view)
+{
+    if (wasSetOnce)
+    {
+        var old = VirtualView as ContextMenuContainer;
+        old.BindingContextChanged -= Element_BindingContextChanged;
+        old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+    }
+
+    base.SetVirtualView(view);
+
+    if (VirtualView is ContextMenuContainer newElement)
+    {
+        newElement.BindingContextChanged += Element_BindingContextChanged;
+        newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+
+        //PlatformView.AddSubview(newElement.Content.ToContainerView(MauiContext));
+        //SetContent();
+        //PlatformView.View = newElement;
+        RefillMenuItems();
+        wasSetOnce = true;
+    }
+}
+
+
+void RefillMenuItems()
+{
+    if (VirtualView is ContextMenuContainer container)
+    {
+        constructInteraction(container);
+    }
+}
+
+void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+{
+    RefillMenuItems();
+}
+
+void Element_BindingContextChanged(object sender, EventArgs e)
+{
+    RefillMenuItems();
+}
 #else
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.iOS;
-#endif 
 using APES.UI.XF;
 using APES.UI.XF.iOS;
-#if MAUI
-namespace APES.UI.XF
 
-#else
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.iOS
-#endif
 {
-
-#if MAUI
-    sealed partial class ContextMenuContainerHandler : ContentViewHandler  //ViewHandler<ContextMenuContainer, ContentView>
-#else
     [Preserve(AllMembers = true)
     class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
-#endif
     {
-        ContextMenuDelegate? contextMenuDelegate;
-        UIContextMenuInteraction? contextMenu;
-        #if MAUI
-        UIView Control => PlatformView;
-        UITraitCollection TraitCollection => UITraitCollection.CurrentTraitCollection;
-#else
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
@@ -59,8 +86,23 @@ namespace APES.UI.XF.iOS
 
         }
         ContextMenuContainer VirtualView => Element;
+    
+        void RefillMenuItems() => constructInteraction(((ContextMenuContainer)VirtualView).MenuItems);
+        void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            RefillMenuItems();
+        }
+
+        void Element_BindingContextChanged(object sender, EventArgs e)
+        {
+            RefillMenuItems();
+        }
 #endif
-        void deconstructIntercation()
+
+    ContextMenuDelegate? contextMenuDelegate;
+    UIContextMenuInteraction? contextMenu;
+
+    void deconstructIntercation()
         {
             if (Control != null && contextMenu != null)
             {
@@ -79,17 +121,7 @@ namespace APES.UI.XF.iOS
                 Control.AddInteraction(contextMenu);
             }
         }
-#if !MAUI
-        void RefillMenuItems() => constructInteraction(((ContextMenuContainer)VirtualView).MenuItems);
-        void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            RefillMenuItems();
-        }
-
-        void Element_BindingContextChanged(object sender, EventArgs e)
-        {
-            RefillMenuItems();
-        }
-#endif
     }
+#if !MAUI
 }
+#endif

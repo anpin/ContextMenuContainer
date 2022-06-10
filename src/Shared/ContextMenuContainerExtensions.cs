@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 #if MAUI
 using Microsoft.Maui.Hosting;
-using Microsoft.Maui.Controls.Compatibility;
-using Microsoft.Maui.Controls.Compatibility.Hosting;
 #endif
 
 namespace APES.UI.XF

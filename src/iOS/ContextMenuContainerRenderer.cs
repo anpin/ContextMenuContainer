@@ -66,7 +66,7 @@ using APES.UI.XF.iOS;
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 namespace APES.UI.XF.iOS
 {
-    [Preserve(AllMembers = true)
+    [Preserve(AllMembers = true)]
     class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
     {
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
@@ -82,12 +82,12 @@ namespace APES.UI.XF.iOS
             }
             var childRenderer = Element.Content.GetRenderer() ?? Platform.CreateRenderer(Element.Content);
             SetNativeControl(childRenderer.NativeView);
-            constructInteraction(e.NewElement.MenuItems);
+            constructInteraction(e.NewElement);
 
         }
         ContextMenuContainer VirtualView => Element;
     
-        void RefillMenuItems() => constructInteraction(((ContextMenuContainer)VirtualView).MenuItems);
+        void RefillMenuItems() => constructInteraction(VirtualView);
         void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             RefillMenuItems();

@@ -13,8 +13,7 @@
         },
         "documentationRules": {
             "xmlHeader": false,
-            "companyName": "Brightlink AV LTD",
-            "copyrightText": "Copyright © {companyName} All rights reserved."
+            "copyrightText": "MIT License\nCopyright (c) 2021 Pavel Anpin"
         }
     }
 }

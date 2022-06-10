@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <RuleSet Name="StyleCop.Analyzers rules with default action" Description="StyleCop.Analyzers with default action. Rules with IsEnabledByDefault = false are disabled." ToolsVersion="14.0">
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpecialRules">
-        <Rule Id="SA0001"  Action="Warning" />          <!-- XML comment analysis disabled -->
+        <Rule Id="SA0001"  Action="None" />          <!-- XML comment analysis disabled -->
         <Rule Id="SA0002"  Action="Warning" />          <!-- Invalid settings file -->
     </Rules>
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpacingRules">
@@ -17,8 +17,8 @@
         <Rule Id="SA1009"  Action="Warning" />          <!-- Closing parenthesis should be spaced correctly -->
         <Rule Id="SA1010"  Action="Warning" />          <!-- Opening square brackets should be spaced correctly -->
         <Rule Id="SA1011"  Action="Warning" />          <!-- Closing square brackets should be spaced correctly -->
-        <Rule Id="SA1012"  Action="Warning" />          <!-- Opening braces should be spaced correctly -->
-        <Rule Id="SA1013"  Action="Warning" />          <!-- Closing braces should be spaced correctly -->
+        <Rule Id="SA1012"  Action="None" />          <!-- Opening braces should be spaced correctly -->
+        <Rule Id="SA1013"  Action="None" />          <!-- Closing braces should be spaced correctly -->
         <Rule Id="SA1014"  Action="Warning" />          <!-- Opening generic brackets should be spaced correctly -->
         <Rule Id="SA1015"  Action="Warning" />          <!-- Closing generic brackets should be spaced correctly -->
         <Rule Id="SA1016"  Action="Warning" />          <!-- Opening attribute brackets should be spaced correctly -->
@@ -120,7 +120,7 @@
 
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.MaintainabilityRules">
         <Rule Id="SA1119"  Action="Warning" />          <!-- Statement should not use unnecessary parenthesis -->
-        <Rule Id="SA1400"  Action="Warning" />          <!-- Access modifier should be declared -->
+        <Rule Id="SA1400"  Action="None" />          <!-- Access modifier should be declared -->
         <Rule Id="SA1401"  Action="Warning" />          <!-- Fields should be private -->
         <Rule Id="SA1402"  Action="Warning" />          <!-- File may only contain a single type -->
         <Rule Id="SA1403"  Action="Warning" />          <!-- File may only contain a single namespace -->

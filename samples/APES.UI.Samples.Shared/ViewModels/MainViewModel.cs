@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Windows.Input;
 #if MAUI
@@ -15,10 +11,8 @@ namespace APES.UI.XF.Sample.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] String propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         protected bool SetField<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
@@ -26,7 +20,8 @@ namespace APES.UI.XF.Sample.ViewModels
             NotifyPropertyChanged(propertyName);
             return true;
         }
-        string text = "Default text";
+
+        private string text = "Default text";
         public string Text
         {
             get => text;
@@ -39,7 +34,7 @@ namespace APES.UI.XF.Sample.ViewModels
 
         public ICommand ConstructiveCommand { get; }
         public ICommand NeverEndingCommand { get; }
-        ContextMenuItems imageContextItems = new ContextMenuItems();
+        private ContextMenuItems imageContextItems = new ContextMenuItems();
         public ContextMenuItems ImageContextItems
         {
             get => imageContextItems;
@@ -101,16 +96,13 @@ namespace APES.UI.XF.Sample.ViewModels
 
             FillAllImageActions();
         }
-        void OnFirstCommandExecuted(string s)
-        {
-            Text = s;
-        }
-        void OnSecondCommandExecuted()
-        {
-            Text = $"Action was pressed {++SecondCounter} times!";
-        }
+
+        private void OnFirstCommandExecuted(string s) => Text = s;
+
+        private void OnSecondCommandExecuted() => Text = $"Action was pressed {++SecondCounter} times!";
         internal int SecondCounter { get; set; } = 0;
-        void DestructiveHandler()
+
+        private void DestructiveHandler()
         {
             ImageContextItems.Clear();
             ImageContextItems.Add(new ContextMenuItem()
@@ -122,13 +114,14 @@ namespace APES.UI.XF.Sample.ViewModels
             NotifyPropertyChanged(nameof(ImageContextItems));
 
         }
-        void ConstructiveHandler()
+
+        private void ConstructiveHandler()
         {
             ImageContextItems.Clear();
             FillAllImageActions();
         }
 
-        void FillAllImageActions()
+        private void FillAllImageActions()
         {
             for (var i = 1; i < 5; i++)
             {
@@ -149,7 +142,8 @@ namespace APES.UI.XF.Sample.ViewModels
             });
             NotifyPropertyChanged(nameof(ImageContextItems));
         }
-        async Task NeverendingTask()
+
+        private async Task NeverendingTask()
         {
             while(true)
             {
@@ -158,7 +152,8 @@ namespace APES.UI.XF.Sample.ViewModels
                 await Task.Delay(5000);
             }
         }
-        long neverEndingCounter;
+
+        private long neverEndingCounter;
         public long NeverEndingCounter
         {
             get => neverEndingCounter;
@@ -166,10 +161,10 @@ namespace APES.UI.XF.Sample.ViewModels
         }
 
 
-        readonly FileImageSource logoIconSource;
+        private readonly FileImageSource logoIconSource;
         public FileImageSource LogoIconSource => logoIconSource;
-        readonly FileImageSource deleteIconSource;
-        readonly FileImageSource settingsIconSource;
+        private readonly FileImageSource deleteIconSource;
+        private readonly FileImageSource settingsIconSource;
         public FileImageSource SettingsIconSource => settingsIconSource;
 
     }

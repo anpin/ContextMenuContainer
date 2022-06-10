@@ -1,4 +1,4 @@
-﻿using APES.UI.XF;
+using APES.UI.XF;
 namespace APES.UI.MAUI.Sample;
 
 public static class MauiProgram

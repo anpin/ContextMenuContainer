@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+﻿
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,13 +16,13 @@ public partial class App : MauiWinUIApplication
     /// </summary>
     public App()
     {
-        this.UnhandledException += App_UnhandledException;
-        this.InitializeComponent();
+        UnhandledException += App_UnhandledException;
+        InitializeComponent();
     }
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        APES.UI.XF.Logger.Error(e.Exception);
+        XF.Logger.Error(e.Exception);
         e.Handled = true;
     }
 

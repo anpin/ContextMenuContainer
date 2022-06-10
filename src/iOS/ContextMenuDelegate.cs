@@ -1,44 +1,51 @@
-﻿using System;
-using System.Linq;
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
+
+using System;
 using System.Collections.Generic;
-using System.Text;
-using UIKit;
+using System.Linq;
 using Foundation;
+using UIKit;
 #if MAUI
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
-#else
-using Xamarin.Forms;
-using Xamarin.Forms.Platform.iOS;
 #endif
 using CoreGraphics;
 
+// ReSharper disable BitwiseOperatorOnEnumWithoutFlags
+// ReSharper disable once CheckNamespace
+#pragma warning disable SA1300
 namespace APES.UI.XF.iOS
+#pragma warning restore SA1300
 {
-    class ContextMenuDelegate : UIContextMenuInteractionDelegate
+    internal class ContextMenuDelegate : UIContextMenuInteractionDelegate
     {
-        readonly INSCopying? Identifier;
-        readonly Func<UIViewController>? Preview;
-        readonly ContextMenuItems MenuItems;
-        readonly Func<UIUserInterfaceStyle> GetCurrentTheme;
-        UIMenu? nativeMenu;
+        private readonly INSCopying? _identifier;
+        private readonly Func<UIViewController>? _preview;
+        private readonly ContextMenuItems _menuItems;
+        private readonly Func<UIUserInterfaceStyle> _getCurrentTheme;
+        private UIMenu? _nativeMenu;
+
         public ContextMenuDelegate(ContextMenuItems items, Func<UIUserInterfaceStyle> getCurrentTheme, INSCopying? identifier = null, Func<UIViewController>? preview = null)
         {
-            MenuItems = items ?? throw new ArgumentNullException(nameof(items));
-            this.Identifier = identifier;
-            this.Preview = preview;
-            GetCurrentTheme = getCurrentTheme;
+            _menuItems = items ?? throw new ArgumentNullException(nameof(items));
+            _identifier = identifier;
+            _preview = preview;
+            _getCurrentTheme = getCurrentTheme;
         }
 
-        IEnumerable<UIAction> ToNativeActions(IEnumerable<ContextMenuItem> sharedDefenitions)
+        public override UIContextMenuConfiguration GetConfigurationForMenu(UIContextMenuInteraction interaction, CGPoint location)
+            => UIContextMenuConfiguration.Create(_identifier, _preview != null ? PreviewDelegate! : null, ConstructMenuFromItems);
+
+        private IEnumerable<UIMenuElement> ToNativeActions(IEnumerable<ContextMenuItem> sharedDefinitions)
         {
-            var iconColor = GetCurrentTheme() == UIUserInterfaceStyle.Dark ? UIColor.White : UIColor.Black;
-            foreach (var item in sharedDefenitions)
+            var iconColor = _getCurrentTheme() == UIUserInterfaceStyle.Dark ? UIColor.White : UIColor.Black;
+            foreach (var item in sharedDefinitions)
             {
                 if (!string.IsNullOrEmpty(item.Text))
                 {
@@ -49,11 +56,18 @@ namespace APES.UI.XF.iOS
                         nativeImage = nativeImage.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
                         nativeImage.ApplyTintColor(item.IsDestructive ? UIColor.Red : iconColor);
                     }
+
                     var nativeItem = UIAction.Create(item.Text, nativeImage, item.Text, ActionDelegate);
                     if (!item.IsEnabled)
+                    {
                         nativeItem.Attributes |= UIMenuElementAttributes.Disabled;
+                    }
+
                     if (item.IsDestructive)
+                    {
                         nativeItem.Attributes |= UIMenuElementAttributes.Destructive;
+                    }
+
                     yield return nativeItem;
                 }
                 else
@@ -62,27 +76,17 @@ namespace APES.UI.XF.iOS
                 }
             }
         }
-        void ActionDelegate(UIAction action)
+
+        private void ActionDelegate(UIAction action) => _menuItems[action.Identifier].OnItemTapped();
+
+        private UIMenu ConstructMenuFromItems(UIMenuElement[] suggestedActions)
         {
-            MenuItems[action.Identifier].OnItemTapped();
-        }
-        UIMenu ContructMenuFromItems(UIMenuElement[] suggestedActions)
-        {
-            if (nativeMenu == null)
-                nativeMenu = UIMenu.Create(ToNativeActions(MenuItems).ToArray());
-            else
-                nativeMenu = nativeMenu.GetMenuByReplacingChildren(ToNativeActions(MenuItems).ToArray());
-            return nativeMenu;
+            _nativeMenu = _nativeMenu == null ?
+                UIMenu.Create(ToNativeActions(_menuItems).ToArray()) :
+                _nativeMenu.GetMenuByReplacingChildren(ToNativeActions(_menuItems).ToArray());
+            return _nativeMenu;
         }
 
-        UIViewController? PreviewDelegate()
-        {
-            return Preview?.Invoke();
-        }
-
-        public override UIContextMenuConfiguration GetConfigurationForMenu(UIContextMenuInteraction interaction, CGPoint location)
-        {
-            return UIContextMenuConfiguration.Create(Identifier, Preview != null ? PreviewDelegate : null, ContructMenuFromItems);
-        }
+        private UIViewController? PreviewDelegate() => _preview?.Invoke();
     }
 }

@@ -1,179 +1,189 @@
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
+
+#pragma warning disable SA1137
 using System;
 using System.Linq;
 using System.Threading;
-using Android.App;
 using Android.Content;
-using Android.Graphics;
-using Android.OS;
-using Android.Views;
+using Android.Graphics.Drawables;
 using Android.Text;
 using Android.Text.Style;
-using Android.Graphics.Drawables;
+using Android.Views;
+using AndroidX.AppCompat.Widget;
+using Java.Lang.Reflect;
+using AColor = Android.Graphics.Color;
+using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapper;
+using Path = System.IO.Path;
+#if MAUI
 using Android.Runtime;
 using Android.Util;
-using AndroidX.AppCompat.Widget;
-using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapper;
-using Java.Lang.Reflect;
-using APES.UI.XF;
-using Path = System.IO.Path;
-using AColor = Android.Graphics.Color;
-#if MAUI
 using Microsoft.Maui;
-using Microsoft.Maui.Platform;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Handlers;
-using JetBrains.Annotations;
+using Microsoft.Maui.Platform;
 
-namespace APES.UI.XF;
-sealed partial class ContextMenuContainerRenderer : ContentViewHandler
+namespace APES.UI.XF
 {
-    //TODO: not sure if this is really needed, will test when debug is available for MAUI 
-    bool wasSetOnce = false;
-    public override void SetVirtualView(IView view)
+    internal sealed class ContextMenuContainerRenderer : ContentViewHandler
     {
-        if (wasSetOnce)
+        private bool _wasSetOnce;
+
+        public override void SetVirtualView(IView view)
         {
-            var old = VirtualView as ContextMenuContainer;
-            old.BindingContextChanged -= Element_BindingContextChanged;
-            old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+            if (_wasSetOnce)
+            {
+                if (VirtualView is ContextMenuContainer old)
+                {
+                    old.BindingContextChanged -= Element_BindingContextChanged;
+                    if (old.MenuItems != null)
+                    {
+                        old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+                    }
+                }
+            }
+
+            base.SetVirtualView(view);
+
+            if (VirtualView is ContextMenuContainer newElement)
+            {
+                newElement.BindingContextChanged += Element_BindingContextChanged;
+                if (newElement.MenuItems != null)
+                {
+                    newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+                }
+
+                RefillMenuItems();
+                _wasSetOnce = true;
+            }
         }
 
-        base.SetVirtualView(view);
-
-        if (VirtualView is ContextMenuContainer newElement)
+        protected override ContentViewGroup CreatePlatformView()
         {
-            newElement.BindingContextChanged += Element_BindingContextChanged;
-            newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+            if (VirtualView == null)
+            {
+                throw new InvalidOperationException($"{nameof(VirtualView)} must be set to create a ContentViewGroup");
+            }
 
-            //PlatformView.AddSubview(newElement.Content.ToContainerView(MauiContext));
-            //SetContent();
-            //PlatformView.View = newElement;
-            RefillMenuItems();
-            wasSetOnce = true;
-        }
-    }
+            if (VirtualView is not ContextMenuContainer)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(VirtualView)} must be of type ContextMenuContainer, but was {VirtualView.GetType()} ");
+            }
 
-
-    void RefillMenuItems()
-    {
-        if (VirtualView is ContextMenuContainer container)
-        {
-            constructInteraction(container);
-        }
-    }
-
-    void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        RefillMenuItems();
-    }
-
-    void Element_BindingContextChanged(object sender, EventArgs e)
-    {
-        RefillMenuItems();
-    }
-
-    void constructInteraction(ContextMenuContainer menuItems)
-    {
-        ((ContainerViewGroup)PlatformView).SetupMenu(menuItems);
-        //deconstructIntercation();
-        //if (menuItems?.Count > 0)
-        //{
-        //    foreach (var item in menuItems)
-        //    {
-        //        AddMenuItem(item);
-        //    }
-        //}
-    }
-
-    protected override ContentViewGroup CreatePlatformView()
-    {
-        if (VirtualView == null)
-        {
-            throw new InvalidOperationException($"{nameof(VirtualView)} must be set to create a ContentViewGroup");
-        }
-        if (VirtualView is not ContextMenuContainer)
-        {
-            throw new InvalidOperationException($"{nameof(VirtualView)} must be of type ContextMenuContainer, but was {VirtualView.GetType()} ");
+            var viewGroup = new ContainerViewGroup(Context);
+            return viewGroup;
         }
 
-        var viewGroup = new ContainerViewGroup(Context);
-        //{
-        //    CrossPlatformMeasure = VirtualView.CrossPlatformMeasure,
-        //    CrossPlatformArrange = VirtualView.CrossPlatformArrange
-        //};
-        return viewGroup;
-    }
-
-    class ContainerViewGroup : ContentViewGroup
-    {
-
-
-        private ContextMenuContainer? Element;
-        public ContainerViewGroup([NotNull] Context context) : base(context)
+        private void RefillMenuItems()
         {
-
+            if (VirtualView is ContextMenuContainer container)
+            {
+                ConstructInteraction(container);
+            }
         }
 
-        public ContainerViewGroup(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-        }
+        private void MenuItems_CollectionChanged(
+            object? sender,
+            System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            => RefillMenuItems();
 
-        public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs) : base(context, attrs)
-        {
-        }
+        private void Element_BindingContextChanged(object? sender, EventArgs e)
+            => RefillMenuItems();
 
-        public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs, int defStyleAttr) :
-            base(context, attrs, defStyleAttr)
-        {
-        }
+        private void ConstructInteraction(ContextMenuContainer menuItems) =>
+            ((ContainerViewGroup)PlatformView).SetupMenu(menuItems);
 
-        public ContainerViewGroup([NotNull] Context context, [NotNull] IAttributeSet attrs, int defStyleAttr,
-            int defStyleRes) : base(context, attrs, defStyleAttr, defStyleRes)
+        private class ContainerViewGroup : ContentViewGroup
         {
-        }
+#pragma warning disable SA1306
+#pragma warning disable SX1309
+            // ReSharper disable once InconsistentNaming
+            private ContextMenuContainer? Element;
+#pragma warning restore SX1309
+#pragma warning restore SA1306
 
-        public void SetupMenu(ContextMenuContainer? container)
-        {
-            deconstructIntercation();
-            Element = container;
-        }
+            public ContainerViewGroup(Context context)
+                : base(context)
+            {
+            }
+
+            // ReSharper disable once UnusedMember.Local
+            public ContainerViewGroup(IntPtr javaReference, JniHandleOwnership transfer)
+                : base(javaReference, transfer)
+            {
+            }
+
+            // ReSharper disable once UnusedMember.Local
+            public ContainerViewGroup(Context context, IAttributeSet attrs)
+                : base(context, attrs)
+            {
+            }
+
+            // ReSharper disable once UnusedMember.Local
+            public ContainerViewGroup(Context context, IAttributeSet attrs, int defStyleAttr)
+                : base(context, attrs, defStyleAttr)
+            {
+            }
+
+            // ReSharper disable once UnusedMember.Local
+            public ContainerViewGroup(Context context, IAttributeSet attrs, int defStyleAttr, int defStyleRes)
+                : base(context, attrs, defStyleAttr, defStyleRes)
+            {
+            }
+
+            public void SetupMenu(ContextMenuContainer? container)
+            {
+                DeconstructInteraction();
+                Element = container;
+            }
 #else
-using Xamarin.Forms;
-using Xamarin.Forms.Internals;
-using Xamarin.Forms.Platform.Android;
+using Android.OS;
+using APES.UI.XF;
 using APES.UI.XF.Droid;
-using XView = Xamarin.Forms.View;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
 using PreserveAttribute = Xamarin.Forms.Internals.PreserveAttribute;
+using XView = Xamarin.Forms.View;
+
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
+
 namespace APES.UI.XF.Droid
 {
     [Preserve(AllMembers = true)]
-    class ContextMenuContainerRenderer : ViewRenderer
-
+    internal class ContextMenuContainerRenderer : ViewRenderer
     {
-    
-        public ContextMenuContainerRenderer(Context context) : base(context)
+        public ContextMenuContainerRenderer(Context context)
+            : base(context)
         {
-
         }
-        
+
         protected override void OnElementChanged(ElementChangedEventArgs<XView> e)
         {
             base.OnElementChanged(e);
             if (e.OldElement is ContextMenuContainer old)
             {
                 old.BindingContextChanged -= Element_BindingContextChanged;
-                old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+                if (old.MenuItems != null)
+                {
+                    old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+                }
             }
+
             if (e.NewElement is ContextMenuContainer newElement)
-            { 
+            {
                 newElement.BindingContextChanged += Element_BindingContextChanged;
-                newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+                if (newElement.MenuItems != null)
+                {
+                    newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+                }
             }
         }
-        void constructInteraction(ContextMenuContainer container)
+
+        private void ConstructInteraction(ContextMenuContainer container)
         {
-            deconstructIntercation();
+            DeconstructInteraction();
             if (container.MenuItems?.Count > 0)
             {
                 foreach (var item in container.MenuItems)
@@ -183,67 +193,68 @@ namespace APES.UI.XF.Droid
             }
         }
 
-        void RefillMenuItems()
+        private void RefillMenuItems()
         {
             if (Element is ContextMenuContainer container)
             {
-                constructInteraction(container);
+                ConstructInteraction(container);
             }
         }
-        void MenuItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            RefillMenuItems();
-        }
 
-        void Element_BindingContextChanged(object sender, EventArgs e)
-        {
-            RefillMenuItems();
-        }
+        private void MenuItems_CollectionChanged(
+            object? sender,
+            System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            => RefillMenuItems();
+
+        private void Element_BindingContextChanged(object sender, EventArgs e)
+            => RefillMenuItems();
 #endif
 
-        PopupMenu? contextMenu;
-        MyTimer? timer;
-        bool timerFired = false;
+#pragma warning disable SA1201
+            private PopupMenu? _contextMenu;
+#pragma warning restore SA1201
+            private MyTimer? _timer;
+            private bool _timerFired;
 
-        private bool enabled => Element is ContextMenuContainer element && element.MenuItems.Count > 0;
+            // ReSharper disable once RedundantTypeCheckInPattern
+            private bool ContextMenuIsNotEmpty => Element is ContextMenuContainer {MenuItems.Count: > 0};
 
-        void deconstructIntercation()
+            public override bool DispatchTouchEvent(MotionEvent? e)
             {
-                if (Element != null && contextMenu != null)
+                if (e == null)
                 {
-                    contextMenu.Dismiss();
-                    contextMenu.Menu.Clear();
+                    return base.DispatchTouchEvent(e);
                 }
-            }
-            public override bool DispatchTouchEvent(MotionEvent e)
-            {
+
                 bool result;
                 Logger.Debug("ContextMenuContainer DispatchTouchEvent fired {0}", e.Action);
-                if (enabled && e.Action == MotionEventActions.Down)
+                if (ContextMenuIsNotEmpty && e.Action == MotionEventActions.Down)
                 {
-                    //You can change the timespan of the long press
-                    timerFired = false;
-                    timer = new MyTimer(TimeSpan.FromMilliseconds(1500), () =>
+                    // You can change the timespan of the long press
+                    _timerFired = false;
+                    _timer = new MyTimer(TimeSpan.FromMilliseconds(1500), () =>
                     {
-                        timerFired = true;
+                        _timerFired = true;
                         OpenContextMenu();
                     });
-                    timer.Start();
+                    _timer.Start();
                 }
 
-                if (timerFired)
+                if (_timerFired)
                 {
                     result = true;
                 }
-                else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel)
+                else if (e.Action is MotionEventActions.Up or MotionEventActions.Cancel)
                 {
-                    timer?.Stop();
+                    _timer?.Stop();
                     result = base.DispatchTouchEvent(e);
                 }
                 else
                 {
                     result = base.DispatchTouchEvent(e);
-                    if (!result && enabled)
+
+                    // ReSharper disable once ConvertIfToOrExpression
+                    if (!result && ContextMenuIsNotEmpty)
                     {
                         result = true;
                     }
@@ -252,53 +263,70 @@ namespace APES.UI.XF.Droid
                 return result;
             }
 
+            private void DeconstructInteraction()
+            {
+                if (Element != null && _contextMenu != null)
+                {
+                    _contextMenu.Dismiss();
+                    _contextMenu.Menu.Clear();
+                }
+            }
 
-
-            void OpenContextMenu()
+            private void OpenContextMenu()
             {
                 if (GetContextMenu() == null)
                 {
                     ConstructNativeMenu();
                     FillMenuItems();
-
                 }
 
-                contextMenu?.Show();
+                _contextMenu?.Show();
             }
 
-            void ConstructNativeMenu()
+            private void ConstructNativeMenu()
             {
                 var child = GetChildAt(0);
                 if (child == null)
+                {
                     return;
-                contextMenu = new PopupMenu(Context, child);
-                contextMenu.MenuItemClick += ContextMenu_MenuItemClick;
-                Field field = contextMenu.Class.GetDeclaredField("mPopup");
+                }
+
+                _contextMenu = new PopupMenu(Context, child);
+                _contextMenu.MenuItemClick += ContextMenu_MenuItemClick;
+                Field field = _contextMenu.Class.GetDeclaredField("mPopup");
                 field.Accessible = true;
-                Java.Lang.Object? menuPopupHelper = field.Get(contextMenu);
+                Java.Lang.Object? menuPopupHelper = field.Get(_contextMenu);
                 Method? setForceIcons =
-                    menuPopupHelper?.Class.GetDeclaredMethod("setForceShowIcon", Java.Lang.Boolean.Type);
+                    menuPopupHelper?.Class.GetDeclaredMethod("setForceShowIcon", Java.Lang.Boolean.Type!);
                 setForceIcons?.Invoke(menuPopupHelper, true);
             }
 
-            void DeconstructNativeMenu()
+            private void DeconstructNativeMenu()
             {
-                if (contextMenu == null)
+                if (_contextMenu == null)
+                {
                     return;
-                contextMenu.MenuItemClick -= ContextMenu_MenuItemClick;
-                contextMenu.Dispose();
-                contextMenu = null;
+                }
+
+                _contextMenu.MenuItemClick -= ContextMenu_MenuItemClick;
+                _contextMenu.Dispose();
+                _contextMenu = null;
             }
 
-
-            void AddMenuItem(ContextMenuItem item)
+            private void AddMenuItem(ContextMenuItem item)
             {
-                if (contextMenu == null)
+                if (_contextMenu == null)
+                {
                     return;
+                }
+
                 var title = new SpannableString(item.Text);
                 if (item.IsDestructive)
+                {
                     title.SetSpan(new ForegroundColorSpan(AColor.Red), 0, title.Length(), 0);
-                var contextAction = contextMenu.Menu.Add(title);
+                }
+
+                var contextAction = _contextMenu.Menu.Add(title);
                 if (contextAction == null)
                 {
                     Logger.Error("We couldn't create IMenuItem with title {0}", item.Text);
@@ -308,56 +336,61 @@ namespace APES.UI.XF.Droid
                 contextAction.SetEnabled(item.IsEnabled);
                 if (item.Icon != null)
                 {
-                    var name = Path.GetFileNameWithoutExtension(item.Icon.File);
-                    var id = Context.GetDrawableId(name);
-                    if (id != 0)
+                    string name = Path.GetFileNameWithoutExtension(item.Icon.File);
+                    int id = Context?.GetDrawableId(name) ?? 0;
+                    if (id == 0)
                     {
+                        return;
+                    }
 #if MAUI
-                        Drawable? drawable = Context?.GetDrawable(id);
+                    Drawable? drawable = Context?.GetDrawable(id);
 #else
-                        Drawable? drawable = (int)Build.VERSION.SdkInt >= 21
-                            ? Context?.GetDrawable(id)
-                            : Context?.GetDrawable(name);
+                Drawable? drawable = (int)Build.VERSION.SdkInt >= 21
+                    ? Context?.GetDrawable(id)
+                    : Context?.GetDrawable(name);
 #endif
-                        if (drawable != null)
-                        {
-                            var wrapper = new DrawableWrapperX(drawable);
-                            if (item.IsDestructive)
-                                wrapper.SetTint(AColor.Red);
-                            contextAction.SetIcon(wrapper);
-                        }
-                    }
-                }
-            }
-
-            void FillMenuItems()
-            {
-                if (Element is ContextMenuContainer element)
-                {
-                    if (element.MenuItems.Count > 0)
+                    if (drawable != null)
                     {
-                        foreach (var item in element.MenuItems)
+                        var wrapper = new DrawableWrapperX(drawable);
+                        if (item.IsDestructive)
                         {
-                            AddMenuItem(item);
+                            wrapper.SetTint(AColor.Red);
                         }
+
+                        contextAction.SetIcon(wrapper);
                     }
                 }
             }
 
-            PopupMenu? GetContextMenu()
+            private void FillMenuItems()
             {
-                if (contextMenu != null && Element is ContextMenuContainer element)
+                // ReSharper disable once RedundantTypeCheckInPattern
+                if (Element is ContextMenuContainer {MenuItems.Count: > 0} element)
                 {
-                    if (element.MenuItems.Count != contextMenu.Menu.Size())
+                    foreach (var item in element.MenuItems)
+                    {
+                        AddMenuItem(item);
+                    }
+                }
+            }
+
+#pragma warning disable SA1137
+            private PopupMenu? GetContextMenu()
+#pragma warning restore SA1137
+            {
+                // ReSharper disable once ConvertTypeCheckPatternToNullCheck
+                if (_contextMenu != null && Element is ContextMenuContainer element)
+                {
+                    if (element.MenuItems?.Count != _contextMenu.Menu.Size())
                     {
                         DeconstructNativeMenu();
                     }
                     else
                     {
-                        for (int i = 0; i < contextMenu.Menu.Size(); i++)
+                        for (int i = 0; i < _contextMenu.Menu.Size(); i++)
                         {
                             if (!element.MenuItems[i].Text
-                                    .Equals(contextMenu.Menu.GetItem(i)?.TitleFormatted?.ToString()))
+                                    .Equals(_contextMenu.Menu.GetItem(i)?.TitleFormatted?.ToString()))
                             {
                                 DeconstructNativeMenu();
                                 break;
@@ -366,50 +399,61 @@ namespace APES.UI.XF.Droid
                     }
                 }
 
-                return contextMenu;
+                return _contextMenu;
             }
 
-            private void ContextMenu_MenuItemClick(object sender, PopupMenu.MenuItemClickEventArgs e)
+            private void ContextMenu_MenuItemClick(object? sender, PopupMenu.MenuItemClickEventArgs e)
             {
-
-                var item = ((ContextMenuContainer)Element).MenuItems.FirstOrDefault(x =>
+                // ReSharper disable once RedundantCast
+                var item = ((ContextMenuContainer?)Element)?.MenuItems?.FirstOrDefault(x =>
                     x.Text == e.Item.TitleFormatted?.ToString());
                 item?.OnItemTapped();
             }
-#if MAUI
-    }
-#endif
-        class MyTimer
-        {
-            private readonly TimeSpan timespan;
-            private readonly Action callback;
 
-            private CancellationTokenSource cancellation;
+#if MAUI
+        }
+
+#endif
+        private class MyTimer
+        {
+            private readonly TimeSpan _timespan;
+            private readonly Action _callback;
+
+            private CancellationTokenSource _cancellation;
 
             public MyTimer(TimeSpan timespan, Action callback)
             {
-                this.timespan = timespan;
-                this.callback = callback;
-                this.cancellation = new CancellationTokenSource();
+                _timespan = timespan;
+                _callback = callback;
+                _cancellation = new CancellationTokenSource();
             }
+
             public void Start()
             {
-                CancellationTokenSource cts = this.cancellation; // safe copy
-                Device.StartTimer(this.timespan,
-                    () =>
+                CancellationTokenSource cts = _cancellation; // safe copy
+#if MAUI
+                DispatcherProvider.Current.GetForCurrentThread() !.StartTimer(
+#else
+                Device.StartTimer(
+#endif
+#pragma warning disable SA1114
+                    interval: _timespan,
+#pragma warning restore SA1114
+                    callback: () =>
                     {
-                        if (cts.IsCancellationRequested) return false;
-                        this.callback.Invoke();
+                        if (cts.IsCancellationRequested)
+                        {
+                            return false;
+                        }
+
+                        _callback.Invoke();
                         return false; // or true for periodic behavior
                     });
             }
 
-            public void Stop()
-            {
-                Interlocked.Exchange(ref this.cancellation, new CancellationTokenSource()).Cancel();
-            }
+            public void Stop() => Interlocked.Exchange(ref _cancellation, new CancellationTokenSource()).Cancel();
         }
     }
-#if !MAUI
 }
-#endif
+
+#pragma warning restore SA1137

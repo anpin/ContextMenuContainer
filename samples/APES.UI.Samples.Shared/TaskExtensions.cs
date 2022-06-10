@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace APES.UI.XF.Sample
+﻿namespace APES.UI.XF.Sample
 {
     public static class TaskExtension
     {

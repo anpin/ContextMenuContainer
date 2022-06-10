@@ -1,5 +1,4 @@
-﻿using System;
-namespace APES.UI.XF.Sample
+﻿namespace APES.UI.XF.Sample
 {
     public interface IErrorHandler
     {

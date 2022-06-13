@@ -1,6 +1,4 @@
-﻿using System;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
+﻿using Xamarin.Forms;
 
 namespace APES.UI.XF.Sample
 {
@@ -9,7 +7,7 @@ namespace APES.UI.XF.Sample
         public App()
         {
             InitializeComponent();
-            APES.UI.XF.ContextMenuContainer.Init();
+            ContextMenuContainer.Init();
             MainPage = new NavPage(new MainPage());
         }
 

@@ -1,53 +1,124 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
+
 using UIKit;
+#if MAUI
+using System;
+using System.Collections.Specialized;
+using APES.UI.XF.iOS;
+using Microsoft.Maui;
+using Microsoft.Maui.Handlers;
+
+namespace APES.UI.XF
+{
+    internal sealed class ContextMenuContainerRenderer : ContentViewHandler
+    {
+        private bool _wasSetOnce;
+
+        private UIView Control => PlatformView;
+
+        private UITraitCollection TraitCollection => UITraitCollection.CurrentTraitCollection;
+
+        public override void SetVirtualView(IView view)
+        {
+            if (_wasSetOnce)
+            {
+                if (VirtualView is ContextMenuContainer old)
+                {
+                    old.BindingContextChanged -= Element_BindingContextChanged;
+                    if (old.MenuItems != null)
+                    {
+                        old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
+                    }
+                }
+            }
+
+            base.SetVirtualView(view);
+
+            if (VirtualView is ContextMenuContainer newElement)
+            {
+                newElement.BindingContextChanged += Element_BindingContextChanged;
+                if (newElement.MenuItems != null)
+                {
+                    newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+                }
+
+                RefillMenuItems();
+                _wasSetOnce = true;
+            }
+        }
+
+        private void RefillMenuItems()
+        {
+            if (VirtualView is ContextMenuContainer container)
+            {
+                ConstructInteraction(container);
+            }
+        }
+
+        private void MenuItems_CollectionChanged(
+            object? sender,
+            NotifyCollectionChangedEventArgs e) => RefillMenuItems();
+
+        private void Element_BindingContextChanged(object? sender, EventArgs e) => RefillMenuItems();
+#else
+using APES.UI.XF;
+using APES.UI.XF.iOS;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.iOS;
-using APES.UI.XF;
-using APES.UI.XF.iOS;
+
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
+
+#pragma warning disable SA1300
 namespace APES.UI.XF.iOS
+#pragma warning restore SA1300
 {
     [Preserve(AllMembers = true)]
-    class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
+    internal class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
     {
-        ContextMenuDelegate? contextMenuDelegate;
-        UIContextMenuInteraction? contextMenu;
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
             if (e.OldElement != null)
             {
-                //do something with old element
+                // do something with old element
             }
+
             if (e.NewElement == null || e.NewElement.Content == null)
             {
                 return;
             }
-            var childRenderer = Platform.CreateRenderer(Element.Content);
-            SetNativeControl(childRenderer.NativeView);
-            constructInteraction(e.NewElement.MenuItems);
 
+            var childRenderer = Element.Content.GetRenderer() ?? Platform.CreateRenderer(Element.Content);
+            SetNativeControl(childRenderer.NativeView);
+            ConstructInteraction(e.NewElement);
         }
-        void deconstructIntercation()
+#endif
+
+#pragma warning disable SA1201
+        private ContextMenuDelegate? _contextMenuDelegate;
+#pragma warning restore SA1201
+        private UIContextMenuInteraction? _contextMenu;
+
+        private void DeconstructInteraction()
         {
-            if (Control != null && contextMenu != null)
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (Control != null && _contextMenu != null)
             {
-                Control.RemoveInteraction(contextMenu);
-                //contextMenuDelegate?.Dispose();
-                //contextMenu?.Dispose();
+                Control.RemoveInteraction(_contextMenu);
             }
         }
-        void constructInteraction(ContextMenuItems menuItems)
+
+        private void ConstructInteraction(ContextMenuContainer container)
         {
-            deconstructIntercation();
-            if (menuItems?.Count > 0)
+            DeconstructInteraction();
+            if (container.MenuItems?.Count > 0)
             {
-                contextMenuDelegate = new ContextMenuDelegate(menuItems, () => TraitCollection.UserInterfaceStyle);
-                contextMenu = new UIContextMenuInteraction(contextMenuDelegate);
-                Control.AddInteraction(contextMenu);
+                _contextMenuDelegate =
+                    new ContextMenuDelegate(container.MenuItems, () => TraitCollection.UserInterfaceStyle);
+                _contextMenu = new UIContextMenuInteraction(_contextMenuDelegate);
+                Control.AddInteraction(_contextMenu);
             }
         }
     }

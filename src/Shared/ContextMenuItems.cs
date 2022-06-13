@@ -1,5 +1,9 @@
-﻿using System;
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
+
+using System;
 using System.Collections.ObjectModel;
+
 namespace APES.UI.XF
 {
     public class ContextMenuItems : ObservableCollection<ContextMenuItem>
@@ -8,7 +12,7 @@ namespace APES.UI.XF
 
         private ContextMenuItem FindTextIndex(string text)
         {
-            for (int j = 0; j <  Items.Count; j++)
+            for (int j = 0; j < Items.Count; j++)
             {
                 if (Items[j].Text == text)
                 {

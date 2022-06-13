@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using APES.UI.XF;
 using Xamarin.Forms;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -9,17 +8,13 @@ namespace APES.UI.XF.Tests
 {
     public class ContextMenuItemTest
     {
-        public ContextMenuItemTest()
-        {
-            Xamarin.Forms.Mocks.MockForms.Init();
-        }
-        class vm : INotifyPropertyChanged
+        public ContextMenuItemTest() => Xamarin.Forms.Mocks.MockForms.Init();
+
+        private class vm : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged;
-            protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] String propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
+            protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] String propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
             protected bool SetField<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
             {
                 if (EqualityComparer<T>.Default.Equals(field, value)) return false;
@@ -27,31 +22,36 @@ namespace APES.UI.XF.Tests
                 NotifyPropertyChanged(propertyName);
                 return true;
             }
-            string text;
+
+            private string text;
             public string Text
             {
                 get => text;
                 set => SetField(ref text, value);
             }
-            string cmdParam;
+
+            private string cmdParam;
             public string CmdParam
             {
                 get => cmdParam;
                 set => SetField(ref cmdParam, value);
             }
-            bool enabled;
+
+            private bool enabled;
             public bool Enabled
             {
                 get => enabled;
                 set => SetField(ref enabled, value);
             }
-            ImageSource icon;
+
+            private ImageSource icon;
             public ImageSource Icon
             {
                 get => icon;
                 set => SetField(ref icon, value);
             }
-            ICommand cmd;
+
+            private ICommand cmd;
             public ICommand Cmd
             {
                 get => cmd;
@@ -82,10 +82,9 @@ namespace APES.UI.XF.Tests
             item.SetBinding(ContextMenuItem.CommandParameterProperty, nameof(vm.CmdParam));
             item.SetBinding(ContextMenuItem.IsEnabledProperty, nameof(vm.Enabled));
             item.SetBinding(ContextMenuItem.IconProperty, nameof(vm.Icon));
-            item.ItemTapped += (s, e) =>
+            item.ItemTapped += (item) =>
             {
                 eventFired = true;
-                var item = s as ContextMenuItem;
 #pragma warning disable CS0252 // Possible unintended reference comparison; left hand side needs cast
                 eventHadArg = item?.CommandParameter == vm.CmdParam;
 #pragma warning restore CS0252 // Possible unintended reference comparison; left hand side needs cast

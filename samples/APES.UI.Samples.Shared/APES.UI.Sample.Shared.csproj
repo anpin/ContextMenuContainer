@@ -1,0 +1,16 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
+	<PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
+	<DebugType>portable</DebugType>
+  </PropertyGroup>
+	<PropertyGroup Condition="$(TargetFramework.StartsWith('net6.0'))">
+		<DefineConstants>$(DefineConstants);MAUI</DefineConstants>
+		<UseMaui>true</UseMaui>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\APES.UI.XF.csproj" />
+	</ItemGroup>
+</Project>

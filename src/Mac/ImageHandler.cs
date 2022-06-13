@@ -1,25 +1,32 @@
-﻿using System.IO;
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
+
+using System.IO;
 using AppKit;
 using CoreGraphics;
 using Xamarin.Forms;
+
 namespace APES.UI.XF.Mac
 {
     public static class ImageHandler
     {
-        public static NSImage? ToNative(this FileImageSource source)
+        public static NSImage? ToNative(this FileImageSource? source)
         {
             NSImage? image = null;
-            var file = source?.File;
+            string? file = source?.File;
             if (!string.IsNullOrWhiteSpace(file))
-                image = File.Exists(file) ? new NSImage(file) : NSImage.ImageNamed(file);
+            {
+                image = File.Exists(file) ? new NSImage(file!) : NSImage.ImageNamed(file!);
+            }
+
             return image;
         }
-        public static NSImage ImageTintedWithColor(NSImage sourceImage, NSColor tintColor, CGSize? size = null)
-        {
-            return NSImage.ImageWithSize(size ?? sourceImage.Size, false, rect =>
+
+        public static NSImage ImageTintedWithColor(NSImage sourceImage, NSColor tintColor, CGSize? size = null) =>
+            NSImage.ImageWithSize(size ?? sourceImage.Size, false, rect =>
             {
                 // Draw the original source image
-                sourceImage.DrawInRect(rect, CGRect.Empty, NSCompositingOperation.SourceOver, 1f);
+                sourceImage.Draw(rect, CGRect.Empty, NSCompositingOperation.SourceOver, 1f);
 
                 // Apply tint
                 tintColor.Set();
@@ -27,6 +34,5 @@ namespace APES.UI.XF.Mac
 
                 return true;
             });
-        }
     }
 }

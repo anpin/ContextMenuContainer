@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 namespace APES.UI.XF.Sample
 {
     public class AsyncCommand : IAsyncCommand
@@ -22,10 +20,7 @@ namespace APES.UI.XF.Sample
             _errorHandler = errorHandler;
         }
 
-        public bool CanExecute()
-        {
-            return !_isExecuting && (_canExecute?.Invoke() ?? true);
-        }
+        public bool CanExecute() => !_isExecuting && (_canExecute?.Invoke() ?? true);
 
         public async Task ExecuteAsync()
         {
@@ -45,21 +40,13 @@ namespace APES.UI.XF.Sample
             RaiseCanExecuteChanged();
         }
 
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 
         #region Explicit implementations
-        bool ICommand.CanExecute(object parameter)
-        {
-            return CanExecute();
-        }
+        bool ICommand.CanExecute(object parameter) => CanExecute();
 
-        void ICommand.Execute(object parameter)
-        {
-            ExecuteAsync().FireAndForgetSafeAsync(_errorHandler);
-        }
+        void ICommand.Execute(object parameter) => ExecuteAsync().FireAndForgetSafeAsync(_errorHandler);
+
         #endregion
     }
 }

@@ -1,31 +1,36 @@
-﻿using System;
-using Xamarin.Forms.Platform.UWP;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls;
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
 
+using System;
+#if MAUI
+using Microsoft.UI.Xaml.Data;
+
+#else
+using Windows.UI.Xaml.Data;
+
+#endif
 namespace APES.UI.XF.UWP
 {
-    class GenericBoolConverter<T> : IValueConverter
+    internal class GenericBoolConverter<T> : IValueConverter
     {
-        public T True { get; set; }
-        public T False { get; set; }
-        public GenericBoolConverter(T True, T False)
+        public GenericBoolConverter(T @true, T @false)
         {
-
-            this.True = True ?? throw new ArgumentNullException(nameof(True));
-            this.False = False ?? throw new ArgumentNullException(nameof(False));
+            True = @true ?? throw new ArgumentNullException(nameof(@true));
+            False = @false ?? throw new ArgumentNullException(nameof(@false));
         }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public T True { get; set; }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public T False { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             bool? boolean = value as bool?;
-            return (boolean ?? false) ? True : False;
-
-        }
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotSupportedException();
+            return (boolean ?? false ? True : False) !;
         }
 
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
     }
 }

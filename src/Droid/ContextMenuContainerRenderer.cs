@@ -28,24 +28,22 @@ namespace APES.UI.XF
 {
     internal sealed class ContextMenuContainerRenderer : ContentViewHandler
     {
-        private bool _wasSetOnce;
-
-        public override void SetVirtualView(IView view)
+        protected override void DisconnectHandler(ContentViewGroup platformView)
         {
-            if (_wasSetOnce)
+            if (VirtualView is ContextMenuContainer old)
             {
-                if (VirtualView is ContextMenuContainer old)
+                old.BindingContextChanged -= Element_BindingContextChanged;
+                if (old.MenuItems != null)
                 {
-                    old.BindingContextChanged -= Element_BindingContextChanged;
-                    if (old.MenuItems != null)
-                    {
-                        old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
-                    }
+                    old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
                 }
             }
 
-            base.SetVirtualView(view);
+            base.DisconnectHandler(platformView);
+        }
 
+        protected override void ConnectHandler(ContentViewGroup platformView)
+        {
             if (VirtualView is ContextMenuContainer newElement)
             {
                 newElement.BindingContextChanged += Element_BindingContextChanged;
@@ -55,8 +53,9 @@ namespace APES.UI.XF
                 }
 
                 RefillMenuItems();
-                _wasSetOnce = true;
             }
+
+            base.ConnectHandler(platformView);
         }
 
         protected override ContentViewGroup CreatePlatformView()
@@ -232,7 +231,9 @@ namespace APES.UI.XF.Droid
                 {
                     // You can change the timespan of the long press
                     _timerFired = false;
-                    _timer = new MyTimer(TimeSpan.FromMilliseconds(1500), () =>
+                    _timer = new MyTimer(
+                        TimeSpan.FromMilliseconds(1500),
+                        () =>
                     {
                         _timerFired = true;
                         OpenContextMenu();
@@ -405,8 +406,8 @@ namespace APES.UI.XF.Droid
             private void ContextMenu_MenuItemClick(object? sender, PopupMenu.MenuItemClickEventArgs e)
             {
                 // ReSharper disable once RedundantCast
-                var item = ((ContextMenuContainer?)Element)?.MenuItems?.FirstOrDefault(x =>
-                    x.Text == e.Item.TitleFormatted?.ToString());
+                var item = ((ContextMenuContainer?)Element)?.MenuItems?.FirstOrDefault(
+                    x => x.Text == e.Item.TitleFormatted?.ToString());
                 item?.OnItemTapped();
             }
 

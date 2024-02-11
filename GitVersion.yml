@@ -6,6 +6,7 @@ tag-prefix: '[vV]'
 major-version-bump-message: '\+semver:\s?(breaking|major)'
 minor-version-bump-message: '\+semver:\s?(feature|minor)'
 patch-version-bump-message: '\+semver:\s?(fix|patch)'
+next-version: 1.2.0
 branches: 
   main:
     regex: ^master$|^main$

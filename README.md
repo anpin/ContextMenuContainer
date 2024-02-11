@@ -1,8 +1,9 @@
 # ContextMenuContainer
 [![NuGet](https://img.shields.io/nuget/v/ContextMenuContainer.svg?style=flat)](https://www.nuget.org/packages/ContextMenuContainer/)
+[![Package nuget](https://github.com/anpin/ContextMenuContainer/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/anpin/ContextMenuContainer/actions/workflows/main.yml)
 [![Paypal](https://img.shields.io/badge/Donate%20with-PayPal-blue)](https://paypal.me/APEngineeringLLC?locale.x=en_US)
 
-Native context menu any MAUI and Xamarin.Forms view. 
+Native context menu for any MAUI and Xamarin.Forms view. 
 Supports Windows, Android, iOS and macOS.
 
 iOS | Android | macOs | Windows

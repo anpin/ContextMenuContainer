@@ -22,6 +22,10 @@ jobs:
           source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
       - name: Restore dotnet tools
         run: dotnet tool restore
       - name: Restore dependencies

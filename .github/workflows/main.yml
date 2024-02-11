@@ -32,10 +32,11 @@ jobs:
         run: |
           $packageOutputPath = Join-Path -Path $(pwd) -ChildPath ${{ env.RESULT_DIR }}
           Write-Host "packageOutputPath: $packageOutputPath"
+          New-Item -Path $packageOutputPath -ItemType Directory -Force
           $absolutePackageOutputPath = Convert-Path -Path $PackageOutputPath -ErrorAction Stop
           Write-Host "absolutePackageOutputPath: $absolutePackageOutputPath"
           msbuild -t:Restore -p:Configuration=Release
-          ./pack.ps1 -PackageOutputPath $packageOutputPath
+          ./pack.ps1 -PackageOutputPath $absolutePackageOutputPath
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -54,7 +55,7 @@ jobs:
           path: ${{ env.RESULT_DIR }}
       - name: Publish to github
         run: |
-          dotnet nuget push "result/*.nupkg" \
+          dotnet nuget push "${{ env.RESULT_DIR }}/*.nupkg" \
             --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
             --no-symbols \
             --skip-duplicate \
@@ -74,7 +75,7 @@ jobs:
           path: ${{ env.RESULT_DIR }}
       - name: Publish to nuget.org
         run: |
-          dotnet nuget push "result/*.nupkg" \
+          dotnet nuget push "${{ env.RESULT_DIR }}/*.nupkg" \
             --source "nuget.org" \
             --skip-duplicate \
             --api-key ${NUGET_TOKEN} 

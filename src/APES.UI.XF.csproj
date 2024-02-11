@@ -1,9 +1,6 @@
 <Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
   <PropertyGroup>
-    <!--Work around so the conditions work below-->
-    <!--<TargetFrameworks>netstandard2.0;monoandroid13.0;net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
-    <!--<TargetFrameworks>netstandard2.0;monoandroid13.0;net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
     <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;monoandroid13.0;net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0;uap10.0.19041</TargetFrameworks>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
@@ -12,8 +9,7 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'net8.0-android'">29.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-  </PropertyGroup>
-  <PropertyGroup>
+  
     <AssemblyName>APES.UI.XF</AssemblyName>
     <RootNamespace>APES.UI.XF</RootNamespace>
     <PackageId>ContextMenuContainer</PackageId>
@@ -38,20 +34,20 @@
     <PackageProjectUrl>https://github.com/anpin/ContextMenuContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/anpin/ContextMenuContainer</RepositoryUrl>
     <PackageReleaseNotes>Added MAUI targets</PackageReleaseNotes>
-    <PackageTags>xamarin, windows, ios, android, mac, xamarin.forms, plugin, contextmenu, rightmenu, actions, MAUI</PackageTags>
-    
-    <Title>ContextMenuContainer Plugin for Xamarin.Forms and MAUI</Title>
-    <Summary>Xamarin.Forms and MAUI multi-platform context menu plugin</Summary>
-    <Description>Xamarin.Forms and MAUI plugin to add native context menu to any view. Renders platform-specific context action on UWP, Android, iOS and macOS.</Description>
+    <PackageTags>MAUI, contextmenu, rightmenu, actions, xamarin, windows, ios, android, mac, xamarin.forms, plugin, </PackageTags>
+    <Title>Context menu for MAUI and XF</Title>
+    <Summary>Context menu for MAUI and XF</Summary>
+    <Description>Native context menu for any MAUI or Xamarin.Forms view. Renders platform-specific context action on Windows, Android, iOS and macOS.</Description>
     
     
     <Owners>Pavel Anpin</Owners>
     <Authors>Pavel Anpin</Authors>
     <Copyright>Copyright 2021</Copyright>
 
-    <!--When built in 2019 will remove extra references on pack-->
     <DisableExtraReferences>true</DisableExtraReferences>
     <Nullable>enable</Nullable>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
@@ -139,6 +135,7 @@
 
 	<ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
     <!-- <None Include="icon.png" Pack="true" Visible="false" PackagePath="" /> -->
   </ItemGroup>
   <!--Additional item groups-->
@@ -168,5 +165,4 @@
     <Compile Include="**\*.dotnet.cs" />
   </ItemGroup>
   -->
-  
 </Project>

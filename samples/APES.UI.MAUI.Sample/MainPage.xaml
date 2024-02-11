@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APES.UI.MAUI.Sample.MainPage"
+             xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels;assembly=APES.UI.Sample.Shared"
+             xmlns:c="http://apes.ge"
+             x:DataType="vm:MainViewModel"
+             Title="Context menu example"
+>
+    <ContentPage.BindingContext>
+        <vm:MainViewModel/>
+    </ContentPage.BindingContext>
+    <StackLayout>
+        <c:ContextMenuContainer x:Name="container1">
+            <c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuItem Text="Action 1" Command="{Binding FirstCommand}" CommandParameter="Action 1 pressed!" />
+                <c:ContextMenuItem Text="Action with icon" Command="{Binding FirstCommand}" CommandParameter="Action with icon pressed!" Icon="{Binding SettingsIconSource}"/>
+            </c:ContextMenuContainer.MenuItems>
+            <c:ContextMenuContainer.Content>
+                <Frame BackgroundColor="ForestGreen" Padding="24" CornerRadius="0" >
+
+                    <Label Text="{Binding Text}" HorizontalTextAlignment="Center" TextColor="White" FontSize="36" HorizontalOptions="FillAndExpand" VerticalOptions="Center" MinimumHeightRequest="30" MinimumWidthRequest="100"/>
+
+                </Frame>
+            </c:ContextMenuContainer.Content>
+        </c:ContextMenuContainer>
+
+        <c:ContextMenuContainer x:Name="container2" MenuItems="{Binding ImageContextItems}">
+            <c:ContextMenuContainer.Content>
+                <Frame BackgroundColor="BurlyWood" Padding="24" CornerRadius="0" >
+                    <Image Source="{Binding LogoIconSource}" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" MaximumWidthRequest="100"/>
+                </Frame>
+            </c:ContextMenuContainer.Content>
+        </c:ContextMenuContainer>
+        <c:ContextMenuContainer x:Name="container3">
+            <c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuItem Text="Start the loop!" IsDestructive="True" Command="{Binding NeverEndingCommand}"/>
+            </c:ContextMenuContainer.MenuItems>
+            <c:ContextMenuContainer.Content>
+                <Label Text="{Binding NeverEndingCounter, StringFormat='This has never ending command which fired {0} times'}" FontSize="Large"/>
+            </c:ContextMenuContainer.Content>
+        </c:ContextMenuContainer>
+    </StackLayout>
+
+</ContentPage>

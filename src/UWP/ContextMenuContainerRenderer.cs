@@ -1,55 +1,98 @@
-﻿using System;
-using System.Linq;
-using System.ComponentModel;
-using System.Numerics;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections.Generic;
+// MIT License
+// Copyright (c) 2021 Pavel Anpin
+
+using System;
 using System.Collections.Specialized;
+#if MAUI
+using APES.UI.XF.UWP;
+using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Handlers;
+using Microsoft.Maui.Platform;
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using MenuFlyoutItem = Microsoft.UI.Xaml.Controls.MenuFlyoutItem;
+using Setter = Microsoft.UI.Xaml.Setter;
+using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
+using Style = Microsoft.UI.Xaml.Style;
+using WBinding = Microsoft.UI.Xaml.Data.Binding;
+using WColors = Microsoft.UI.Colors;
+using WControl = Microsoft.UI.Xaml.Controls.Control;
+
+namespace APES.UI.XF
+{
+    [Preserve(AllMembers = true)]
+    internal sealed class ContextMenuContainerRenderer : ContentViewHandler
+    {
+        private ContextMenuContainer Element => (ContextMenuContainer)VirtualView;
+
+        protected override ContentPanel CreatePlatformView()
+        {
+            var result = base.CreatePlatformView();
+            result.PointerReleased += PlatformViewPointerReleased;
+            return result;
+        }
+
+        // ReSharper disable once InconsistentNaming
+#pragma warning disable SA1300
+#pragma warning disable SA1201
+        private FrameworkElement _platformView => PlatformView;
+#pragma warning restore SA1201
+#pragma warning restore SA1300
+
+#else
+using APES.UI.XF;
+using APES.UI.XF.UWP;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.UWP;
-using APES.UI.XF;
-using APES.UI.XF.UWP;
-using WColors = Windows.UI.Colors;
 using WBinding = Windows.UI.Xaml.Data.Binding;
+using WColors = Windows.UI.Colors;
+using WControl = Windows.UI.Xaml.Controls.Control;
+
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
+
+// ReSharper disable once CheckNamespace
 namespace APES.UI.XF.UWP
 {
     [Preserve(AllMembers = true)]
     public class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, ContentControl>
     {
-        FrameworkElement? content;
-        public ContextMenuContainerRenderer()
-        {
-          AutoPackage = false;
-        }
+#pragma warning disable SA1201
+        private FrameworkElement? _platformView;
+#pragma warning restore SA1201
+
+        public ContextMenuContainerRenderer() => AutoPackage = false;
+
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
             if (e.OldElement != null)
             {
-                //unsubscribe from events here
+                // unsubscribe from events here
             }
+
             if (e.NewElement == null)
             {
                 return;
             }
+
             if (Control == null)
             {
                 SetNativeControl(new ContentControl());
             }
+
             Pack();
         }
 
-        void Pack()
+        private void Pack()
         {
             if (Element.Content == null)
             {
@@ -57,148 +100,180 @@ namespace APES.UI.XF.UWP
             }
 
             IVisualElementRenderer renderer = Element.Content.GetOrCreateRenderer();
-            content = renderer.ContainerElement;
-            content.PointerReleased += Content_PointerReleased;
-            //content.Holding += FrameworkElement_Holding;
-            Control.Content = content;
+            _platformView = renderer.ContainerElement;
+            _platformView.PointerReleased += PlatformViewPointerReleased;
+
+            // PlatformView.Holding += FrameworkElement_Holding;
+            Control.Content = _platformView;
         }
 
-        private void Content_PointerReleased(object sender, PointerRoutedEventArgs e)
+#endif
+
+        private void PlatformViewPointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            PointerPoint point = e.GetCurrentPoint(content);
+            PointerPoint point = e.GetCurrentPoint(_platformView);
             if (point.Properties.PointerUpdateKind != PointerUpdateKind.RightButtonReleased)
+            {
                 return;
+            }
+
             try
             {
                 if (Element.HasMenuOptions())
+                {
                     OpenContextMenu();
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
             }
         }
-        MenuFlyout? GetContextMenu()
+
+        private MenuFlyout? GetContextMenu()
         {
-            if (FlyoutBase.GetAttachedFlyout(content) is MenuFlyout flyout)
+            if (FlyoutBase.GetAttachedFlyout(_platformView) is MenuFlyout flyout)
             {
                 var actions = Element.MenuItems;
-                if (flyout.Items.Count != actions.Count)
-                    return null;
-
-                for (int i = 0; i < flyout.Items.Count; i++)
+                if (flyout.Items?.Count != actions?.Count)
                 {
-                    if (flyout.Items[i].DataContext != actions[i])
-                        return null;
+                    return null;
                 }
+
+                for (int i = 0; i < flyout.Items?.Count; i++)
+                {
+                    if (flyout.Items[i].DataContext != actions?[i])
+                    {
+                        return null;
+                    }
+                }
+
                 return flyout;
             }
+
             return null;
         }
-        void OpenContextMenu()
+
+        private void OpenContextMenu()
         {
             if (GetContextMenu() == null)
             {
                 var flyout = new MenuFlyout();
                 SetupMenuItems(flyout);
 
-                Element.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+                if (Element.MenuItems != null)
+                {
+                    Element.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
+                }
 
-                FlyoutBase.SetAttachedFlyout(content, flyout);
+                FlyoutBase.SetAttachedFlyout(_platformView, flyout);
             }
 
-            FlyoutBase.ShowAttachedFlyout(content);
+            FlyoutBase.ShowAttachedFlyout(_platformView);
         }
 
-        private void MenuItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void MenuItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             var menu = GetContextMenu();
             if (menu != null)
             {
-                menu.Items.Clear();
+                if (menu.Items != null)
+                {
+                    menu.Items.Clear();
+                }
+
                 SetupMenuItems(menu);
             }
         }
 
-        void SetupMenuItems(MenuFlyout menu)
+        private void SetupMenuItems(MenuFlyout menu)
         {
-
-            foreach (var item in Element.MenuItems)
+            if (Element.MenuItems != null)
             {
-                AddMenuItem(menu, item);
+                foreach (var item in Element.MenuItems)
+                {
+                    AddMenuItem(menu, item);
+                }
             }
         }
-        void AddMenuItem(MenuFlyout contextMenu, ContextMenuItem item)
+
+        private void AddMenuItem(MenuFlyout contextMenu, ContextMenuItem item)
         {
             var nativeItem = new MenuFlyoutItem();
-            nativeItem.SetBinding(MenuFlyoutItem.TextProperty, new WBinding()
-            {
-                Path = new PropertyPath(nameof(ContextMenuItem.Text)),
-            });
+            nativeItem.SetBinding(
+                MenuFlyoutItem.TextProperty,
+                new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.Text)) });
 
-            //nativeItem.SetBinding(MenuFlyoutItem.CommandProperty, new WBinding()
-            //{
-            //    Path = new PropertyPath(nameof(ContextMenuItem.Command)),
-            //});
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (ImageConverter != null)
+            {
+                nativeItem.SetBinding(
+                    MenuFlyoutItem.IconProperty,
+                    new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.Icon)), Converter = ImageConverter });
+            }
 
-            //nativeItem.SetBinding(MenuFlyoutItem.CommandParameterProperty, new WBinding()
-            //{
-            //    Path = new PropertyPath(nameof(ContextMenuItem.CommandParameter)),
-            //});
-
-            nativeItem.SetBinding(MenuFlyoutItem.IconProperty, new WBinding()
-            {
-                Path = new PropertyPath(nameof(ContextMenuItem.Icon)),
-                Converter = ImageConverter,
-            });
-            nativeItem.SetBinding(MenuFlyoutItem.StyleProperty, new WBinding()
-            {
-                Path = new PropertyPath(nameof(ContextMenuItem.IsDestructive)),
-                Converter = BoolToStytleConverter,
-            });
-            nativeItem.SetBinding(MenuFlyoutItem.IsEnabledProperty, new WBinding()
-            {
-                Path = new PropertyPath(nameof(ContextMenuItem.IsEnabled)),
-            });
+            nativeItem.SetBinding(
+                FrameworkElement.StyleProperty,
+                new WBinding()
+                {
+                    Path = new PropertyPath(nameof(ContextMenuItem.IsDestructive)),
+                    Converter = BoolToStyleConverter,
+                });
+            nativeItem.SetBinding(
+                WControl.IsEnabledProperty,
+                new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.IsEnabled)) });
             nativeItem.Click += NativeItem_Click;
             nativeItem.DataContext = item;
-            contextMenu.Items.Add(nativeItem);
+            if (contextMenu.Items != null)
+            {
+                contextMenu.Items.Add(nativeItem);
+            }
         }
 
         private void NativeItem_Click(object sender, RoutedEventArgs e)
         {
             var item = sender as MenuFlyoutItem;
-            if(item == null)
+            if (item == null)
             {
                 Logger.Error("Couldn't cast to MenuFlyoutItem");
                 return;
             }
-            var context = item.DataContext as ContextMenuItem;
-            if (context == null)
+
+            if (item.DataContext is not ContextMenuItem context)
             {
                 Logger.Error("Couldn't cast MenuFlyoutItem.DataContext to ContextMenuItem");
                 return;
             }
+
             context.OnItemTapped();
         }
 
-        static Style DestructiveStyle { get; } = new Style()
+#pragma warning disable SA1201
+        private static Style DestructiveStyle { get; } = new Style()
+#pragma warning restore SA1201
         {
             TargetType = typeof(MenuFlyoutItem),
             Setters =
             {
-                new Setter(MenuFlyoutItem.ForegroundProperty, new SolidColorBrush(WColors.Red)),
-            }
+                new Setter(
+                    WControl.ForegroundProperty,
+                    new SolidColorBrush(WColors.Red)),
+            },
         };
-        static Style NondDestructiveStyle { get; } = new Style()
+
+        private static Style NonDestructiveStyle { get; } = new Style()
         {
             TargetType = typeof(MenuFlyoutItem),
             Setters =
             {
-                //new Setter(MenuFlyoutItem.ForegroundProperty, new SolidColorBrush(WColors.Red)),
-            }
+                // new Setter(MenuFlyoutItem.ForegroundProperty, new SolidColorBrush(WColors.Red)),
+            },
         };
-        static FileImageSourceToBitmapIconSourceConverter ImageConverter { get; } = new FileImageSourceToBitmapIconSourceConverter();
-        static GenericBoolConverter<Style> BoolToStytleConverter { get; } = new(DestructiveStyle, NondDestructiveStyle);
+
+        private static FileImageSourceToBitmapIconSourceConverter ImageConverter { get; } =
+            new FileImageSourceToBitmapIconSourceConverter();
+
+        private static GenericBoolConverter<Style> BoolToStyleConverter { get; } =
+            new (DestructiveStyle, NonDestructiveStyle);
     }
 }

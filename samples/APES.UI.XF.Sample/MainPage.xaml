@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="APES.UI.XF.Sample.MainPage"
-             xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels"
+             xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels;assembly=APES.UI.Sample.Shared"
              xmlns:c="http://apes.ge"
              x:DataType="vm:MainViewModel"
              Title="Context menu example"

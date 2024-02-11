@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+ <ItemGroup>
+   <PackageReference Include="GitVersion.MsBuild">
+     <PrivateAssets>All</PrivateAssets>
+   </PackageReference>
+ </ItemGroup>
+</Project>

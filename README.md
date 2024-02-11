@@ -1,13 +1,13 @@
 # ContextMenuContainer
 [![NuGet](https://img.shields.io/nuget/v/ContextMenuContainer.svg?style=flat)](https://www.nuget.org/packages/ContextMenuContainer/)
-[![Coinbase](https://img.shields.io/badge/Donate%20with-Crypto-red)](https://commerce.coinbase.com/checkout/68c42319-c494-47b5-8755-2fad731a3547)
 [![Paypal](https://img.shields.io/badge/Donate%20with-PayPal-blue)](https://paypal.me/APEngineeringLLC?locale.x=en_US)
 
-Xamarin.Forms plugin to add native context menu to any view. Supports UWP, Android, iOS and macOS.
+Native context menu any MAUI and Xamarin.Forms view. 
+Supports Windows, Android, iOS and macOS.
 
-iOS | Android | macOs | UWP
+iOS | Android | macOs | Windows
 :-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-![iOS](img/ios.gif) | ![Android](img/android.gif) | ![Mac](img/macos.gif) | ![UWP](img/uwp.png) (UWP doesn't support capturing of the context menu for some reason) 
+![iOS](img/ios.gif) | ![Android](img/android.gif) | ![Mac](img/macos.gif) | ![UWP](img/uwp.png)
 ## How to use
 1. Add namespace to your XAML file 
     `xmlns:apes="http://apes.ge"`
@@ -58,17 +58,17 @@ Cross-platform icons are really messy at this point, but you can put your assets
 - Using it in a `ViewCell` template of `ListView` might lead to issues with recognizing tap/select events from the list itself, so you might consider using TapGestureRecognizer on the template instead
 
 ## To-Do
-- [ ] Cover it all with tests
-- [ ] Configure build scripts
+- [x] Configure build scripts
+- [ ] Refactor MAUI initialization
 - [ ] Add visibility property 
 - [ ] Add highlight property 
 - [ ] Add support for shortcuts 
 - [ ] Add support of accessability features
 - [ ] Add support for submenus and separators
 - [ ] Add font icons
+- [ ] Cover it all with tests
 
 ## If this plugin saves you time please consider donating via buttons below, so I can make it even better
-[![Coinbase](https://img.shields.io/badge/Donate%20with-Crypto-red)](https://commerce.coinbase.com/checkout/68c42319-c494-47b5-8755-2fad731a3547)
 [![Paypal](https://img.shields.io/badge/Donate%20with-PayPal-blue)](https://paypal.me/APEngineeringLLC?locale.x=en_US)
 
 

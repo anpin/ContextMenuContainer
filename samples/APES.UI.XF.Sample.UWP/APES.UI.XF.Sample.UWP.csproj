@@ -149,7 +149,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.UI.Xaml" />
     <PackageReference Include="Xamarin.Forms"  />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
+    <!-- <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" /> -->
     <PackageReference Include="Xamarin.Essentials" />
   </ItemGroup>
   <ItemGroup>

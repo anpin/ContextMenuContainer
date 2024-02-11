@@ -1,0 +1,1 @@
+msbuild .\src\APES.UI.XF.csproj -t:Build,Pack -p:Configuration=Release -p:PackageOutputPath="publish"

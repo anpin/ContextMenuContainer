@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "dependencies": {
+    ".NETStandard,Version=v2.0": {
+      "GitVersion.MsBuild": {
+        "type": "Direct",
+        "requested": "[5.12.0, )",
+        "resolved": "5.12.0",
+        "contentHash": "dJuigXycpJNOiLT9or7mkHSkGFHgGW3/p6cNNYEKZBa7Hhp1FdX/cvqYWWYhRLpfoZOedeA7aRbYiOB3vW/dvA=="
+      },
+      "NETStandard.Library": {
+        "type": "Direct",
+        "requested": "[2.0.3, )",
+        "resolved": "2.0.3",
+        "contentHash": "st47PosZSHrjECdjeIzZQbzivYBJFv6P2nv4cj2ypdI204DO+vZ7l5raGMiX4eXMJ53RfOIg+/s4DHVZ54Nu2A==",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.0"
+        }
+      },
+      "Xamarin.Essentials": {
+        "type": "Direct",
+        "requested": "[1.8.1, )",
+        "resolved": "1.8.1",
+        "contentHash": "IzfRGrCrRuytgdQU+Im17Cepib6qUyLj1xfMjn+sDPTfmhmcZotsQCm5Dblm4Vxo9/SGFTdm1OgJUKWzu+dfjw==",
+        "dependencies": {
+          "System.Numerics.Vectors": "4.5.0"
+        }
+      },
+      "Xamarin.Forms": {
+        "type": "Direct",
+        "requested": "[5.0.0.2622, )",
+        "resolved": "5.0.0.2622",
+        "contentHash": "vuhBbYbYM2fir0HkKeWBt3r+KzfJmXQQj4SlRYqRD/3MG9WS385T2VPuvakXMKgsGEkamaRyZacQ8ZPdac6cpA=="
+      },
+      "Microsoft.NETCore.Platforms": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A=="
+      },
+      "System.Numerics.Vectors": {
+        "type": "Transitive",
+        "resolved": "4.5.0",
+        "contentHash": "QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ=="
+      },
+      "apes.ui.sample.shared": {
+        "type": "Project",
+        "dependencies": {
+          "ContextMenuContainer": "[1.1.0.2-preview, )"
+        }
+      },
+      "ContextMenuContainer": {
+        "type": "Project",
+        "dependencies": {
+          "Xamarin.Forms": "[5.0.0.2622, )"
+        }
+      }
+    }
+  }
+}

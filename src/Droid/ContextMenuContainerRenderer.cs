@@ -13,13 +13,11 @@ using Android.Views;
 using AndroidX.AppCompat.Widget;
 using Java.Lang.Reflect;
 using AColor = Android.Graphics.Color;
-using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapper;
 using Path = System.IO.Path;
 #if MAUI
+using DrawableWrapperX =  Android.Graphics.Drawables.InsetDrawable;
 using Android.Runtime;
 using Android.Util;
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
@@ -144,6 +142,7 @@ using APES.UI.XF.Droid;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using PreserveAttribute = Xamarin.Forms.Internals.PreserveAttribute;
+using DrawableWrapperX = AndroidX.AppCompat.Graphics.Drawable.DrawableWrapperCompat;
 using XView = Xamarin.Forms.View;
 
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
@@ -352,7 +351,12 @@ namespace APES.UI.XF.Droid
 #endif
                     if (drawable != null)
                     {
-                        var wrapper = new DrawableWrapperX(drawable);
+                        var wrapper = 
+                        #if MAUI
+                            new DrawableWrapperX(drawable,0);
+                        #else 
+                            new DrawableWrapperX(drawable);
+                        #endif
                         if (item.IsDestructive)
                         {
                             wrapper.SetTint(AColor.Red);

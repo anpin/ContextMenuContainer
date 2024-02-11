@@ -1,12 +1,12 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 	<PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<LangVersion>latest</LangVersion>
 	<DebugType>portable</DebugType>
   </PropertyGroup>
-	<PropertyGroup Condition="$(TargetFramework.StartsWith('net6.0'))">
+	<PropertyGroup Condition="$(TargetFramework.StartsWith('net8.0'))">
 		<DefineConstants>$(DefineConstants);MAUI</DefineConstants>
 		<UseMaui>true</UseMaui>
 	</PropertyGroup>

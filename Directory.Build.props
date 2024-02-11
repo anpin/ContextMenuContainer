@@ -1,12 +1,14 @@
 <Project>
-<!--  <PropertyGroup>-->
+  <PropertyGroup>
 <!--    <CodeAnalysisRuleset>$(MSBuildThisFileDirectory).stylecop.ruleset</CodeAnalysisRuleset>-->
-<!--  </PropertyGroup>-->
-<!-- <ItemGroup>-->
-<!--   <AdditionalFiles Include="$(MSBuildThisFileDirectory).stylecop.json" />-->
-<!--      <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">-->
-<!--          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
-<!--          <PrivateAssets>all</PrivateAssets>-->
-<!--      </PackageReference>-->
-<!-- </ItemGroup>-->
+    <!--this is for CI caching of nugets -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+<!--    <MauiVersion>8.0.6</MauiVersion> -->
+  </PropertyGroup>
+ <ItemGroup>
+   <PackageReference Include="GitVersion.MsBuild">
+     <PrivateAssets>All</PrivateAssets>
+   </PackageReference>
+ </ItemGroup>
 </Project>

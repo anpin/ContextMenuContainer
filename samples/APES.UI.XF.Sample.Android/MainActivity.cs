@@ -13,14 +13,14 @@ namespace APES.UI.XF.Sample.Droid
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            try
-            {
-                var r = new APES.UI.XF.Droid.ContextMenuContainerRenderer(null!);
-            }
-            catch
-            {
-
-            }
+            // try
+            // {
+            //     var r = new APES.UI.XF.Droid.ContextMenuContainerRenderer(null!);
+            // }
+            // catch
+            // {
+            //
+            // }
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());

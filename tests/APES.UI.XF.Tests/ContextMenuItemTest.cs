@@ -1,15 +1,21 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using Xamarin.Forms;
 using System.ComponentModel;
 using System.Windows.Input;
+#if MAUI 
+using Microsoft.Maui.Controls;
+#else 
+using Xamarin.Forms;
+#endif 
 namespace APES.UI.XF.Tests
 {
     public class ContextMenuItemTest
     {
+        #if MAUI 
+        #else
         public ContextMenuItemTest() => Xamarin.Forms.Mocks.MockForms.Init();
-
+        #endif 
         private class vm : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged;

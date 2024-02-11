@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <!--Work around so the conditions work below-->
-    <!--<TargetFrameworks>netstandard2.0;monoandroid10.0;net6.0;net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>-->
-    <!--<TargetFrameworks>netstandard2.0;monoandroid10.0;net6.0;net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>-->
-    <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;monoandroid10.0;net6.0;net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.17763.0;uap10.0.17763</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard2.0;monoandroid13.0;net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
+    <!--<TargetFrameworks>netstandard2.0;monoandroid13.0;net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
+    <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;monoandroid13.0;net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0;uap10.0.19041</TargetFrameworks>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'monoandroid10.0'">21.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'net6.0-android'">29.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'monoandroid13.0'">21.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'net8.0-android'">29.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -67,22 +67,27 @@
   </PropertyGroup>
   <PropertyGroup Condition="$(TargetFramework.StartsWith('uap')) And '$(OS)' == 'Windows_NT'">
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <Platforms>x86; x64 ARM; ARM64</Platforms>
+    <RuntimeIdentifiers>win</RuntimeIdentifiers>
   </PropertyGroup>
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('net6.0'))">
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net8.0'))">
 		<DefineConstants>$(DefineConstants);MAUI</DefineConstants>
-	    <UseMaui>true</UseMaui>
-    </PropertyGroup>
-
-	<PropertyGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
+	  <UseMaui>true</UseMaui>
+  </PropertyGroup>
+	<PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.0-windows')) ">
 		<DefineConstants>$(DefineConstants);__WINDOWS__</DefineConstants>
 	</PropertyGroup>
   <ItemGroup>
     <Compile Include="Shared\*.cs" />
   </ItemGroup>
-  <ItemGroup Condition="!$(TargetFramework.StartsWith('net6.0'))">
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
+  <ItemGroup Condition="!$(TargetFramework.StartsWith('net8.0'))">
+    <PackageReference Include="Xamarin.Forms"/>
   </ItemGroup>
 
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0'))">
+    <PackageReference Include="Microsoft.Maui.Controls" />
+  </ItemGroup>
+  
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac20'))">
@@ -91,27 +96,20 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('uap10.0')) ">
     <Compile Include="UWP\*.cs" />
-    <PackageReference Include="Microsoft.UI.Xaml" Version="2.7.1" />
-    <!--
-    If you need to add sdk references:
-     <SDKReference Include="WindowsMobile, Version=10.0.16299.0">
-      <Name>Windows Mobile Extensions for the UWP</Name>
-    </SDKReference>
-    -->
+    <PackageReference Include="Microsoft.UI.Xaml"/>
+    
   </ItemGroup>
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
-	  <!--<PackageReference Include="Microsoft.UI.Xaml" Version="2.7.0" />-->
-	  <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0" />
-  </ItemGroup>
+<!--  <ItemGroup Condition=" $(TargetFramework.StartsWith('net8.0-windows')) ">-->
+<!--	  <PackageReference Include="Microsoft.WindowsAppSDK"  />-->
+<!--  </ItemGroup>-->
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Compile Include="Droid\*.cs" />
     <Reference Include="Mono.Android" />
-    <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources" Version="1.3.1.3" />
-<!--    <PackageReference Include="Xamarin.AndroidX.Legacy.Support" Version="1.0.0.10" />-->
-    <PackageReference Include="Xamarin.AndroidX.MediaRouter" Version="1.2.5.2" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.3" />
-    <PackageReference Include="Xamarin.AndroidX.Browser" Version="1.3.0.8" />
-    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.4.0.4" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources"  />
+    <PackageReference Include="Xamarin.AndroidX.MediaRouter" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData"  />
+    <PackageReference Include="Xamarin.AndroidX.Browser" />
+    <PackageReference Include="Xamarin.Google.Android.Material" />
     
   </ItemGroup>
 
@@ -124,18 +122,18 @@
     <Compile Include="Mac\*.cs" />
   </ItemGroup>
     
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-android')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net8.0-android')) ">
 	    <Compile Include="Droid\*.cs" />
     </ItemGroup>
-    <ItemGroup Condition="$(TargetFramework.StartsWith('net6.0-ios')) or $(TargetFramework.StartsWith('net6.0-maccatalyst'))">
+    <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-ios')) or $(TargetFramework.StartsWith('net8.0-maccatalyst'))">
 	    <Compile Include="iOS\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-macos')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net8.0-macos')) ">
 	    <Compile Include="Mac\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net6.0-windows')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net8.0-windows')) ">
 	    <Compile Include="UWP\*.cs" />
     </ItemGroup>
 
@@ -170,14 +168,5 @@
     <Compile Include="**\*.dotnet.cs" />
   </ItemGroup>
   -->
-  <PropertyGroup>
-    <CodeAnalysisRuleset>..\.stylecop.ruleset</CodeAnalysisRuleset>
-  </PropertyGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="..\.stylecop.json" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+  
 </Project>

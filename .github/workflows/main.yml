@@ -1,0 +1,77 @@
+name: Package nuget
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+env:
+  RESULT_DIR: result
+jobs:
+  build_and_test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2    
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+          source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+      - name: Restore dependencies
+        run: msbuild -r
+      - name: Build package
+        run:
+          ./pack.ps1 -PackageOutputPath="${{ env.RESULT_DIR }}"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packages
+          path: ${{ env.RESULT_DIR }}
+          
+  publish_to_github:
+    runs-on: ubuntu-latest
+    needs: [ build_and_test ]
+    environment: nuget
+    steps:
+      - name: Download artifacts  
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+          path: ${{ env.RESULT_DIR }}
+      - name: Publish to github
+        run: |
+          dotnet nuget push "result/*.nupkg" \
+            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --no-symbols \
+            --skip-duplicate \
+            --api-key ${GITHUB_TOKEN}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  publish_to_nuget:
+    runs-on: ubuntu-latest
+    needs: [ build_and_test ]
+    environment: nuget
+    if: github.base_ref == '' # this would be set only on pull_request builds
+    steps:
+      - name: Download artifacts  
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+          path: ${{ env.RESULT_DIR }}
+      - name: Publish to nuget.org
+        run: |
+          dotnet nuget push "result/*.nupkg" \
+            --source "nuget.org" \
+            --skip-duplicate \
+            --api-key ${NUGET_TOKEN} 
+        env:
+          NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+            
+        

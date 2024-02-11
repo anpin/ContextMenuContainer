@@ -32,7 +32,7 @@ jobs:
         run: msbuild -t:Restore -p:Configuration=Release
       - name: Build package
         run:
-          ./pack.ps1 -PackageOutputPath="${{ env.RESULT_DIR }}"
+          ./pack.ps1 -PackageOutputPath="$(pwd)\${{ env.RESULT_DIR }}"
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:

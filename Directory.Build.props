@@ -1,10 +1,6 @@
 <Project>
   <PropertyGroup>
-<!--    <CodeAnalysisRuleset>$(MSBuildThisFileDirectory).stylecop.ruleset</CodeAnalysisRuleset>-->
-    <!--this is for CI caching of nugets -->
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-<!--    <MauiVersion>8.0.6</MauiVersion> -->
   </PropertyGroup>
  <ItemGroup>
    <PackageReference Include="GitVersion.MsBuild">

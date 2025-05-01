@@ -31,6 +31,7 @@ let
     nil
     jetbrains.rider
     nodejs
+    act
     
   ];
   DOTNET_ROOT = "${sdk}";

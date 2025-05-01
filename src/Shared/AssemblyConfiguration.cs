@@ -11,5 +11,5 @@ using Xamarin.Forms;
 #endif
 [assembly: XmlnsDefinition("http://apes.ge", "APES.UI.XF")]
 [assembly: XmlnsPrefix("http://apes.ge", "apes")]
-[assembly: InternalsVisibleTo("APES.UI.XF.Tests")]
+[assembly: InternalsVisibleTo("unit")]
 [assembly: InternalsVisibleTo("APES.UI.MAUI.Sample")]

@@ -12,10 +12,6 @@ namespace APES.UI.XF.Tests
 {
     public class ContextMenuItemTest
     {
-        #if MAUI 
-        #else
-        public ContextMenuItemTest() => Xamarin.Forms.Mocks.MockForms.Init();
-        #endif 
         private class vm : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged;

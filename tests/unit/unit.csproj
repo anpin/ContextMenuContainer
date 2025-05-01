@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <RootNamespace>APES.UI.XF.Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
@@ -20,9 +21,6 @@
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
     
-  </ItemGroup>
-  <ItemGroup Condition="!$(TargetFramework.StartsWith('net9.0'))">
-    <PackageReference Include="Xamarin.Forms.Mocks"  />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

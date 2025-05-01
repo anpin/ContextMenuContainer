@@ -30,6 +30,7 @@ let
     nixpkgs-fmt
     nil
     jetbrains.rider
+    nodejs
     
   ];
   DOTNET_ROOT = "${sdk}";

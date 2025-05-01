@@ -3,7 +3,7 @@
     <PackageVersion Include="GitVersion.MsBuild" Version="5.12.0" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.3.230724000" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.6.250228001" />
     <PackageVersion Include="Microsoft.UI.Xaml" Version="2.7.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
@@ -12,6 +12,5 @@
     <PackageVersion Include="Appium.WebDriver" Version="7.2.0" />
     <PackageVersion Include="NUnit" Version="4.3.2" />
     <PackageVersion Include="NUnit3TestAdapter" Version="5.0.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
   </ItemGroup>
 </Project>

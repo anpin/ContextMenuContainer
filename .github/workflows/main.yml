@@ -58,7 +58,7 @@ jobs:
             --skip-duplicate \
             --api-key ${GITHUB_TOKEN}
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   publish_to_nuget:
     runs-on: ubuntu-latest
     needs: [ build ]

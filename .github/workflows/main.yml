@@ -35,7 +35,7 @@ jobs:
           msbuild -t:Restore -p:Configuration=Release
           ./pack.ps1 -PackageOutputPath $packageOutputPath
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: packages
           path: ${{ env.RESULT_DIR }}
@@ -46,7 +46,7 @@ jobs:
     environment: nuget
     steps:
       - name: Download artifacts  
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: packages
           path: ${{ env.RESULT_DIR }}
@@ -66,7 +66,7 @@ jobs:
     if: github.base_ref == '' # this would be set only on pull_request builds
     steps:
       - name: Download artifacts  
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: packages
           path: ${{ env.RESULT_DIR }}

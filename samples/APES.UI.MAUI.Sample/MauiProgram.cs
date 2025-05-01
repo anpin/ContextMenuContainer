@@ -1,4 +1,7 @@
 using APES.UI.XF;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Maui.Hosting;
+
 namespace APES.UI.MAUI.Sample;
 
 public static class MauiProgram

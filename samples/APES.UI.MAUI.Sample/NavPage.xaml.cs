@@ -1,4 +1,6 @@
-﻿namespace APES.UI.MAUI.Sample;
+﻿using Microsoft.Maui.Controls;
+
+namespace APES.UI.MAUI.Sample;
     public partial class NavPage : NavigationPage
     {
         public NavPage(Page root) : base(root)

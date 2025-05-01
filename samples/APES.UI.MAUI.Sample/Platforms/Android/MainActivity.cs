@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content.PM;
+using Microsoft.Maui;
 
 namespace APES.UI.MAUI.Sample;
 

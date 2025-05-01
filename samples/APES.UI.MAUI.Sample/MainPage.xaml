@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="APES.UI.MAUI.Sample.MainPage"
-             xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels;assembly=APES.UI.Sample.Shared"
+             xmlns:vm="clr-namespace:APES.UI.XF.Sample.ViewModels"
              xmlns:c="http://apes.ge"
              x:DataType="vm:MainViewModel"
              Title="Context menu example"

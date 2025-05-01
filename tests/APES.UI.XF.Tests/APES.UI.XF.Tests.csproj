@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('net8.0'))">
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
     <DefineConstants>$(DefineConstants);MAUI</DefineConstants>
   </PropertyGroup>
 
@@ -18,10 +18,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0'))">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
     
   </ItemGroup>
-  <ItemGroup Condition="!$(TargetFramework.StartsWith('net8.0'))">
+  <ItemGroup Condition="!$(TargetFramework.StartsWith('net9.0'))">
     <PackageReference Include="Xamarin.Forms.Mocks"  />
   </ItemGroup>
   <ItemGroup>

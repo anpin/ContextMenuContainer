@@ -35,10 +35,10 @@
     <PackageProjectUrl>https://github.com/anpin/ContextMenuContainer</PackageProjectUrl>
     <RepositoryUrl>https://github.com/anpin/ContextMenuContainer</RepositoryUrl>
     <PackageReleaseNotes>Added MAUI targets</PackageReleaseNotes>
-    <PackageTags>MAUI, contextmenu, rightmenu, actions, xamarin, windows, ios, android, mac, xamarin.forms, plugin, </PackageTags>
-    <Title>Context menu for MAUI and XF</Title>
-    <Summary>Context menu for MAUI and XF</Summary>
-    <Description>Native context menu for any MAUI or Xamarin.Forms view. Renders platform-specific context action on Windows, Android, iOS and macOS.</Description>
+    <PackageTags>MAUI, contextmenu, rightmenu, actions, windows, ios, android, mac, plugin </PackageTags>
+    <Title>Context menu for MAUI</Title>
+    <Summary>Context menu for MAUI</Summary>
+    <Description>Native context menu for any MAUI view. Renders platform-specific context action on Windows, Android, iOS and macOS.</Description>
     
     
     <Owners>Pavel Anpin</Owners>

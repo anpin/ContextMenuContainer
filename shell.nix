@@ -15,9 +15,9 @@ let
             platforms-android-34
             platforms-android-30
           ]);
-  in 
- mkShell {
-  packages = [
+fhs = pkgs.buildFHSEnv {
+  name = "dotnet-android-env";
+  targetPkgs = pkgs: [
     sdk
     tree
     android-sdk
@@ -34,8 +34,25 @@ let
     act
     
   ];
-  DOTNET_ROOT = "${sdk}";
-  ANDROID_HOME = "${android-sdk}/share/android-sdk";
-  ANDROID_SDK_ROOT = "${android-sdk}/share/android-sdk";
-  JAVA_HOME = jdk17.home;
-}
+#  DOTNET_ROOT = "${sdk}";
+#  ANDROID_HOME = "${android-sdk}/share/android-sdk";
+#  ANDROID_SDK_ROOT = "${android-sdk}/share/android-sdk";
+#  JAVA_HOME = jdk17.home;
+
+  profile = ''
+    export DOTNET_ROOT="${sdk}"
+    export ANDROID_HOME="${android-sdk}/share/android-sdk"
+    export ANDROID_SDK_ROOT="${android-sdk}/share/android-sdk"
+    export JAVA_HOME="${pkgs.jdk17.home}"
+    mkdir -p ~/.npm
+    npm config set prefix ~/.npm
+    export PATH="$HOME/.npm/bin:$PATH"
+    npm install -g appium
+    if ! appium driver list --installed --json | jq -e '.drivers | has("uiautomator2")' >/dev/null; then
+      appium driver install uiautomator2
+    fi    
+  '';
+
+  runScript = "bash --init-file /etc/profile";
+#  runScript = "bash";
+}; in fhs.env

@@ -15,12 +15,13 @@ public class AppiumSetup
     public const string AndroidApplicationActivity = $"{AndroidApplication}.MainActivity";
     
     static string slnRoot =>
-        Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 4)));
+        Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 6) ));
     static string appPath =>
         Environment.GetEnvironmentVariable("ANDROID_APP_PATH") ??
         Path.GetFullPath(Path.Combine(
             slnRoot,
-            "app",
+            "samples", 
+            "APES.UI.MAUI.Sample",
             "bin",
             "Debug", 
             "net9.0-android",

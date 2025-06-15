@@ -25,7 +25,7 @@ public class AppiumSetup
             "bin",
             "Release", 
             "net9.0-android",
-            $"{AndroidApplication}.apk"));
+            $"{AndroidApplication}-Signed.apk"));
     private static AppiumDriver? driver;
 
     public static AppiumDriver App => driver ?? throw new NullReferenceException("AppiumDriver is null");

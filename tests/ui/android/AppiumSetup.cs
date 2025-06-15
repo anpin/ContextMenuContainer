@@ -23,7 +23,7 @@ public class AppiumSetup
             "samples", 
             "APES.UI.MAUI.Sample",
             "bin",
-            "Debug", 
+            "Release", 
             "net9.0-android",
             $"{AndroidApplication}.apk"));
     private static AppiumDriver? driver;

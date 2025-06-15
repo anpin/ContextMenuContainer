@@ -40,14 +40,14 @@ jobs:
           name: packages
           path: ${{ env.RESULT_DIR }}
       - name: Build Android APK
-        run: dotnet build samples/APES.UI.MAUI.Sample/APES.UI.MAUI.Sample.csproj -c Debug -f net9.0-android
+        run: dotnet build samples/APES.UI.MAUI.Sample/APES.UI.MAUI.Sample.csproj -c Release -f net9.0-android
       - name: Upload Android APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: samples/APES.UI.MAUI.Sample/bin/Debug/net9.0-android
+          path: samples/APES.UI.MAUI.Sample/bin/Release/net9.0-android
       - name: Build Appium Test Runner
-        run: dotnet publish tests/ui/android/UITests.Android.csproj -c Debug -f net9.0 -o appium-runner
+        run: dotnet publish tests/ui/android/UITests.Android.csproj -c Release -f net9.0 -o appium-runner
       - name: Upload Appium Test Runner artifact
         uses: actions/upload-artifact@v4
         with:

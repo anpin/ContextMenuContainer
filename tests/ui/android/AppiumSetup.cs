@@ -25,6 +25,7 @@ public class AppiumSetup
             "bin",
             "Release", 
             "net9.0-android",
+            "publish",
             $"{AndroidApplication}-Signed.apk"));
     private static AppiumDriver? driver;
 

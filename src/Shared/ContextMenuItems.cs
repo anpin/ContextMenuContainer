@@ -4,7 +4,7 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace APES.UI.XF
+namespace APES.MAUI
 {
     public class ContextMenuItems : ObservableCollection<ContextMenuItem>
     {

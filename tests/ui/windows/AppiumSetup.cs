@@ -25,7 +25,7 @@ public class AppiumSetup
 			PlatformName = "Windows",
 			// The identifier of the deployed application to test
 			// App = "f0276ba8-3171-4a5d-9410-ac37ee234b34_9zz4h110yvjzm!App",
-			App = "APES.UI.MAUI.Sample!App",
+			App = "APES.MAUI.Sample!App",
 		};
 
 		// Note there are many more options that you can use to influence the app under test according to your needs

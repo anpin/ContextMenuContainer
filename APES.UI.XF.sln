@@ -7,13 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8D069BC7-B62
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4AD557F6-04AF-4ECC-A1EB-2BE1208AA94C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{44E54204-4497-43C1-AAF9-43AFFD5FB5F2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{44E54204-4497-43C1-AAF9-43AFFD5FB5F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "unit", "tests\unit\unit.csproj", "{FF8B7181-F526-4624-A4E2-5AA3B809ED79}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APES.UI.XF", "src\APES.UI.XF.csproj", "{53559169-EC01-4D52-9348-092783E9E5F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APES.MAUI", "src\APES.MAUI.csproj", "{53559169-EC01-4D52-9348-092783E9E5F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APES.UI.MAUI.Sample", "samples\APES.UI.MAUI.Sample\APES.UI.MAUI.Sample.csproj", "{6D3BEB7F-E3F6-41EF-8BDC-DF56EC39EBE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APES.MAUI.Sample", "sample\APES.MAUI.Sample.csproj", "{6D3BEB7F-E3F6-41EF-8BDC-DF56EC39EBE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UITests.Android", "tests\ui\android\UITests.Android.csproj", "{D8A45F20-EE39-4010-9DBE-39E61DCB805D}"
 EndProject
@@ -34,6 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sln", "sln", "{278630DA-288
 		pack.ps1 = pack.ps1
 		README.md = README.md
 		shell.nix = shell.nix
+		shell_fhs.nix = shell_fhs.nix
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UITests.iOS", "tests\ui\ios\UITests.iOS.csproj", "{35622AC2-6128-41AE-92DF-9ECC68C24B0F}"

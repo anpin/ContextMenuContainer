@@ -2,14 +2,8 @@
 // Copyright (c) 2021 Pavel Anpin
 
 using System.Runtime.CompilerServices;
-#if MAUI
 using Microsoft.Maui.Controls;
-
-#else
-using Xamarin.Forms;
-
-#endif
-[assembly: XmlnsDefinition("http://apes.ge", "APES.UI.XF")]
+[assembly: XmlnsDefinition("http://apes.ge", "APES.MAUI")]
 [assembly: XmlnsPrefix("http://apes.ge", "apes")]
 [assembly: InternalsVisibleTo("unit")]
-[assembly: InternalsVisibleTo("APES.UI.MAUI.Sample")]
+[assembly: InternalsVisibleTo("APES.MAUI.Sample")]

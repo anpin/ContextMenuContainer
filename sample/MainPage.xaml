@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APES.MAUI.Sample.MainPage"
+             xmlns:vm="clr-namespace:APES.MAUI.Sample.ViewModels"
+             xmlns:c="http://apes.ge"
+             x:DataType="vm:MainViewModel"
+             Title="ContextMenuContainer Demo"
+             BackgroundColor="#f5f5f5"
+             AutomationId="sample_page"
+             >
+    
+    <ContentPage.BindingContext>
+        <vm:MainViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Resources>
+        <Style x:Key="CardStyle" TargetType="Frame">
+            <Setter Property="Margin" Value="12,8" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HasShadow" Value="True" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="Margin" Value="12,8,12,0" />
+            <Setter Property="TextColor" Value="#3E3E3E" />
+        </Style>
+    </ContentPage.Resources>
+    
+    <ScrollView>
+        <StackLayout Spacing="8">
+            <Label Text="ContextMenuContainer Demo" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center"
+                   Margin="0,12,0,0"
+                   TextColor="#2B2B2B" />
+            
+            <Label Text="Tap and hold or right-click on any card to see the context menu" 
+                   HorizontalOptions="Center" 
+                   FontSize="14"
+                   TextColor="#7E7E7E"
+                   Margin="0,0,0,8" />
+            
+            <!-- Basic example with static menu items -->
+            <Label Text="Basic Context Menu" Style="{StaticResource HeaderStyle}" />
+            <c:ContextMenuContainer x:Name="container1" AutomationId="container1">
+                <c:ContextMenuContainer.MenuItems>
+                    <c:ContextMenuItem x:Name="c1_action1" AutomationId="c1_action1" Text="Action 1" Command="{Binding FirstCommand}" CommandParameter="Action 1 pressed!" />
+                    <c:ContextMenuItem x:Name="c1_action2" AutomationId="c1_action2" Text="Action with icon" Command="{Binding FirstCommand}" CommandParameter="Action with icon pressed!" Icon="{Binding SettingsIconSource}"/>
+                </c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuContainer.Content>
+                    <Frame Style="{StaticResource CardStyle}" BackgroundColor="#4CAF50">
+                        <StackLayout>
+                            <Label Text="Basic Example" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                            <Label AutomationId="c1_label" Text="{Binding Text}" TextColor="White" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+                        </StackLayout>
+                    </Frame>
+                </c:ContextMenuContainer.Content>
+            </c:ContextMenuContainer>
+
+            <!-- Dynamic menu items example -->
+            <Label Text="Dynamic Context Menu Items" Style="{StaticResource HeaderStyle}" />
+            <c:ContextMenuContainer x:Name="container2" AutomationId="container2" MenuItems="{Binding ImageContextItems}">
+                <c:ContextMenuContainer.Content>
+                    <Frame Style="{StaticResource CardStyle}" BackgroundColor="#FFB74D">
+                        <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="Auto,*">
+                            <Image Source="{Binding LogoIconSource}" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0"
+                                   HeightRequest="60" WidthRequest="60" Margin="0,0,12,0" />
+                            <Label Text="Dynamic Menu Items" Grid.Row="0" Grid.Column="1"
+                                   FontSize="16" FontAttributes="Bold" TextColor="#5D4037" />
+                            <Label Text="{Binding DynamicSectionText}" Grid.Row="1" Grid.Column="1"
+                                   TextColor="#5D4037" FontAttributes="Italic" />
+                            <Label Text="Right-click to see multiple dynamic menu items" Grid.Row="2" Grid.Column="1"
+                                   TextColor="#5D4037" />
+                        </Grid>
+                    </Frame>
+                </c:ContextMenuContainer.Content>
+            </c:ContextMenuContainer>
+            
+            <!-- Asynchronous command example -->
+            <Label Text="Asynchronous Command" Style="{StaticResource HeaderStyle}" />
+            <c:ContextMenuContainer x:Name="container3" AutomationId="container3">
+                <c:ContextMenuContainer.MenuItems>
+                    <c:ContextMenuItem Text="Start the loop!" IsDestructive="True" Command="{Binding NeverEndingCommand}"/>
+                </c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuContainer.Content>
+                    <Frame Style="{StaticResource CardStyle}" BackgroundColor="#EF5350">
+                        <StackLayout>
+                            <Label Text="Long-running Commands" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                            <Label Text="{Binding NeverEndingCounter, StringFormat='This has never ending command which fired {0} times'}" 
+                                   TextColor="White" />
+                        </StackLayout>
+                    </Frame>
+                </c:ContextMenuContainer.Content>
+            </c:ContextMenuContainer>
+            
+            <!-- Disabled items example -->
+            <Label Text="Disabled Menu Items" Style="{StaticResource HeaderStyle}" />
+            <c:ContextMenuContainer x:Name="container4" AutomationId="container4">
+                <c:ContextMenuContainer.MenuItems>
+                    <c:ContextMenuItem Text="Enabled Action" Command="{Binding FirstCommand}" CommandParameter="Enabled action pressed!" />
+                    <c:ContextMenuItem Text="Disabled Action" IsEnabled="False" />
+                    <c:ContextMenuItem Text="Conditional Action" IsEnabled="{Binding IsConditionalActionEnabled}" Command="{Binding ToggleConditionalCommand}" />
+                </c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuContainer.Content>
+                    <Frame Style="{StaticResource CardStyle}" BackgroundColor="#7986CB">
+                        <StackLayout>
+                            <Label Text="Disabled Items Example" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                            <Label Text="Right-click to see enabled and disabled menu items" TextColor="White" />
+                            <Label Text="{Binding ConditionalActionStatus}" TextColor="White" Margin="0,8,0,0" />
+                            <Button Text="Toggle Conditional Action" Command="{Binding ToggleConditionalCommand}" 
+                                    BackgroundColor="#5C6BC0" TextColor="White" Margin="0,8,0,0" />
+                        </StackLayout>
+                    </Frame>
+                </c:ContextMenuContainer.Content>
+            </c:ContextMenuContainer>
+            
+            <!-- Nested controls example -->
+            <Label Text="Nested Controls" Style="{StaticResource HeaderStyle}" />
+            <c:ContextMenuContainer x:Name="container5" AutomationId="container5">
+                <c:ContextMenuContainer.MenuItems>
+                    <c:ContextMenuItem Text="Add Item" Command="{Binding AddItemCommand}" Icon="{Binding SettingsIconSource}" />
+                    <c:ContextMenuItem Text="Clear Items" Command="{Binding ClearItemsCommand}" IsDestructive="True" />
+                </c:ContextMenuContainer.MenuItems>
+                <c:ContextMenuContainer.Content>
+                    <Frame Style="{StaticResource CardStyle}" BackgroundColor="#9575CD">
+                        <StackLayout>
+                            <Label Text="Collection Example" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                            <CollectionView ItemsSource="{Binding ListItems}" EmptyView="No items in the collection" HeightRequest="120">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame Margin="4" Padding="8" BackgroundColor="#7E57C2" CornerRadius="4">
+                                            <Label Text="{Binding}" TextColor="White" />
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </StackLayout>
+                    </Frame>
+                </c:ContextMenuContainer.Content>
+            </c:ContextMenuContainer>
+
+            <BoxView HeightRequest="20" />
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

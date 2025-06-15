@@ -21,6 +21,13 @@ public abstract class TestPageBase
         _ => MobileBy.Id(id),
     };
 
+     protected By GetByText(string id) => App switch
+    {
+        AndroidDriver _ => MobileBy.AndroidUIAutomator($"new UiSelector().text(\"{id}\")"),
+        
+        _ => MobileBy.LinkText(id),
+    };
+
     protected IWebElement GetElement(string id) => 
         App.FindElement(GetBy(id));
 
@@ -28,6 +35,8 @@ public abstract class TestPageBase
         App.FindElement(MobileBy.TagName("email"));
     public IWebElement PageElement() => GetElement(PageName);
     public void VerifyPageShown() => Assert.That(PageElement(), Is.Not.Null);
+
+
 }
 
 public enum Platform

@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\APES.UI.XF.csproj" />
+    <ProjectReference Include="..\..\src\APES.MAUI.csproj" />
   </ItemGroup>
 
 </Project>

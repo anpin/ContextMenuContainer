@@ -3,8 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
-#if MAUI
-using APES.UI.XF.UWP;
+using APES.MAUI.UWP;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
@@ -21,7 +20,7 @@ using WBinding = Microsoft.UI.Xaml.Data.Binding;
 using WColors = Microsoft.UI.Colors;
 using WControl = Microsoft.UI.Xaml.Controls.Control;
 
-namespace APES.UI.XF
+namespace APES.MAUI
 {
     [Preserve(AllMembers = true)]
     internal sealed class ContextMenuContainerRenderer : ContentViewHandler
@@ -41,73 +40,6 @@ namespace APES.UI.XF
         private FrameworkElement _platformView => PlatformView;
 #pragma warning restore SA1201
 #pragma warning restore SA1300
-
-#else
-using APES.UI.XF;
-using APES.UI.XF.UWP;
-using Windows.UI.Input;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Xamarin.Forms.Internals;
-using Xamarin.Forms.Platform.UWP;
-using WBinding = Windows.UI.Xaml.Data.Binding;
-using WColors = Windows.UI.Colors;
-using WControl = Windows.UI.Xaml.Controls.Control;
-
-[assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
-
-// ReSharper disable once CheckNamespace
-namespace APES.UI.XF.UWP
-{
-    [Preserve(AllMembers = true)]
-    public class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, ContentControl>
-    {
-#pragma warning disable SA1201
-        private FrameworkElement? _platformView;
-#pragma warning restore SA1201
-
-        public ContextMenuContainerRenderer() => AutoPackage = false;
-
-        protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
-        {
-            base.OnElementChanged(e);
-            if (e.OldElement != null)
-            {
-                // unsubscribe from events here
-            }
-
-            if (e.NewElement == null)
-            {
-                return;
-            }
-
-            if (Control == null)
-            {
-                SetNativeControl(new ContentControl());
-            }
-
-            Pack();
-        }
-
-        private void Pack()
-        {
-            if (Element.Content == null)
-            {
-                return;
-            }
-
-            IVisualElementRenderer renderer = Element.Content.GetOrCreateRenderer();
-            _platformView = renderer.ContainerElement;
-            _platformView.PointerReleased += PlatformViewPointerReleased;
-
-            // PlatformView.Holding += FrameworkElement_Holding;
-            Control.Content = _platformView;
-        }
-
-#endif
 
         private void PlatformViewPointerReleased(object sender, PointerRoutedEventArgs e)
         {

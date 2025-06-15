@@ -10,7 +10,7 @@ namespace UITests;
 [SetUpFixture]
 public class AppiumSetup
 {
-    public const string AndroidApplication = "com.apes.ui.maui.sample";
+    public const string AndroidApplication = "com.apes.maui.sample";
 
     public const string AndroidApplicationActivity = $"{AndroidApplication}.MainActivity";
     
@@ -20,8 +20,7 @@ public class AppiumSetup
         Environment.GetEnvironmentVariable("ANDROID_APP_PATH") ??
         Path.GetFullPath(Path.Combine(
             slnRoot,
-            "samples", 
-            "APES.UI.MAUI.Sample",
+            "sample", 
             "bin",
             "Release", 
             "net9.0-android",

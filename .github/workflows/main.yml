@@ -40,12 +40,12 @@ jobs:
           name: packages
           path: ${{ env.RESULT_DIR }}
       - name: Build Android APK
-        run: dotnet publish samples/APES.UI.MAUI.Sample/APES.UI.MAUI.Sample.csproj -c Release -f net9.0-android -p:RunAOTCompilation=true -p:AndroidPackageFormat=apk
+        run: dotnet publish sample -c Release -f net9.0-android -p:RunAOTCompilation=true -p:AndroidPackageFormat=apk
       - name: Upload Android APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: samples/APES.UI.MAUI.Sample/bin/Release/net9.0-android/publish
+          path: sample/bin/Release/net9.0-android/publish
       - name: Build Appium Test Runner
         run: dotnet publish tests/ui/android/UITests.Android.csproj -c Release -f net9.0 -o appium-runner
       - name: Upload Appium Test Runner artifact
@@ -112,9 +112,8 @@ jobs:
           disable-animations: true
           script: |
               ls -alhR ./android-apk
-              export ANDROID_APP_PATH="$PWD/android-apk/com.apes.ui.maui.sample-Signed.apk"
               adb devices
-              dotnet test ./appium-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
+              export ANDROID_APP_PATH="$PWD/android-apk/com.apes.maui.sample-Signed.apk" && dotnet test ./appium-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
               
       - name: Upload Test Results
         if: always()

@@ -4,12 +4,12 @@
 using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("APES.UI.XF.Droid")]
-[assembly: InternalsVisibleTo("APES.UI.XF.iOS")]
-[assembly: InternalsVisibleTo("APES.UI.XF.UWP")]
-[assembly: InternalsVisibleTo("APES.UI.XF.Mac")]
+[assembly: InternalsVisibleTo("APES.MAUI.Droid")]
+[assembly: InternalsVisibleTo("APES.MAUI.iOS")]
+[assembly: InternalsVisibleTo("APES.MAUI.UWP")]
+[assembly: InternalsVisibleTo("APES.MAUI.Mac")]
 
-namespace APES.UI.XF
+namespace APES.MAUI
 {
     internal static class Logger
     {
@@ -34,7 +34,7 @@ namespace APES.UI.XF
 
         private static void DiagnosticLog(string format, params object[] parameters)
         {
-            string formatWithHeader = " APES.UI.XF " + DateTime.Now.ToString("MM-dd H:mm:ss.fff ") + format;
+            string formatWithHeader = " APES.MAUI " + DateTime.Now.ToString("MM-dd H:mm:ss.fff ") + format;
 #if DEBUG
             System.Diagnostics.Debug.WriteLine(formatWithHeader, parameters);
 #else

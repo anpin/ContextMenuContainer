@@ -10,7 +10,7 @@ namespace UITests;
 [SetUpFixture]
 public class AppiumSetup
 {
-    public const string iosApplication = "com.apes.ui.maui.sample";
+    public const string iosApplication = "com.apes.maui.sample";
 
     static string slnRoot =>
         Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 4)));
@@ -32,7 +32,7 @@ public class AppiumSetup
         var capabilities = new AppiumOptions();
         capabilities.AutomationName = AutomationName.iOSXcuiTest;
         capabilities.DeviceName = "iPhone SE (3rd generation) Simulator";
-        capabilities.App =  "com.apes.ui.maui.sample";
+        capabilities.App =  "com.apes.maui.sample";
 
         driver = new IOSDriver(capabilities);
     }

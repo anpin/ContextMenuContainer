@@ -112,7 +112,7 @@ jobs:
           disable-animations: true
           script: |
               ls -alhR ./android-apk
-              export ANDROID_APP_PATH="$PWD/android-apk/com.apes.ui.maui.sample.apk" && dotnet test ./appium-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
+              export ANDROID_APP_PATH="$PWD/android-apk/com.apes.ui.maui.sample-Signed.apk" && dotnet test ./appium-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
               
       - name: Upload Test Results
         if: always()

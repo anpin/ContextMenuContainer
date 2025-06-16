@@ -24,7 +24,10 @@
     inherit (inputs.nixpkgs) lib; 
     in {
       
-      devShells.${system}.default = import ./shell.nix {inherit pkgs android-nixpkgs;};
+      devShells.${system} = { 
+        default = import ./shell.nix {inherit pkgs android-nixpkgs;};
+        fhs = import ./shell_fhs.nix {inherit pkgs android-nixpkgs;};
+      };
 
   };
 }

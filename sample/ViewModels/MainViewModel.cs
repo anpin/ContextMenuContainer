@@ -93,9 +93,6 @@ namespace APES.MAUI.Sample.ViewModels
             ToggleConditionalCommand = new Command(ToggleConditionalAction);
             AddItemCommand = new Command(AddItem);
             ClearItemsCommand = new Command(ClearItems);
-
-            // Initialize resource paths
-            LogoIconSource = "logo.png";
             _deleteIconSource = "outline_delete_black_24.png";
             SettingsIconSource = "outline_settings_black_24.png";
             
@@ -187,8 +184,7 @@ namespace APES.MAUI.Sample.ViewModels
             get => _neverEndingCounter;
             set => SetField(ref _neverEndingCounter, value);
         }
-
-        public FileImageSource LogoIconSource { get; private set; }
+        
         public FileImageSource SettingsIconSource { get; private set; }
         private readonly FileImageSource _deleteIconSource;
     }

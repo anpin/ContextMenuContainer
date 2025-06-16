@@ -24,7 +24,6 @@ public abstract class TestPageBase
      protected By GetByText(string id) => App switch
     {
         AndroidDriver _ => MobileBy.AndroidUIAutomator($"new UiSelector().text(\"{id}\")"),
-        
         _ => MobileBy.LinkText(id),
     };
 

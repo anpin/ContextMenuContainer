@@ -67,12 +67,12 @@
                 <c:ContextMenuContainer.Content>
                     <Frame Style="{StaticResource CardStyle}" BackgroundColor="#FFB74D">
                         <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="Auto,*">
-                            <Image Source="{Binding LogoIconSource}" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0"
-                                   HeightRequest="60" WidthRequest="60" Margin="0,0,12,0" />
                             <Label Text="Dynamic Menu Items" Grid.Row="0" Grid.Column="1"
                                    FontSize="16" FontAttributes="Bold" TextColor="#5D4037" />
                             <Label Text="{Binding DynamicSectionText}" Grid.Row="1" Grid.Column="1"
-                                   TextColor="#5D4037" FontAttributes="Italic" />
+                                   TextColor="#5D4037" FontAttributes="Italic"
+                                   AutomationId="c2_label"
+                                   />
                             <Label Text="Right-click to see multiple dynamic menu items" Grid.Row="2" Grid.Column="1"
                                    TextColor="#5D4037" />
                         </Grid>
@@ -91,7 +91,9 @@
                         <StackLayout>
                             <Label Text="Long-running Commands" FontSize="16" FontAttributes="Bold" TextColor="White" />
                             <Label Text="{Binding NeverEndingCounter, StringFormat='This has never ending command which fired {0} times'}" 
-                                   TextColor="White" />
+                                   TextColor="White"
+                                   AutomationId="c3_label"
+                                   />
                         </StackLayout>
                     </Frame>
                 </c:ContextMenuContainer.Content>

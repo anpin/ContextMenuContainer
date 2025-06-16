@@ -261,6 +261,22 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             }
 
             contextAction.SetEnabled(item.IsEnabled);
+                
+            // Set ContentDescription for Appium/UI testing
+            if (string.IsNullOrEmpty(item.AutomationId))
+            {
+                if (!string.IsNullOrEmpty(item.Text))
+                {
+                    // If no AutomationId, use the Text as fallback for testability
+                    contextAction.SetContentDescription(item.Text);
+                }
+            }
+            else
+            {
+                // Android uses ContentDescription for automation testing
+                contextAction.SetContentDescription(item.AutomationId);
+            }
+
             if (item.Icon != null)
             {
                 string name = Path.GetFileNameWithoutExtension(item.Icon.File);

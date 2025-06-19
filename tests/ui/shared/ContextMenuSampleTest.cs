@@ -117,14 +117,14 @@ public class ContextMenuSampleTest : TestPageBase
     {
         // Use ScrollToAndGetElement to find container3 even if it's not visible
         SaveScreenshot("Before_Scrolling_To_Container3.png");
-        var container = ScrollToAndGetElement("container3");
+        ScrollToAndGetElement("c3_label");
         SaveScreenshot("After_Finding_Container3.png");
         
         var getLabel = () => App.FindElement(GetBy("c3_label")).Text;
         var initialText = getLabel();
         
         var actions = new Actions(App);
-        actions.ClickAndHold(container).Perform();
+        actions.ClickAndHold(GetElement("container3")).Perform();
         
         
         var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));

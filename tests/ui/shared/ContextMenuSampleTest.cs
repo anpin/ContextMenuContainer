@@ -151,7 +151,7 @@ public class ContextMenuSampleTest : TestPageBase
     {
         // Scroll to container4 first
         SaveScreenshot("Before_Scrolling_To_Container4.png");
-        ScrollToElement("container4");
+        ScrollToAndGetElement("c4_toggle");
         SaveScreenshot("After_Finding_Container4.png");
         
         var getLabel = () => App.FindElement(GetBy("c4_label")).Text;

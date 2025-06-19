@@ -51,51 +51,45 @@ public abstract class TestPageBase
         _ => MobileBy.LinkText(id),
     };
 
-    protected IWebElement GetElement(string id) => 
+    protected AppiumElement GetElement(string id) => 
         App.FindElement(GetBy(id));
-        
-    protected IWebElement ScrollToAndGetElement(string id)
+
+    protected bool TryGetElement(string id, out AppiumElement? element)
     {
         try
         {
-            // Try to find the element first without scrolling
-            return GetElement(id);
+            element = App.FindElement(GetBy(id));
+            return true;
         }
-        catch (OpenQA.Selenium.NoSuchElementException)
+        catch (Exception e)
         {
-            // Element not found, try to scroll to it
-            ScrollToElement(id);
-            return GetElement(id);
+            element = null;
+            return false;
         }
     }
     
-    protected void ScrollToElement(string id)
+        
+    
+    protected AppiumElement? ScrollToAndGetElement(string id)
     {
         switch (App)
         {
             case AndroidDriver androidDriver:
-                try
-                {
-                    // Use Android UIAutomator2 to scroll to the element
-                    string uiCommand = $"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId(\"{id}\"))";
-                    androidDriver.FindElement(MobileBy.AndroidUIAutomator(uiCommand));
-                    Console.WriteLine($"Scrolled to element: {id}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to scroll to element {id}: {ex.Message}");
-                    // Try a general scroll down if the specific scroll fails
-                    PerformGeneralScroll();
-                }
-                break;
             case IOSDriver iosDriver:
-                PerformGeneralScroll();
+                AppiumElement? element = null;
+                while (!TryGetElement(id, out element))
+                {
+                    ScrollDown();
+                }
+
+                return element;
+
                 break;
             default:
                 throw new NotImplementedException("Unsupported platform");
         }
     }
-    protected void PerformGeneralScroll()
+    protected void ScrollDown()
     {
         // Get screen dimensions
         var size = App.Manage().Window.Size;
@@ -104,34 +98,17 @@ public abstract class TestPageBase
         int startX = size.Width / 2;
         int startY = (int)(size.Height * 0.7);
         int endX = size.Width / 2;
-        int endY = (int)(size.Height * 0.3);
-        
-        // Perform the scroll
-        try 
-        {
-            // Simple scrolling for both Android and iOS
-            var actions = new OpenQA.Selenium.Interactions.Actions(App);
+        int endY = (int)(size.Height * 0.1);
+        var actions = new OpenQA.Selenium.Interactions.Actions(App);
             actions.MoveToLocation(startX, startY)
                 .ClickAndHold()
-                .MoveByOffset(0, startY - endY)
+                .MoveByOffset(0, -endY)
                 .Release()
                 .Perform();
-                
-            Console.WriteLine("Performed general scroll");
-            
-            // Short wait to let scroll complete
-            Thread.Sleep(1000);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to perform general scroll: {ex.Message}");
-        }
+            Thread.Sleep(300);
     }
 
-    public IWebElement FindByTagName(string tagName) =>
-        App.FindElement(MobileBy.TagName("email"));
     public IWebElement PageElement() => GetElement(PageName);
-    public void VerifyPageShown() => Assert.That(PageElement(), Is.Not.Null);
 
     public string StartScreenRecording()
     {
@@ -207,13 +184,4 @@ public abstract class TestPageBase
                (value.Equals("1") || value.Equals("true", StringComparison.OrdinalIgnoreCase));
     }
     
-
-
-}
-
-public enum Platform
-{
-    Windows,
-    iOS,
-    Android,
 }

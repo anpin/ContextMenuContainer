@@ -114,10 +114,7 @@ jobs:
               ls -alhR ./android-apk
               adb devices
               
-              export APPIUM_SCREENSHOTS_DIR="Screenshots" &&
-              export APPIUM_RECORD_SCREEN="true" &&
-              export ANDROID_APP_PATH="$PWD/android-apk/com.apes.maui.sample-Signed.apk" &&
-              dotnet test ./appium-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
+              export APPIUM_SCREENSHOTS_DIR="Screenshots" && export APPIUM_RECORD_SCREEN="true" && export ANDROID_APP_PATH="$PWD/android-apk/com.apes.maui.sample-Signed.apk" && dotnet test ./appium-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
               
       - name: Upload Test Results
         if: always()

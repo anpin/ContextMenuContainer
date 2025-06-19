@@ -27,6 +27,7 @@ public abstract class TestPageBase
                 string envDir = Environment.GetEnvironmentVariable(ScreenshotsDirEnvVar) ?? "";
                 _screenshotsDir = !string.IsNullOrEmpty(envDir) ? envDir : DefaultScreenshotsDir;
                 Directory.CreateDirectory(_screenshotsDir);
+                Console.WriteLine("Screenshots would be saved to [{0}]", _screenshotsDir);
             }
             return _screenshotsDir;
         }

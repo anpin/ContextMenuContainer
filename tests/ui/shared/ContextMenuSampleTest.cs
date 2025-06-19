@@ -1,7 +1,7 @@
 using OpenQA.Selenium.Appium.Interactions;
 using OpenQA.Selenium.Interactions;
 using PointerInputDevice = OpenQA.Selenium.Appium.Interactions.PointerInputDevice;
-using System.IO;
+using NUnit.Framework;
 
 namespace UITests;
 
@@ -11,24 +11,19 @@ namespace UITests;
 public class ContextMenuSampleTest : TestPageBase
 {
     protected override string PageName => "sample_page";
-
-    private const string ScreenshotsDir = "Screenshots";
     
     [SetUp]
     public void Setup()
-    {
-        // Create screenshots directory if it doesn't exist
-        Directory.CreateDirectory(ScreenshotsDir);
-        
+    {       
         Assert.That(PageElement().Displayed, Is.True, "Page should be visible");
         SaveScreenshot("InitialState.png");
+        StartScreenRecording();
     }
+
+    [TearDown]
+    public void TearDown() => StopScreenRecording();
     
-    private void SaveScreenshot(string filename)
-    {
-        string path = Path.Combine(ScreenshotsDir, filename);
-        App.GetScreenshot().SaveAsFile(path);
-    }
+    // Using base class SaveScreenshot method
 
     [Test]
     public void Container1_ContextMenuActions()

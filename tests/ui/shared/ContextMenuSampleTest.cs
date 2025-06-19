@@ -1,6 +1,7 @@
 using OpenQA.Selenium.Appium.Interactions;
 using OpenQA.Selenium.Interactions;
 using PointerInputDevice = OpenQA.Selenium.Appium.Interactions.PointerInputDevice;
+using System.IO;
 
 namespace UITests;
 
@@ -11,11 +12,22 @@ public class ContextMenuSampleTest : TestPageBase
 {
     protected override string PageName => "sample_page";
 
+    private const string ScreenshotsDir = "Screenshots";
+    
     [SetUp]
     public void Setup()
     {
+        // Create screenshots directory if it doesn't exist
+        Directory.CreateDirectory(ScreenshotsDir);
+        
         Assert.That(PageElement().Displayed, Is.True, "Page should be visible");
-        App.GetScreenshot().SaveAsFile("InitialState.png");
+        SaveScreenshot("InitialState.png");
+    }
+    
+    private void SaveScreenshot(string filename)
+    {
+        string path = Path.Combine(ScreenshotsDir, filename);
+        App.GetScreenshot().SaveAsFile(path);
     }
 
     [Test]
@@ -26,7 +38,7 @@ public class ContextMenuSampleTest : TestPageBase
             var container = GetElement("container1");
             Assert.That(container.Displayed, Is.True, "container1 should be visible");
             
-            App.GetScreenshot().SaveAsFile("Container1_Before.png");
+            SaveScreenshot("Container1_Before.png");
             
             var actions = new Actions(App);
             
@@ -35,13 +47,13 @@ public class ContextMenuSampleTest : TestPageBase
             var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
             
             var actionItem =  wait.Until(d =>App.FindElement(GetByText("Action 1")));
-            App.GetScreenshot().SaveAsFile("Container1_Menu.png");
+            SaveScreenshot("Container1_Menu.png");
 
             Assert.That(actionItem, Is.Not.Null, "Action 1 menu item should be visible");
 
             actionItem.Click();
             
-            App.GetScreenshot().SaveAsFile("Container1_After.png");
+            SaveScreenshot("Container1_After.png");
 
             var actionResult = wait.Until(d =>  App.FindElement(GetByText("Action 1 pressed!")));
             Assert.That(actionResult, Is.Not.Null, "Action 1 should change text");
@@ -54,7 +66,7 @@ public class ContextMenuSampleTest : TestPageBase
         }
         catch (WebDriverException ex)
         {
-            App.GetScreenshot().SaveAsFile("Container1_ContextMenu_Error.png");
+            SaveScreenshot("Container1_ContextMenu_Error.png");
             Assert.Fail($"Failed to interact with context menu: {ex.Message} {ex.StackTrace}");
         }
     }
@@ -75,7 +87,7 @@ public class ContextMenuSampleTest : TestPageBase
             var destructiveItem = wait.Until(d => App.FindElement(GetByText("Remove context actions"))); 
             destructiveItem.Click();
             
-            App.GetScreenshot().SaveAsFile("Container2_Remove_Result.png");
+            SaveScreenshot("Container2_Remove_Result.png");
             
             actions.ClickAndHold(container).Perform();
             
@@ -84,7 +96,7 @@ public class ContextMenuSampleTest : TestPageBase
             var restoreItem = wait.Until(d => App.FindElement(GetByText("Give me my actions back!"))); 
             restoreItem.Click();
             
-            App.GetScreenshot().SaveAsFile("Container2_ActionsRestored.png");
+            SaveScreenshot("Container2_ActionsRestored.png");
             
             actions.ClickAndHold(container).Perform();
             var verifyItem = wait.Until(d => App.FindElement(GetByText($"Press me 1!"))); 
@@ -96,7 +108,7 @@ public class ContextMenuSampleTest : TestPageBase
         }
         catch (WebDriverException ex)
         {
-            App.GetScreenshot().SaveAsFile("Container2_ContextMenu_Error.png");
+            SaveScreenshot("Container2_ContextMenu_Error.png");
             Assert.Fail($"Failed to interact with dynamic context menu: {ex.Message} {ex.StackTrace}");
         }
     }
@@ -119,16 +131,16 @@ public class ContextMenuSampleTest : TestPageBase
             var menuItem = wait.Until(d => App.FindElement(GetByText("Start the loop!"))); 
             menuItem.Click();
             
-            App.GetScreenshot().SaveAsFile("Container3_BeforeCounterIncrease.png");
+            SaveScreenshot("Container3_BeforeCounterIncrease.png");
             Thread.Sleep(6000);
             var currentText = getLabel();
-            App.GetScreenshot().SaveAsFile("Container3_AfterCounterIncrease.png");
+            SaveScreenshot("Container3_AfterCounterIncrease.png");
             
             Assert.That(currentText, Is.Not.EqualTo(initialText), "Counter should have increased");
         }
         catch (WebDriverException ex)
         {
-            App.GetScreenshot().SaveAsFile("Container3_ContextMenu_Error.png");
+            SaveScreenshot("Container3_ContextMenu_Error.png");
             Assert.Fail($"Failed to interact with never-ending command: {ex.Message}");
         }
     }
@@ -161,7 +173,7 @@ public class ContextMenuSampleTest : TestPageBase
                 App.PerformActions([ sequence ]);
             }
             var currentText = getLabel();
-            App.GetScreenshot().SaveAsFile("Container4_AfterCounterIncrease.png");
+            SaveScreenshot("Container4_AfterCounterIncrease.png");
 
             if(ie)
                 Assert.That(currentText, Is.Not.EqualTo(initialText), "Counter should have increased");
@@ -181,7 +193,7 @@ public class ContextMenuSampleTest : TestPageBase
         }
         catch (WebDriverException ex)
         {
-            App.GetScreenshot().SaveAsFile("Container4_ContextMenu_Error.png");
+            SaveScreenshot("Container4_ContextMenu_Error.png");
             Assert.Fail($"Failed to interact with conditional command: {ex.Message} {ex.StackTrace}");
         }
     }

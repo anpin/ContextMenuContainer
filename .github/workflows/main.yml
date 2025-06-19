@@ -122,6 +122,7 @@ jobs:
           name: appium-test-results
           path: |
             **/TestResults.trx
+            Screenshots/**
             appium_log.txt
   publish_to_github:
     runs-on: ubuntu-latest

@@ -1,13 +1,6 @@
-using System;
-using System.Threading;
-using OpenQA.Selenium.Appium;
-using OpenQA.Selenium.Appium.Enums;
-using OpenQA.Selenium.Appium.Android;
-using OpenQA.Selenium.Appium.iOS;
-using OpenQA.Selenium.Appium.Windows;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
+using OpenQA.Selenium.Appium.Interactions;
 using OpenQA.Selenium.Interactions;
+using PointerInputDevice = OpenQA.Selenium.Appium.Interactions.PointerInputDevice;
 
 namespace UITests;
 
@@ -16,15 +9,12 @@ namespace UITests;
 /// </summary>
 public class ContextMenuSampleTest : TestPageBase
 {
-    // We'll use container1 as the main identifier for the page
     protected override string PageName => "sample_page";
 
     [SetUp]
     public void Setup()
     {
-        // Verify the main page is loaded and all containers are present
         Assert.That(PageElement().Displayed, Is.True, "Page should be visible");
-        // Save initial state screenshot
         App.GetScreenshot().SaveAsFile("InitialState.png");
     }
 
@@ -65,44 +55,37 @@ public class ContextMenuSampleTest : TestPageBase
         catch (WebDriverException ex)
         {
             App.GetScreenshot().SaveAsFile("Container1_ContextMenu_Error.png");
-            Assert.Fail($"Failed to interact with context menu: {ex.Message}");
+            Assert.Fail($"Failed to interact with context menu: {ex.Message} {ex.StackTrace}");
         }
     }
 
     [Test]
     public void Container2_DynamicContextMenuItems()
     {
-        // Find the container2 element
         var container = GetElement("container2");
         
-        // Trigger context menu
+        
         var actions = new Actions(App);
         actions.ClickAndHold(container).Perform();
         
         
-        // Wait for context menu to appear
         var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
         
         try {
-            // Find and click on "Press me 1!" menu item
             var destructiveItem = wait.Until(d => App.FindElement(GetByText("Remove context actions"))); 
             destructiveItem.Click();
             
             App.GetScreenshot().SaveAsFile("Container2_Remove_Result.png");
             
-            // Trigger context menu again
             actions.ClickAndHold(container).Perform();
             
-            // Trigger context menu again
             actions.ClickAndHold(container).Perform();
             
-            // Now there should be only one item - "Give me my actions back!"
             var restoreItem = wait.Until(d => App.FindElement(GetByText("Give me my actions back!"))); 
             restoreItem.Click();
             
             App.GetScreenshot().SaveAsFile("Container2_ActionsRestored.png");
             
-            // Verify actions are restored by triggering the menu again and checking for original items
             actions.ClickAndHold(container).Perform();
             var verifyItem = wait.Until(d => App.FindElement(GetByText($"Press me 1!"))); 
             verifyItem.Click();
@@ -121,29 +104,23 @@ public class ContextMenuSampleTest : TestPageBase
     [Test]
     public void Container3_NeverEndingCommand()
     {
-        // Find the container3 element
         var container = GetElement("container3");
         
-        // Get the initial counter value
         var getLabel = () => container.FindElement(GetBy("c3_label")).Text;
         var initialText = getLabel();
         
-        // Trigger context menu
         var actions = new Actions(App);
         actions.ClickAndHold(container).Perform();
         
-        // Wait for context menu to appear
+        
         var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
         
         try {
             var menuItem = wait.Until(d => App.FindElement(GetByText("Start the loop!"))); 
             menuItem.Click();
             
-            // Wait for counter to increase (at least 5 seconds)
             App.GetScreenshot().SaveAsFile("Container3_BeforeCounterIncrease.png");
             Thread.Sleep(6000);
-            
-            // Check if counter increased
             var currentText = getLabel();
             App.GetScreenshot().SaveAsFile("Container3_AfterCounterIncrease.png");
             
@@ -153,6 +130,59 @@ public class ContextMenuSampleTest : TestPageBase
         {
             App.GetScreenshot().SaveAsFile("Container3_ContextMenu_Error.png");
             Assert.Fail($"Failed to interact with never-ending command: {ex.Message}");
+        }
+    }
+    [Test]
+    public void Container4_ConditionalCommand()
+    {
+        var getLabel = () => App.FindElement(GetBy("c4_label")).Text;
+        Func<AppiumElement> getToggle = () => App.FindElement(GetBy("c4_toggle"));
+        var isEnabled = () => getToggle().Text.Contains("enabled");
+        var doTest = () =>
+        {
+            var e = GetElement("container4");
+            var ie = isEnabled();
+            var actions = new Actions(App);
+            var initialText = getLabel();
+            actions.ClickAndHold(e).Perform();
+            var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
+            var menuItem = wait.Until(d => App.FindElement(GetByText( ie ? "Should be enabled" : "Should be disabled")));
+            menuItem.Click();
+            if (!ie)
+            {
+                //disabled item won't close the popup, so we need to click outside the popup menu to close it
+                Console.WriteLine("Move finger outside the container");
+                var finger = new PointerInputDevice(PointerKind.Touch);
+                var sequence = new ActionSequence(finger, 0);
+                sequence.AddAction(finger.CreatePointerMove(CoordinateOrigin.Viewport,300,500,TimeSpan.Zero ));
+                sequence.AddAction(finger.CreatePointerDown(PointerButton.TouchContact));
+                sequence.AddAction(finger.CreatePause(TimeSpan.FromSeconds(1)));
+                sequence.AddAction(finger.CreatePointerUp(PointerButton.TouchContact));
+                App.PerformActions([ sequence ]);
+            }
+            var currentText = getLabel();
+            App.GetScreenshot().SaveAsFile("Container4_AfterCounterIncrease.png");
+
+            if(ie)
+                Assert.That(currentText, Is.Not.EqualTo(initialText), "Counter should have increased");
+            else 
+                Assert.That(currentText, Is.EqualTo(initialText), "Counter should not have increased");
+                
+        };
+        try {
+            
+            
+            doTest();
+            getToggle().Click();
+            doTest();
+            getToggle().Click();
+            doTest();
+            
+        }
+        catch (WebDriverException ex)
+        {
+            App.GetScreenshot().SaveAsFile("Container4_ContextMenu_Error.png");
+            Assert.Fail($"Failed to interact with conditional command: {ex.Message} {ex.StackTrace}");
         }
     }
 }

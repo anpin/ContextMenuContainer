@@ -103,18 +103,27 @@
             <Label Text="Disabled Menu Items" Style="{StaticResource HeaderStyle}" />
             <c:ContextMenuContainer x:Name="container4" AutomationId="container4">
                 <c:ContextMenuContainer.MenuItems>
-                    <c:ContextMenuItem Text="Enabled Action" Command="{Binding FirstCommand}" CommandParameter="Enabled action pressed!" />
-                    <c:ContextMenuItem Text="Disabled Action" IsEnabled="False" />
-                    <c:ContextMenuItem Text="Conditional Action" IsEnabled="{Binding IsConditionalActionEnabled}" Command="{Binding ToggleConditionalCommand}" />
+                    <c:ContextMenuItem Text="Always enabled Action" Command="{Binding ConditionalCommand}"  />
+                    <c:ContextMenuItem Text="Always disabled Action" Command="{Binding ConditionalCommand}"  IsEnabled="False" />
+                    <c:ContextMenuItem 
+                        Text="{Binding IsConditionalActionEnabled, Converter={StaticResource conditionalCommandConverter}}" 
+                        IsEnabled="{Binding IsConditionalActionEnabled}" 
+                        Command="{Binding ConditionalCommand}" 
+                        />
                 </c:ContextMenuContainer.MenuItems>
                 <c:ContextMenuContainer.Content>
                     <Frame Style="{StaticResource CardStyle}" BackgroundColor="#7986CB">
                         <StackLayout>
                             <Label Text="Disabled Items Example" FontSize="16" FontAttributes="Bold" TextColor="White" />
                             <Label Text="Right-click to see enabled and disabled menu items" TextColor="White" />
-                            <Label Text="{Binding ConditionalActionStatus}" TextColor="White" Margin="0,8,0,0" />
-                            <Button Text="Toggle Conditional Action" Command="{Binding ToggleConditionalCommand}" 
-                                    BackgroundColor="#5C6BC0" TextColor="White" Margin="0,8,0,0" />
+                            <Label Text="{Binding ConditionalCommandCounter, StringFormat='Conditional command fired {0} times'}" 
+                                   TextColor="White"
+                                   AutomationId="c4_label"
+                            />
+                            <Button Text="{Binding ConditionalActionStatus}" Command="{Binding ToggleConditionalCommand}"
+                                    BackgroundColor="#5C6BC0" TextColor="White" Margin="0,8,0,0"
+                                    AutomationId="c4_toggle"
+                                    />
                         </StackLayout>
                     </Frame>
                 </c:ContextMenuContainer.Content>
@@ -135,7 +144,7 @@
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate>
                                         <Frame Margin="4" Padding="8" BackgroundColor="#7E57C2" CornerRadius="4">
-                                            <Label Text="{Binding}" TextColor="White" />
+                                            <Label Text="{Binding .}" TextColor="White" />
                                         </Frame>
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>

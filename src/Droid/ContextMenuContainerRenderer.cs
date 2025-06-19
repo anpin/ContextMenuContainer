@@ -3,6 +3,7 @@
 
 #pragma warning disable SA1137
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Android.Content;
@@ -46,6 +47,10 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             newElement.BindingContextChanged += Element_BindingContextChanged;
             if (newElement.MenuItems != null)
             {
+                foreach (ContextMenuItem element in newElement.MenuItems)
+                {
+                    element.PropertyChanged += Item_Changed;
+                }
                 newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
             }
 
@@ -83,7 +88,29 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
     private void MenuItems_CollectionChanged(
         object? sender,
         System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        => RefillMenuItems();
+
+    {
+        if (e.OldItems != null)
+        {
+            foreach (ContextMenuItem element in e.OldItems)
+            {
+                element.PropertyChanged -= Item_Changed;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (ContextMenuItem element in e.NewItems)
+            {
+                element.PropertyChanged += Item_Changed;
+            }
+        }
+
+        RefillMenuItems();
+    }
+
+
+    private void Item_Changed(object? sender, PropertyChangedEventArgs e) => ((ContainerViewGroup)PlatformView).NeedToRefillMenu = true;
 
     private void Element_BindingContextChanged(object? sender, EventArgs e)
         => RefillMenuItems();
@@ -238,6 +265,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             _contextMenu.MenuItemClick -= ContextMenu_MenuItemClick;
             _contextMenu.Dispose();
             _contextMenu = null;
+            NeedToRefillMenu = false;
         }
 
         private void AddMenuItem(ContextMenuItem item)
@@ -261,21 +289,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             }
 
             contextAction.SetEnabled(item.IsEnabled);
-                
-            // Set ContentDescription for Appium/UI testing
-            if (string.IsNullOrEmpty(item.AutomationId))
-            {
-                if (!string.IsNullOrEmpty(item.Text))
-                {
-                    // If no AutomationId, use the Text as fallback for testability
-                    contextAction.SetContentDescription(item.Text);
-                }
-            }
-            else
-            {
-                // Android uses ContentDescription for automation testing
-                contextAction.SetContentDescription(item.AutomationId);
-            }
+            
 
             if (item.Icon != null)
             {
@@ -318,21 +332,10 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             // ReSharper disable once ConvertTypeCheckPatternToNullCheck
             if (_contextMenu != null && Element is ContextMenuContainer element)
             {
-                if (element.MenuItems?.Count != _contextMenu.Menu.Size())
+                if (NeedToRefillMenu || element.MenuItems?.Count != _contextMenu.Menu.Size())
                 {
                     DeconstructNativeMenu();
-                }
-                else
-                {
-                    for (int i = 0; i < _contextMenu.Menu.Size(); i++)
-                    {
-                        if (!element.MenuItems[i].Text
-                                .Equals(_contextMenu.Menu.GetItem(i)?.TitleFormatted?.ToString()))
-                        {
-                            DeconstructNativeMenu();
-                            break;
-                        }
-                    }
+                    
                 }
             }
 
@@ -346,6 +349,9 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
                 x => x.Text == e.Item.TitleFormatted?.ToString());
             item?.OnItemTapped();
         }
+        
+        public bool NeedToRefillMenu { get; set; } = false;
+        
 
     }
 

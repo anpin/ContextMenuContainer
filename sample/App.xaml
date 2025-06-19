@@ -29,6 +29,7 @@
                 <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColor}" />
                 <Setter Property="Padding" Value="14,10" />
             </Style>
+          <local:BoolToStringConverter True="Should be enabled" False="Should be disabled" x:Key="conditionalCommandConverter" />
 
         </ResourceDictionary>
     </Application.Resources>

@@ -45,6 +45,7 @@ namespace APES.MAUI.Sample.ViewModels
         public ICommand ConstructiveCommand { get; }
         public ICommand NeverEndingCommand { get; }
         public ICommand ToggleConditionalCommand { get; }
+        public ICommand ConditionalCommand { get; }
         public ICommand AddItemCommand { get; }
         public ICommand ClearItemsCommand { get; }
         #endregion
@@ -91,6 +92,7 @@ namespace APES.MAUI.Sample.ViewModels
             ConstructiveCommand = new Command(ConstructiveHandler);
             NeverEndingCommand = new AsyncCommand(NeverendingTask);
             ToggleConditionalCommand = new Command(ToggleConditionalAction);
+            ConditionalCommand = new Command(ConditionalAction);
             AddItemCommand = new Command(AddItem);
             ClearItemsCommand = new Command(ClearItems);
             _deleteIconSource = "outline_delete_black_24.png";
@@ -157,6 +159,7 @@ namespace APES.MAUI.Sample.ViewModels
                 NeverEndingCounter++;
                 await Task.Delay(5000);
             }
+            // ReSharper disable once FunctionNeverReturns
         }
 
         private void ToggleConditionalAction()
@@ -166,6 +169,7 @@ namespace APES.MAUI.Sample.ViewModels
                 ? "Conditional action is currently enabled" 
                 : "Conditional action is currently disabled";
         }
+        private void ConditionalAction() => ConditionalCommandCounter++;
 
         private void InitializeListItems()
         {
@@ -185,6 +189,13 @@ namespace APES.MAUI.Sample.ViewModels
             set => SetField(ref _neverEndingCounter, value);
         }
         
+        private long _conditionalCommandCounter;
+        public long ConditionalCommandCounter
+        {
+            get => _conditionalCommandCounter;
+            set => SetField(ref _conditionalCommandCounter, value);
+        }
+
         public FileImageSource SettingsIconSource { get; private set; }
         private readonly FileImageSource _deleteIconSource;
     }

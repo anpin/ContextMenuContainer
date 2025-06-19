@@ -30,7 +30,9 @@ public class ContextMenuSampleTest : TestPageBase
     {
         try
         {
-            var container = GetElement("container1");
+            SaveScreenshot("Before_Scrolling_To_Container1.png");
+            var container = ScrollToAndGetElement("container1");
+            SaveScreenshot("After_Finding_Container1.png");
             Assert.That(container.Displayed, Is.True, "container1 should be visible");
             
             SaveScreenshot("Container1_Before.png");
@@ -69,7 +71,9 @@ public class ContextMenuSampleTest : TestPageBase
     [Test]
     public void Container2_DynamicContextMenuItems()
     {
-        var container = GetElement("container2");
+        SaveScreenshot("Before_Scrolling_To_Container2.png");
+        var container = ScrollToAndGetElement("container2");
+        SaveScreenshot("After_Finding_Container2.png");
         
         
         var actions = new Actions(App);
@@ -111,9 +115,12 @@ public class ContextMenuSampleTest : TestPageBase
     [Test]
     public void Container3_NeverEndingCommand()
     {
-        var container = GetElement("container3");
+        // Use ScrollToAndGetElement to find container3 even if it's not visible
+        SaveScreenshot("Before_Scrolling_To_Container3.png");
+        var container = ScrollToAndGetElement("container3");
+        SaveScreenshot("After_Finding_Container3.png");
         
-        var getLabel = () => container.FindElement(GetBy("c3_label")).Text;
+        var getLabel = () => App.FindElement(GetBy("c3_label")).Text;
         var initialText = getLabel();
         
         var actions = new Actions(App);
@@ -142,6 +149,11 @@ public class ContextMenuSampleTest : TestPageBase
     [Test]
     public void Container4_ConditionalCommand()
     {
+        // Scroll to container4 first
+        SaveScreenshot("Before_Scrolling_To_Container4.png");
+        ScrollToElement("container4");
+        SaveScreenshot("After_Finding_Container4.png");
+        
         var getLabel = () => App.FindElement(GetBy("c4_label")).Text;
         Func<AppiumElement> getToggle = () => App.FindElement(GetBy("c4_toggle"));
         var isEnabled = () => getToggle().Text.Contains("enabled");

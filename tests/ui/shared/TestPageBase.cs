@@ -5,8 +5,10 @@ using OpenQA.Selenium.Appium.Android;
 using OpenQA.Selenium.Appium.iOS;
 using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.IO;
+using System.Threading;
 using NUnit.Framework;
 
 namespace UITests;
@@ -51,6 +53,80 @@ public abstract class TestPageBase
 
     protected IWebElement GetElement(string id) => 
         App.FindElement(GetBy(id));
+        
+    protected IWebElement ScrollToAndGetElement(string id)
+    {
+        try
+        {
+            // Try to find the element first without scrolling
+            return GetElement(id);
+        }
+        catch (OpenQA.Selenium.NoSuchElementException)
+        {
+            // Element not found, try to scroll to it
+            ScrollToElement(id);
+            return GetElement(id);
+        }
+    }
+    
+    protected void ScrollToElement(string id)
+    {
+        switch (App)
+        {
+            case AndroidDriver androidDriver:
+                try
+                {
+                    // Use Android UIAutomator2 to scroll to the element
+                    string uiCommand = $"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId(\"{id}\"))";
+                    androidDriver.FindElement(MobileBy.AndroidUIAutomator(uiCommand));
+                    Console.WriteLine($"Scrolled to element: {id}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to scroll to element {id}: {ex.Message}");
+                    // Try a general scroll down if the specific scroll fails
+                    PerformGeneralScroll();
+                }
+                break;
+            case IOSDriver iosDriver:
+                PerformGeneralScroll();
+                break;
+            default:
+                throw new NotImplementedException("Unsupported platform");
+        }
+    }
+    protected void PerformGeneralScroll()
+    {
+        // Get screen dimensions
+        var size = App.Manage().Window.Size;
+        
+        // Calculate scroll gesture (scroll up from bottom half to top half)
+        int startX = size.Width / 2;
+        int startY = (int)(size.Height * 0.7);
+        int endX = size.Width / 2;
+        int endY = (int)(size.Height * 0.3);
+        
+        // Perform the scroll
+        try 
+        {
+            // Simple scrolling for both Android and iOS
+            var actions = new OpenQA.Selenium.Interactions.Actions(App);
+            actions.MoveToLocation(startX, startY)
+                .ClickAndHold()
+                .MoveByOffset(0, startY - endY)
+                .Release()
+                .Perform();
+                
+            Console.WriteLine("Performed general scroll");
+            
+            // Short wait to let scroll complete
+            Thread.Sleep(1000);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to perform general scroll: {ex.Message}");
+        }
+    }
 
     public IWebElement FindByTagName(string tagName) =>
         App.FindElement(MobileBy.TagName("email"));

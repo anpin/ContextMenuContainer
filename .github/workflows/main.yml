@@ -126,6 +126,71 @@ jobs:
             **/Screenshots/*.png
             **/Screenshots/*.mp4
             appium_log.txt
+
+  ios_ui_tests:
+    runs-on: macos-latest
+    needs: [build]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Install XCUITest driver
+        run: appium driver install xcuitest
+      
+      - name: Download iOS IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-ipa
+          path: ./ios-ipa
+
+      - name: Download Appium Test Runner artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: appium-runner
+          path: ./appium-runner
+
+      - name: Start Appium server
+        run: nohup appium -a 127.0.0.1 -p 4723 > appium_log.txt 2>&1 &
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+
+      - name: Start iOS simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "iPhone" | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          xcrun simctl boot "$DEVICE_ID"
+          echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+
+      - name: Run Appium UI tests
+        run: |
+          ls -la ./ios-ipa
+          export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots"
+          export APPIUM_RECORD_SCREEN="true"
+          export IOS_APP_PATH="$(pwd)/ios-ipa/com.apes.maui.sample.ipa"
+          dotnet test ./appium-runner/UITests.iOS.dll --logger "trx;LogFileName=TestResults.trx"
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: |
+            **/TestResults.trx
+            **/Screenshots/*.png
+            **/Screenshots/*.mp4
+            appium_log.txt
+
   publish_to_github:
     runs-on: ubuntu-latest
     needs: [ build ]

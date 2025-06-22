@@ -57,7 +57,7 @@ jobs:
           path: android-test-runner
           
   
-  ios_tests:
+  build_ios_tests:
     runs-on: macos-15
     needs: [build]
     timeout-minutes: 30
@@ -88,6 +88,49 @@ jobs:
       
       - name: Build iOS Test Runner
         run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0 -o ios-test-runner
+      
+      - name: Upload iOS Test Runner artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-runner
+          path: ios-test-runner
+      - name: Upload iOS App artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app
+          path: sample/bin/Release/net9.0-ios/iossimulator-arm64/*
+
+  run_ios_tests:
+    runs-on: macos-15
+    needs: [build_ios_tests]
+    timeout-minutes: 30
+    steps:
+      
+      - name: Choose XCode 16.4
+        run: |
+          ls /Applications | grep Xcode
+          sudo xcode-select -p
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+          source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        
+      - name: Download iOS App artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-app
+          path: ios-app
+
+      - name: Download iOS Test Runner artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-test-runner
+          path: ios-test-runner
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -105,15 +148,26 @@ jobs:
 
       - name: Start iOS simulator
         run: |
-          echo "available devices: $(xcrun simctl list devices available)"
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "iPhone" | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-          echo "launching simulator $DEVICE_ID"
-          xcrun simctl boot "$DEVICE_ID"
+          # Use iPhone SE (3rd generation) with iOS 18.5
+          DEVICE_NAME="iPhone SE (3rd generation)"
+          IOS_VER="18.5"
+          # First find the iOS version section, then find device by name within that section
+          DEVICE_ID=$(xcrun simctl list devices available | awk -v ver="iOS $IOS_VER" -v device="$DEVICE_NAME" 'BEGIN{p=0} $0 ~ "-- " ver " --" {p=1; next} $0 ~ "--" {p=0} p && $0 ~ device {match($0, /\(([A-F0-9-]+)\)/, a); print a[1]; exit}')
+          
+          # If not found, try without version filtering as fallback
+          if [ -z "$DEVICE_ID" ]; then
+            echo "Device not found with exact iOS version, falling back to any version"
+            DEVICE_ID=$(xcrun simctl list devices available | grep "$DEVICE_NAME" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          fi
+          echo "Using simulator: $DEVICE_NAME with ID: $DEVICE_ID"
+          xcrun simctl boot "$DEVICE_ID" || echo "Simulator may already be booted"
           echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+          echo "DEVICE_NAME=$DEVICE_NAME" >> $GITHUB_ENV
+          echo "Launched simulator: $DEVICE_NAME with ID: $DEVICE_ID"
 
       - name: Run Appium UI tests
         run: |
-          export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots" && export APPIUM_RECORD_SCREEN="true" && export IOS_APP_PATH="$(pwd)/sample/bin/Release/net9.0-ios/iossimulator-arm64/APES.MAUI.Sample.app" && dotnet test ./ios-test-runner/UITests.iOS.dll --logger "trx;LogFileName=TestResults.trx"
+          export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots" && export APPIUM_RECORD_SCREEN="true" && export IOS_APP_PATH="$(pwd)/ios-app/APES.MAUI.Sample.app" && dotnet test ./ios-test-runner/UITests.iOS.dll --logger "trx;LogFileName=TestResults.trx"
 
       - name: Upload Test Results
         if: always()

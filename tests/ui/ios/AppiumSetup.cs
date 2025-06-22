@@ -13,14 +13,16 @@ public class AppiumSetup
     public const string iosApplication = "com.apes.maui.sample";
 
     static string slnRoot =>
-        Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 4)));
-    static string appPath => Path.GetFullPath(Path.Combine(
-        slnRoot,
-        "app",
-        "bin",
-        "Debug", 
-        "net9.0-ios",
-        $"{iosApplication}.ipa"));
+        Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 6) ));
+    static string appPath =>
+        Environment.GetEnvironmentVariable("IOS_APP_PATH") ??
+        Path.GetFullPath(Path.Combine(
+            slnRoot,
+            "sample", 
+            "bin",
+            "Release", 
+            "net9.0-ios",
+            $"{iosApplication}.ipa"));
     private static AppiumDriver? driver;
 
     public static AppiumDriver App => driver ?? throw new NullReferenceException("AppiumDriver is null");
@@ -31,7 +33,7 @@ public class AppiumSetup
         
         var capabilities = new AppiumOptions();
         capabilities.AutomationName = AutomationName.iOSXcuiTest;
-        capabilities.DeviceName = "iPhone SE (3rd generation) Simulator";
+        capabilities.DeviceName = Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "iPhone SE (3rd generation) Simulator";
         capabilities.App =  "com.apes.maui.sample";
 
         driver = new IOSDriver(capabilities);

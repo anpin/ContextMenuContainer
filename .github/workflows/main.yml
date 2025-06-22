@@ -47,15 +47,6 @@ jobs:
           name: android-apk
           path: sample/bin/Release/net9.0-android/publish
           
-      - name: Build iOS Test Runner
-        run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0 -o ios-test-runner
-
-      - name: Upload iOS Test Runner artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-test-runner
-          path: ios-test-runner
-      
       - name: Build Android Test Runner
         run: dotnet publish tests/ui/android/UITests.Android.csproj -c Release -f net9.0 -o android-test-runner
 
@@ -66,7 +57,7 @@ jobs:
           path: android-test-runner
           
   
-  ios_ipa:
+  ios_tests:
     runs-on: macos-15
     needs: [build]
     timeout-minutes: 30
@@ -93,12 +84,46 @@ jobs:
           dotnet workload restore
 
       - name: Build iOS for Simulator
-        run: dotnet publish sample -c Release -f net9.0-ios -p:RuntimeIdentifier=iossimulator-x64 -p:CodesignKey=- -p:CodesignProvision=- -p:CodesignEntitlements=- -p:ArchiveOnBuild=false
-      - name: Upload iOS Simulator app artifact
+        run: dotnet build sample -c Release -f net9.0-ios -p:RuntimeIdentifier=iossimulator-arm64 
+      
+      - name: Build iOS Test Runner
+        run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0 -o ios-test-runner
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Install XCUITest driver
+        run: appium driver install xcuitest
+      
+      - name: Start Appium server
+        run: nohup appium -a 127.0.0.1 -p 4723 > appium_log.txt 2>&1 &
+
+      - name: Start iOS simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "iPhone" | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          xcrun simctl boot "$DEVICE_ID"
+          echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+
+      - name: Run Appium UI tests
+        run: |
+          export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots" && export APPIUM_RECORD_SCREEN="true" && export IOS_APP_PATH="$(pwd)/sample/bin/Release/net9.0-ios/iossimulator-arm64/APES.MAUI.Sample.app" && dotnet test ./ios-test-runner/UITests.iOS.dll --logger "trx;LogFileName=TestResults.trx"
+
+      - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-app
-          path: sample/bin/Release/net9.0-ios/iossimulator-x64/AppBundle
+          name: ios-test-results
+          path: |
+            **/TestResults.trx
+            **/Screenshots/*.png
+            **/Screenshots/*.mp4
+            appium_log.txt
+      
       
   android_ui_tests:
     runs-on: ubuntu-latest
@@ -173,66 +198,7 @@ jobs:
             **/Screenshots/*.mp4
             appium_log.txt
 
-  ios_ui_tests:
-    runs-on: macos-latest
-    needs: [build, ios_ipa]
-    timeout-minutes: 30
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '21'
-
-      - name: Install Appium
-        run: npm install -g appium
-
-      - name: Install XCUITest driver
-        run: appium driver install xcuitest
-      
-      - name: Download iOS Test Runner artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ios-test-runner
-          path: ./ios-test-runner
-
-      - name: Download iOS Sample artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ios-app
-          path: ./ios-app
-
-      - name: Start Appium server
-        run: nohup appium -a 127.0.0.1 -p 4723 > appium_log.txt 2>&1 &
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          global-json-file: global.json
-
-      - name: Start iOS simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "iPhone" | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-          xcrun simctl boot "$DEVICE_ID"
-          echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
-
-      - name: Run Appium UI tests
-        run: |
-          ls -la ./ios-app
-          export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots" && export APPIUM_RECORD_SCREEN="true" && export IOS_APP_PATH="$(pwd)/ios-app/APES.MAUI.Sample.app" && dotnet test ./ios-test-runner/UITests.iOS.dll --logger "trx;LogFileName=TestResults.trx"
-
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-test-results
-          path: |
-            **/TestResults.trx
-            **/Screenshots/*.png
-            **/Screenshots/*.mp4
-            appium_log.txt
 
   publish_to_github:
     runs-on: ubuntu-latest

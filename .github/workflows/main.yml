@@ -105,7 +105,9 @@ jobs:
 
       - name: Start iOS simulator
         run: |
+          echo "available devices: $(xcrun simctl list devices available)"
           DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "iPhone" | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          echo "launching simulator $DEVICE_ID"
           xcrun simctl boot "$DEVICE_ID"
           echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
 

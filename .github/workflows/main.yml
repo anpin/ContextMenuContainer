@@ -84,7 +84,7 @@ jobs:
           dotnet workload restore
 
       - name: Build iOS for Simulator
-        run: dotnet build sample -c Release -f net9.0-ios -p:RuntimeIdentifier=iossimulator-arm64 
+        run: dotnet build sample -c Release -f net9.0-ios -p:RuntimeIdentifier=iossimulator-arm64 -p:MtouchNoSymbolStrip=true -p:MtouchLink=None -p:OptimizationLevel=Debug -p:MtouchFastDev=true -p:PublishAot=false
       
       - name: Build iOS Test Runner
         run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0  -o ios-test-runner 

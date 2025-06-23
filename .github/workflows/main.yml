@@ -87,7 +87,7 @@ jobs:
         run: dotnet build sample -c Release -f net9.0-ios -p:RuntimeIdentifier=iossimulator-arm64 
       
       - name: Build iOS Test Runner
-        run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0 -o ios-test-runner
+        run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0  -o ios-test-runner 
       
       - name: Upload iOS Test Runner artifact
         uses: actions/upload-artifact@v4
@@ -105,6 +105,8 @@ jobs:
     needs: [build_ios_tests]
     timeout-minutes: 30
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
       
       - name: Choose XCode 16.4
         run: |

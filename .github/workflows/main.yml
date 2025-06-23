@@ -153,8 +153,13 @@ jobs:
           # Use iPhone SE (3rd generation) with iOS 18.5
           DEVICE_NAME="iPhone SE (3rd generation)"
           IOS_VER="18.5"
-          # First find the iOS version section, then find device by name within that section
-          DEVICE_ID=$(xcrun simctl list devices available | awk -v ver="iOS $IOS_VER" -v device="$DEVICE_NAME" 'BEGIN{p=0} $0 ~ "-- " ver " --" {p=1; next} $0 ~ "--" {p=0} p && $0 ~ device {match($0, /\(([A-F0-9-]+)\)/, a); print a[1]; exit}')
+          # List all simulators and grep for both version and device name
+          echo "Available simulators:"
+          xcrun simctl list devices available
+          
+          # Find the device ID using a simpler approach
+          # First try to match both iOS version and device name
+          DEVICE_ID=$(xcrun simctl list devices available | grep -A 10 "iOS $IOS_VER" | grep "$DEVICE_NAME" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
           
           # If not found, try without version filtering as fallback
           if [ -z "$DEVICE_ID" ]; then

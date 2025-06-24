@@ -48,6 +48,7 @@ public abstract class TestPageBase
     protected By GetByText(string id) => App switch
     {
         AndroidDriver _ => MobileBy.AndroidUIAutomator($"new UiSelector().text(\"{id}\")"),
+        IOSDriver _ => MobileBy.IosNSPredicate($"label CONTAINS[c] '{id}'"),
         _ => MobileBy.LinkText(id),
     };
 
@@ -183,5 +184,23 @@ public abstract class TestPageBase
         return !string.IsNullOrEmpty(value) && 
                (value.Equals("1") || value.Equals("true", StringComparison.OrdinalIgnoreCase));
     }
-    
+
+    protected void ClickAndHold(Actions actions, AppiumElement element)
+    {
+        switch (App)
+        {
+            case  IOSDriver _:
+                actions
+                    .MoveToElement(element, 10, 10)
+                    .ClickAndHold()
+                    .Pause(TimeSpan.FromSeconds(2.0))
+                    .Release()
+                    .Perform();
+                break;
+            default:
+                actions.ClickAndHold(element).Perform();
+                break;
+        }
+    }
+
 }

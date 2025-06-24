@@ -39,7 +39,8 @@ public class ContextMenuSampleTest : TestPageBase
             
             var actions = new Actions(App);
             
-            actions.ClickAndHold(container).Perform();
+            ClickAndHold(actions, container);
+            
     
             var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
             
@@ -77,7 +78,7 @@ public class ContextMenuSampleTest : TestPageBase
         
         
         var actions = new Actions(App);
-        actions.ClickAndHold(container).Perform();
+        ClickAndHold(actions, container);
         
         
         var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
@@ -88,16 +89,16 @@ public class ContextMenuSampleTest : TestPageBase
             
             SaveScreenshot("Container2_Remove_Result.png");
             
-            actions.ClickAndHold(container).Perform();
+            ClickAndHold(actions, container);
             
-            actions.ClickAndHold(container).Perform();
+            ClickAndHold(actions, container);
             
             var restoreItem = wait.Until(d => App.FindElement(GetByText("Give me my actions back!"))); 
             restoreItem.Click();
             
             SaveScreenshot("Container2_ActionsRestored.png");
             
-            actions.ClickAndHold(container).Perform();
+            ClickAndHold(actions, container);
             var verifyItem = wait.Until(d => App.FindElement(GetByText($"Press me 1!"))); 
             verifyItem.Click();
             var result = GetElement("c2_label");
@@ -124,7 +125,7 @@ public class ContextMenuSampleTest : TestPageBase
         var initialText = getLabel();
         
         var actions = new Actions(App);
-        actions.ClickAndHold(GetElement("container3")).Perform();
+        ClickAndHold(actions, GetElement("container3"));
         
         
         var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
@@ -163,7 +164,7 @@ public class ContextMenuSampleTest : TestPageBase
             var ie = isEnabled();
             var actions = new Actions(App);
             var initialText = getLabel();
-            actions.ClickAndHold(e).Perform();
+            ClickAndHold(actions,e);
             var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
             var menuItem = wait.Until(d => App.FindElement(GetByText( ie ? "Should be enabled" : "Should be disabled")));
             menuItem.Click();

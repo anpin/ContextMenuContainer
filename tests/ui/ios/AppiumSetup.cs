@@ -10,7 +10,7 @@ namespace UITests;
 [SetUpFixture]
 public class AppiumSetup
 {
-    public const string iosApplication = "com.apes.maui.sample";
+    public const string iosApplication = "APES.MAUI.Sample";
 
     static string slnRoot =>
         Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 6) ));
@@ -22,7 +22,8 @@ public class AppiumSetup
             "bin",
             "Release", 
             "net9.0-ios",
-            $"{iosApplication}.ipa"));
+            "iossimulator-x64",
+            $"{iosApplication}.app"));
     private static AppiumDriver? driver;
 
     public static AppiumDriver App => driver ?? throw new NullReferenceException("AppiumDriver is null");
@@ -33,9 +34,8 @@ public class AppiumSetup
         
         var capabilities = new AppiumOptions();
         capabilities.AutomationName = AutomationName.iOSXcuiTest;
-        capabilities.DeviceName = Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "iPhone SE (3rd generation) Simulator";
-        capabilities.App =  "com.apes.maui.sample";
-
+        capabilities.DeviceName = Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "iPhone SE (3rd generation)";
+        capabilities.App =  appPath;
         driver = new IOSDriver(capabilities);
     }
 

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <RootNamespace>APES.UI.XF.Tests</RootNamespace>
+    <RootNamespace>APES.MAUI.Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net9.0'))">

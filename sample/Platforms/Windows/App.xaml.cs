@@ -22,7 +22,7 @@ public partial class App : MauiWinUIApplication
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        XF.Logger.Error(e.Exception);
+        Logger.Error(e.Exception);
         e.Handled = true;
     }
 

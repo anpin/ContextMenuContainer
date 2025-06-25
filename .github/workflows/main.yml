@@ -57,7 +57,7 @@ jobs:
           path: android-test-runner
       - name: Build Windows sample
         run: 
-          dotnet build sample -c Release -f net9.0-windows -o windows-app
+          dotnet build sample -c Release -f net9.0-windows10.0.19041.0 -o windows-app
       - name: Upload Windows sample artifact
         uses: actions/upload-artifact@v4
         with:
@@ -334,7 +334,7 @@ jobs:
         shell: powershell
         run: |
           # Start WinAppDriver in the background
-          Start-Process -FilePath "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe" -ArgumentList "127.0.0.1", "4723" -PassThru
+          Start-Process -FilePath "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe" -ArgumentList "127.0.0.1", "4723" -NoNewWindow -PassThru
       - name: Run Windows UI tests
         shell: powershell
         run: |

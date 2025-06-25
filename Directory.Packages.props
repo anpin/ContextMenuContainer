@@ -3,7 +3,7 @@
     <PackageVersion Include="GitVersion.MsBuild" Version="5.12.0" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.6.250228001" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
     <PackageVersion Include="Microsoft.UI.Xaml" Version="2.7.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />

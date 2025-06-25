@@ -11,6 +11,10 @@ public partial class App : Application
 	{
 		InitializeComponent();
         ContextMenuContainer.Init();
-        MainPage = new NavPage(new MainPage());
 	}
+	
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window( new NavPage(new MainPage()));
+    }
 }

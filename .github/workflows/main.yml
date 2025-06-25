@@ -57,7 +57,7 @@ jobs:
           path: android-test-runner
       - name: Build Windows sample
         run: 
-          dotnet build sample -c Release -f net9.0-windows10.0.19041.0 -o windows-app
+          dotnet publish sample -f net9.0-windows10.0.19041.0 -r win-x64 -p:WindowsPackageType=None -p:UseMonoRuntime=false  -o windows-app
       - name: Upload Windows sample artifact
         uses: actions/upload-artifact@v4
         with:

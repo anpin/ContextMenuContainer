@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <MauiVersion>9.0.60</MauiVersion> 
+    <MauiVersion>9.0.80</MauiVersion>
   </PropertyGroup>
  <ItemGroup>
    <PackageReference Include="GitVersion.MsBuild">

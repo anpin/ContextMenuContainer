@@ -55,12 +55,27 @@ jobs:
         with:
           name: android-test-runner
           path: android-test-runner
+      - name: Build Windows sample
+        run: 
+          dotnet build sample -c Release -f net9.0-windows -o windows-app
+      - name: Upload Windows sample artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-app
+          path: windows-app
+      - name: Build Windows test runner
+        run: dotnet publish tests/ui/windows -c Release -f net9.0 -o windows-test-runner
+      - name: Upload Windows test runner artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-runner
+          path: windows-test-runner
           
-  
+          
   build_ios_tests:
     runs-on: macos-15
     needs: [build]
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -186,8 +201,7 @@ jobs:
             **/Screenshots/*.png
             **/Screenshots/*.mp4
             appium_log.txt
-      
-      
+       
   android_ui_tests:
     runs-on: ubuntu-latest
     needs: [build]
@@ -261,7 +275,83 @@ jobs:
             **/Screenshots/*.mp4
             appium_log.txt
 
-
+  windows_ui_tests:
+    runs-on: windows-latest
+    needs: [build]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download Windows App artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-app
+          path: windows-app
+      - name: Download Windows Test Runner artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-test-runner
+          path: windows-test-runner
+  
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2    
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+          source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Install Appium
+        run: npm install -g appium
+      - name: Install Windows driver
+        run: appium driver install windows
+      - name: Enable Developer Mode
+        shell: powershell
+        run: |
+          # Enable Developer Mode
+          reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+      - name: Download and Install WinAppDriver
+        shell: powershell
+        run: |
+          # Download WinAppDriver
+          $winAppDriverVersion = "1.2.1"
+          $url = "https://github.com/microsoft/WinAppDriver/releases/download/v${winAppDriverVersion}/WindowsApplicationDriver_${winAppDriverVersion}.msi"
+          $outputFile = "$env:TEMP\WindowsApplicationDriver.msi"
+          
+          # Create directory if it doesn't exist
+          New-Item -ItemType Directory -Force -Path "$env:TEMP" | Out-Null
+          
+          # Download the installer
+          Invoke-WebRequest -Uri $url -OutFile $outputFile
+          
+          # Install WinAppDriver silently
+          Start-Process msiexec.exe -ArgumentList "/i `"$outputFile`" /qn" -Wait
+      
+      - name: Start WinAppDriver
+        shell: powershell
+        run: |
+          # Start WinAppDriver in the background
+          Start-Process -FilePath "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe" -ArgumentList "127.0.0.1", "4723" -PassThru
+      - name: Run Windows UI tests
+        shell: powershell
+        run: |
+          $env:APPIUM_SCREENSHOTS_DIR = "$PWD\Screenshots"
+          $env:APPIUM_RECORD_SCREEN = "true"
+          $env:WINDOWS_APP_PATH = "$PWD\windows-app\APES.MAUI.Sample.exe"
+          dotnet test ./windows-test-runner/UITests.Windows.dll --logger "trx;LogFileName=TestResults.trx"     
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-results
+          path: |
+            **/TestResults.trx
+            **/Screenshots/*.png
+            **/Screenshots/*.mp4
+            appium_log.txt
 
   publish_to_github:
     runs-on: ubuntu-latest

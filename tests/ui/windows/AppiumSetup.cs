@@ -6,6 +6,20 @@ namespace UITests;
 [SetUpFixture]
 public class AppiumSetup
 {
+    public const string windowsApplication = "APES.MAUI.Sample";
+	
+	static string slnRoot =>
+        Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 6) ));
+    static string appPath =>
+        Environment.GetEnvironmentVariable("WINDOWS_APP_PATH") ??
+        Path.GetFullPath(Path.Combine(
+            slnRoot,
+            "sample", 
+            "bin",
+            "Release", 
+            "net9.0-windows",
+            "x64",
+            $"{windowsApplication}.exe"));
 	private static AppiumDriver? driver;
 
 	public static AppiumDriver App => driver ?? throw new NullReferenceException("AppiumDriver is null");
@@ -25,7 +39,7 @@ public class AppiumSetup
 			PlatformName = "Windows",
 			// The identifier of the deployed application to test
 			// App = "f0276ba8-3171-4a5d-9410-ac37ee234b34_9zz4h110yvjzm!App",
-			App = "APES.MAUI.Sample!App",
+			App = appPath,
 		};
 
 		// Note there are many more options that you can use to influence the app under test according to your needs
@@ -39,6 +53,6 @@ public class AppiumSetup
 		driver?.Quit();
 
 		// If an Appium server was started locally above, make sure we clean it up here
-		AppiumServerHelper.DisposeAppiumLocalServer();
+		// AppiumServerHelper.DisposeAppiumLocalServer();
 	}
 }

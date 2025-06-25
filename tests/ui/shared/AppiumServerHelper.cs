@@ -10,7 +10,8 @@ public static class AppiumServerHelper
 	public const int DefaultHostPort = 4723;
 
 	public static void StartAppiumLocalServer(string host = DefaultHostAddress,
-		int port = DefaultHostPort)
+		int port = DefaultHostPort,
+		string logFilePath = "appium_log.txt")
 	{
 		if (_appiumLocalService is not null)
 		{
@@ -19,7 +20,8 @@ public static class AppiumServerHelper
 
 		var builder = new AppiumServiceBuilder()
 			.WithIPAddress(host)
-			.UsingPort(port);
+			.UsingPort(port)
+			.WithLogFile(new FileInfo(logFilePath));
 
 		// Start the server with the builder
 		_appiumLocalService = builder.Build();

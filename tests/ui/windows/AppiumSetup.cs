@@ -10,6 +10,10 @@ public class AppiumSetup
 	
 	static string slnRoot =>
         Path.GetRelativePath(Environment.CurrentDirectory,  string.Concat(Enumerable.Repeat($"..{Path.DirectorySeparatorChar}", 6) ));
+
+	static string logFilePath => 
+	Environment.GetEnvironmentVariable("APPIUM_LOG_FILE_PATH") ??
+	Path.GetFullPath(Path.Combine(slnRoot, "appium_log.txt"));
     static string appPath =>
         Environment.GetEnvironmentVariable("WINDOWS_APP_PATH") ??
         Path.GetFullPath(Path.Combine(
@@ -30,7 +34,7 @@ public class AppiumSetup
 	{
 		// If you started an Appium server manually, make sure to comment out the next line
 		// This line starts a local Appium server for you as part of the test run
-		AppiumServerHelper.StartAppiumLocalServer();
+		AppiumServerHelper.StartAppiumLocalServer(logFilePath: logFilePath);
 
 		var windowsOptions = new AppiumOptions
 		{

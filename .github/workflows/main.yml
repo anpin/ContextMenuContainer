@@ -329,18 +329,19 @@ jobs:
           
           # Install WinAppDriver silently
           Start-Process msiexec.exe -ArgumentList "/i `"$outputFile`" /qn" -Wait
-      
-      - name: Start WinAppDriver
-        shell: powershell
-        run: |
-          # Start WinAppDriver in the background
-          Start-Process -FilePath "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe" -ArgumentList "127.0.0.1", "4723" -NoNewWindow -PassThru
+      # I think we don't need to start WinAppDriver manually
+      # - name: Start WinAppDriver
+      #   shell: powershell
+      #   run: |
+      #     # Start WinAppDriver in the background
+      #     Start-Process -FilePath "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe" -ArgumentList "127.0.0.1", "4723" -NoNewWindow -PassThru
       - name: Run Windows UI tests
         shell: powershell
         run: |
           $env:APPIUM_SCREENSHOTS_DIR = "$PWD\Screenshots"
           $env:APPIUM_RECORD_SCREEN = "true"
           $env:WINDOWS_APP_PATH = "$PWD\windows-app\APES.MAUI.Sample.exe"
+          $env:APPIUM_LOG_FILE_PATH = "$PWD\appium_log.txt"
           dotnet test ./windows-test-runner/UITests.Windows.dll --logger "trx;LogFileName=TestResults.trx"     
       - name: Upload Test Results
         if: always()

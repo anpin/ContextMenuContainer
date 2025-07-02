@@ -192,7 +192,7 @@ public class ContextMenuSampleTest : TestPageBase
             var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
             var menuItem = wait.Until(d => App.FindElement(GetByText(ie ? "Should be enabled" : "Should be disabled")));
             menuItem.Click();
-            if (menuItem.Displayed)
+            if (App is WindowsDriver && menuItem.Displayed)
             {
                 menuItem.Click();
             }

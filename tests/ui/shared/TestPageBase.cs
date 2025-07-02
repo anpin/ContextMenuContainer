@@ -93,7 +93,7 @@ public abstract class TestPageBase
             case WindowsDriver wind:
             {
                 AppiumElement? element = null;
-                while (!TryGetElement(id, out element))
+                while (!TryGetElement(id, out element) || !element.Displayed)
                 {
                     ScrollDownDesktop();
                 }
@@ -138,9 +138,10 @@ public abstract class TestPageBase
         int endY = (int)(size.Height * 0.1);
         
         var actions = new OpenQA.Selenium.Interactions.Actions(App);
-        actions.MoveToLocation(startX, startY)
-            .ScrollByAmount(0, -endY)
-            .Perform();
+        // actions.MoveToLocation(startX, startY)
+        //     .ScrollByAmount(0, -endY)
+        //     .Perform();
+        actions.SendKeys(Keys.ArrowDown).Perform();
         Thread.Sleep(300);
     }
 

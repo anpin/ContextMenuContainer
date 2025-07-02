@@ -101,6 +101,7 @@ public class ContextMenuSampleTest : TestPageBase
             ClickAndHold(actions, container);
             var verifyItem = wait.Until(d => App.FindElement(GetByText($"Press me 1!"))); 
             verifyItem.Click();
+            WaitFor(3);
             var result = GetElement("c2_label");
             Assert.That(result.Text.Contains("clicked"), Is.True, "Result label didn't change");
 

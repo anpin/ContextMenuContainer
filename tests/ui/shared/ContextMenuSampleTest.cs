@@ -187,9 +187,15 @@ public class ContextMenuSampleTest : TestPageBase
             // Console.WriteLine("Toggle text was: {0}", t);
             return t.Contains("enabled");
         };
-        var doClick = (bool ie) =>
+        var doTest = (int counter) =>
         {
-
+            var e = GetElement("c4_label");
+            var ie = isEnabled();
+            Console.WriteLine("Is enabled: {0}",  ie);
+            var actions = new Actions(App);
+            string initialText = getLabel();
+            ClickAndHold(actions,e);
+            
             var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
             var menuItem = wait.Until(d => App.FindElement(GetByText(ie ? "Should be enabled" : "Should be disabled")));
             menuItem.Click();

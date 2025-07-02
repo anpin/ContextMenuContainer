@@ -14,6 +14,11 @@ public class AppiumSetup
 	static string logFilePath => 
 	Environment.GetEnvironmentVariable("APPIUM_LOG_FILE_PATH") ??
 	Path.GetFullPath(Path.Combine(slnRoot, "appium_log.txt"));
+
+
+    private static string flauiHost =>
+        Environment.GetEnvironmentVariable("FLAUI_HOST") ?? "http://localhost:5000";
+    
     static string appPath =>
         Environment.GetEnvironmentVariable("WINDOWS_APP_PATH") ??
         Path.GetFullPath(Path.Combine(
@@ -34,12 +39,13 @@ public class AppiumSetup
 	{
 		// If you started an Appium server manually, make sure to comment out the next line
 		// This line starts a local Appium server for you as part of the test run
-		AppiumServerHelper.StartAppiumLocalServer(logFilePath: logFilePath);
+		AppiumServerHelper.StartAppiumLocalServer(logFilePath: logFilePath, port: 4725);
 
 		var windowsOptions = new AppiumOptions
 		{
 			// Specify windows as the driver, typically don't need to change this
-			AutomationName = "windows",
+//            AutomationName = "windows",
+			AutomationName = "flaui",
 			// Always Windows for Windows
 			PlatformName = "Windows",
 			// The identifier of the deployed application to test
@@ -49,7 +55,7 @@ public class AppiumSetup
 
 		// Note there are many more options that you can use to influence the app under test according to your needs
 
-		driver = new WindowsDriver(windowsOptions);
+		driver = new WindowsDriver(new Uri(flauiHost), windowsOptions);
 	}
 
 	[OneTimeTearDown]

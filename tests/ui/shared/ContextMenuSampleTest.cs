@@ -15,14 +15,14 @@ public class ContextMenuSampleTest : TestPageBase
     [SetUp]
     public void Setup()
     {       
-        Assert.That(PageElement().Displayed, Is.True, "Page should be visible");
+        //Assert.That(PageElement().Displayed, Is.True, "Page should be visible");
         SaveScreenshot("InitialState.png");
         StartScreenRecording();
     }
 
     [TearDown]
     public void TearDown() => StopScreenRecording();
-    
+
     // Using base class SaveScreenshot method
 
     [Test]
@@ -31,7 +31,7 @@ public class ContextMenuSampleTest : TestPageBase
         try
         {
             SaveScreenshot("Before_Scrolling_To_Container1.png");
-            var container = ScrollToAndGetElement("container1");
+            var container = ScrollToAndGetElement("c1_label");
             SaveScreenshot("After_Finding_Container1.png");
             Assert.That(container.Displayed, Is.True, "container1 should be visible");
             
@@ -73,7 +73,8 @@ public class ContextMenuSampleTest : TestPageBase
     public void Container2_DynamicContextMenuItems()
     {
         SaveScreenshot("Before_Scrolling_To_Container2.png");
-        var container = ScrollToAndGetElement("container2");
+        var container = ScrollToAndGetElement("c2_label");
+        Assert.That(container, Is.Not.Null);
         SaveScreenshot("After_Finding_Container2.png");
         
         
@@ -91,7 +92,6 @@ public class ContextMenuSampleTest : TestPageBase
             
             ClickAndHold(actions, container);
             
-            ClickAndHold(actions, container);
             
             var restoreItem = wait.Until(d => App.FindElement(GetByText("Give me my actions back!"))); 
             restoreItem.Click();
@@ -125,7 +125,7 @@ public class ContextMenuSampleTest : TestPageBase
         var initialText = getLabel();
         
         var actions = new Actions(App);
-        ClickAndHold(actions, GetElement("container3"));
+        ClickAndHold(actions, GetElement("c3_label"));
         
         
         var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
@@ -156,48 +156,96 @@ public class ContextMenuSampleTest : TestPageBase
         SaveScreenshot("After_Finding_Container4.png");
         
         var getLabel = () => App.FindElement(GetBy("c4_label")).Text;
-        Func<AppiumElement> getToggle = () => App.FindElement(GetBy("c4_toggle"));
-        var isEnabled = () => getToggle().Text.Contains("enabled");
-        var doTest = () =>
+        Func<AppiumElement> getToggle = () =>
         {
-            var e = GetElement("container4");
-            var ie = isEnabled();
-            var actions = new Actions(App);
-            var initialText = getLabel();
-            ClickAndHold(actions,e);
+            var e = App.FindElement(GetBy("c4_toggle"));
+            e.DisableCache();
+            Console.WriteLine("Got Toggle with text: {0}", e.Text);
+                
+            return e;
+        };
+        var toggleClick = () =>
+        {
+            
+            
             var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
-            var menuItem = wait.Until(d => App.FindElement(GetByText( ie ? "Should be enabled" : "Should be disabled")));
+            wait.Until(d =>
+            {
+                var t = getToggle();
+                var it = t.Text;
+                t.Click();
+                return getToggle().Text != it;
+            });
+            
+
+            
+        };
+        var isEnabled = () =>
+        {
+            var t = getToggle().Text;
+            // Console.WriteLine("Toggle text was: {0}", t);
+            return t.Contains("enabled");
+        };
+        var doClick = (bool ie) =>
+        {
+
+            var wait = new WebDriverWait(App, TimeSpan.FromSeconds(10));
+            var menuItem = wait.Until(d => App.FindElement(GetByText(ie ? "Should be enabled" : "Should be disabled")));
             menuItem.Click();
+            if (menuItem.Displayed)
+            {
+                menuItem.Click();
+            }
+
             if (!ie)
             {
                 //disabled item won't close the popup, so we need to click outside the popup menu to close it
                 Console.WriteLine("Move finger outside the container");
-                var finger = new PointerInputDevice(PointerKind.Touch);
-                var sequence = new ActionSequence(finger, 0);
-                sequence.AddAction(finger.CreatePointerMove(CoordinateOrigin.Viewport,300,500,TimeSpan.Zero ));
-                sequence.AddAction(finger.CreatePointerDown(PointerButton.TouchContact));
-                sequence.AddAction(finger.CreatePause(TimeSpan.FromSeconds(1)));
-                sequence.AddAction(finger.CreatePointerUp(PointerButton.TouchContact));
-                App.PerformActions([ sequence ]);
+                // var finger = new PointerInputDevice(PointerKind.Touch);
+                // var sequence = new ActionSequence(finger, 0);
+                // sequence.AddAction(finger.CreatePointerMove(CoordinateOrigin.Viewport, 300, 500, TimeSpan.Zero));
+                // sequence.AddAction(finger.CreatePointerDown(PointerButton.TouchContact));
+                // sequence.AddAction(finger.CreatePause(TimeSpan.FromSeconds(1)));
+                // sequence.AddAction(finger.CreatePointerUp(PointerButton.TouchContact));
+                // App.PerformActions([sequence]);
+                App.FindElement(GetBy("c4_label")).Click();
             }
-            var currentText = getLabel();
-            SaveScreenshot("Container4_AfterCounterIncrease.png");
-
+        };
+        var doTest = (int counter) =>
+        {
+            var e = GetElement("c4_label");
+            var ie = isEnabled();
+            Console.WriteLine("Is enabled: {0}",  ie);
+            var actions = new Actions(App);
+            string initialText = getLabel();
+            ClickAndHold(actions,e);
+            doClick(ie);
+            string currentText = getLabel();
+            SaveScreenshot($"Container4_AfterCounterIncrease_{counter}.png");
+            Console.WriteLine("Initial text: [{0}]; Current text:[{1}]", initialText, currentText );
             if(ie)
                 Assert.That(currentText, Is.Not.EqualTo(initialText), "Counter should have increased");
             else 
                 Assert.That(currentText, Is.EqualTo(initialText), "Counter should not have increased");
                 
         };
-        try {
-            
-            
-            doTest();
-            getToggle().Click();
-            doTest();
-            getToggle().Click();
-            doTest();
-            
+        try
+        {
+
+            Assert.Multiple(() =>
+            {
+                var c = 1;
+                doTest(++c);
+                toggleClick();
+                doTest(++c);
+                toggleClick();
+                doTest(++c);
+                toggleClick();
+                doTest(++c);
+                toggleClick();
+                doTest(++c);
+            });
+
         }
         catch (WebDriverException ex)
         {

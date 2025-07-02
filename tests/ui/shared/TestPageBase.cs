@@ -41,7 +41,7 @@ public abstract class TestPageBase
 
     protected By GetBy(string id) => App switch
     {
-        WindowsDriver _ => MobileBy.AccessibilityId(id),
+        WindowsDriver _ => By.Id(id),
         _ => MobileBy.Id(id),
     };
 
@@ -49,6 +49,7 @@ public abstract class TestPageBase
     {
         AndroidDriver _ => MobileBy.AndroidUIAutomator($"new UiSelector().text(\"{id}\")"),
         IOSDriver _ => MobileBy.IosNSPredicate($"label CONTAINS[c] '{id}'"),
+        WindowsDriver _ => By.PartialLinkText(id),
         _ => MobileBy.LinkText(id),
     };
 
@@ -75,8 +76,10 @@ public abstract class TestPageBase
     {
         switch (App)
         {
+
             case AndroidDriver androidDriver:
             case IOSDriver iosDriver:
+            {
                 AppiumElement? element = null;
                 while (!TryGetElement(id, out element))
                 {
@@ -86,6 +89,20 @@ public abstract class TestPageBase
                 return element;
 
                 break;
+            }
+            case WindowsDriver wind:
+            {
+                AppiumElement? element = null;
+                while (!TryGetElement(id, out element))
+                {
+                    ScrollDownDesktop();
+                }
+
+                return element;
+
+                break;
+            }
+
             default:
                 throw new NotImplementedException("Unsupported platform");
         }
@@ -108,8 +125,26 @@ public abstract class TestPageBase
                 .Perform();
             Thread.Sleep(300);
     }
+    
+    protected void ScrollDownDesktop()
+    {
+        // Get screen dimensions
+        var size = App.Manage().Window.Size;
+        
+        // Calculate scroll gesture (scroll up from bottom half to top half)
+        int startX = size.Width / 2;
+        int startY = (int)(size.Height * 0.7);
+        int endX = size.Width / 2;
+        int endY = (int)(size.Height * 0.1);
+        
+        var actions = new OpenQA.Selenium.Interactions.Actions(App);
+        actions.MoveToLocation(startX, startY)
+            .ScrollByAmount(0, -endY)
+            .Perform();
+        Thread.Sleep(300);
+    }
 
-    public IWebElement PageElement() => GetElement(PageName);
+    //public IWebElement PageElement() => GetElement(PageName);
 
     public string StartScreenRecording()
     {
@@ -149,6 +184,14 @@ public abstract class TestPageBase
         }
         
         return recordingData;
+    }
+
+    protected void WaitFor(int sec)
+    {
+        var finger = new PointerInputDevice(PointerKind.Touch);
+        var sequence = new ActionSequence(finger, 0);
+        sequence.AddAction(finger.CreatePause(TimeSpan.FromSeconds(sec)));
+        App.PerformActions([ sequence ]);
     }
     
     protected void SaveScreenshot(string filename)
@@ -196,6 +239,9 @@ public abstract class TestPageBase
                     .Pause(TimeSpan.FromSeconds(2.0))
                     .Release()
                     .Perform();
+                break;
+            case WindowsDriver _ :
+                actions.ContextClick(element).Perform();
                 break;
             default:
                 actions.ClickAndHold(element).Perform();

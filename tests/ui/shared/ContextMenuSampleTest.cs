@@ -202,25 +202,22 @@ public class ContextMenuSampleTest : TestPageBase
             {
                 //disabled item won't close the popup, so we need to click outside the popup menu to close it
                 Console.WriteLine("Move finger outside the container");
-                // var finger = new PointerInputDevice(PointerKind.Touch);
-                // var sequence = new ActionSequence(finger, 0);
-                // sequence.AddAction(finger.CreatePointerMove(CoordinateOrigin.Viewport, 300, 500, TimeSpan.Zero));
-                // sequence.AddAction(finger.CreatePointerDown(PointerButton.TouchContact));
-                // sequence.AddAction(finger.CreatePause(TimeSpan.FromSeconds(1)));
-                // sequence.AddAction(finger.CreatePointerUp(PointerButton.TouchContact));
-                // App.PerformActions([sequence]);
-                App.FindElement(GetBy("c4_label")).Click();
+                if (App is WindowsDriver)
+                {
+                    App.FindElement(GetBy("c4_label")).Click();
+                }
+                else
+                {
+                    var finger = new PointerInputDevice(PointerKind.Touch);
+                    var sequence = new ActionSequence(finger, 0);
+                    sequence.AddAction(finger.CreatePointerMove(CoordinateOrigin.Viewport, 300, 500, TimeSpan.Zero));
+                    sequence.AddAction(finger.CreatePointerDown(PointerButton.TouchContact));
+                    sequence.AddAction(finger.CreatePause(TimeSpan.FromSeconds(1)));
+                    sequence.AddAction(finger.CreatePointerUp(PointerButton.TouchContact));
+                    App.PerformActions([sequence]);
+                }
             }
-        };
-        var doTest = (int counter) =>
-        {
-            var e = GetElement("c4_label");
-            var ie = isEnabled();
-            Console.WriteLine("Is enabled: {0}",  ie);
-            var actions = new Actions(App);
-            string initialText = getLabel();
-            ClickAndHold(actions,e);
-            doClick(ie);
+            
             string currentText = getLabel();
             SaveScreenshot($"Container4_AfterCounterIncrease_{counter}.png");
             Console.WriteLine("Initial text: [{0}]; Current text:[{1}]", initialText, currentText );

@@ -313,28 +313,23 @@ jobs:
         run: |
           # Enable Developer Mode
           reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
-      - name: Download and Install WinAppDriver
+      - name: Download FlaUI.WebDriver
         shell: powershell
         run: |
-          # Download WinAppDriver
-          $winAppDriverVersion = "1.2.1"
-          $url = "https://github.com/microsoft/WinAppDriver/releases/download/v${winAppDriverVersion}/WindowsApplicationDriver_${winAppDriverVersion}.msi"
-          $outputFile = "$env:TEMP\WindowsApplicationDriver.msi"
+          # Download FlaUI.WebDriver
+          $url = "https://github.com/FlaUI/FlaUI.WebDriver/releases/latest/download/FlaUI.WebDriver.exe"
+          $outputDir = "$env:TEMP\FlaUI"
+          $outputFile = "$outputDir\FlaUI.WebDriver.exe"
           
           # Create directory if it doesn't exist
-          New-Item -ItemType Directory -Force -Path "$env:TEMP" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$outputDir" | Out-Null
           
-          # Download the installer
+          # Download the executable
           Invoke-WebRequest -Uri $url -OutFile $outputFile
           
-          # Install WinAppDriver silently
-          Start-Process msiexec.exe -ArgumentList "/i `"$outputFile`" /qn" -Wait
-      # I think we don't need to start WinAppDriver manually
-      # - name: Start WinAppDriver
-      #   shell: powershell
-      #   run: |
-      #     # Start WinAppDriver in the background
-      #     Start-Process -FilePath "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe" -ArgumentList "127.0.0.1", "4723" -NoNewWindow -PassThru
+          # Ensure the executable has proper permissions
+          Write-Host "Downloaded FlaUI.WebDriver to $outputFile"
+
       - name: Run Windows UI tests
         shell: powershell
         run: |
@@ -342,6 +337,11 @@ jobs:
           $env:APPIUM_RECORD_SCREEN = "true"
           $env:WINDOWS_APP_PATH = "$PWD\windows-app\APES.MAUI.Sample.exe"
           $env:APPIUM_LOG_FILE_PATH = "$PWD\appium_log.txt"
+          $env:FLAUI_HOST = "http://localhost:5000"
+          
+          # Start flaui driver 
+          Start-Process -FilePath "$env:TEMP\FlaUI\FlaUI.WebDriver.exe" -ArgumentList "--urls=$FLAUI_HOST" -NoNewWindow -PassThru
+
           dotnet test ./windows-test-runner/UITests.Windows.dll --logger "trx;LogFileName=TestResults.trx"     
       - name: Upload Test Results
         if: always()

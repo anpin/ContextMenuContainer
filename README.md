@@ -5,11 +5,7 @@
 
 # Native Context Menu for .NET MAUI
 
-Add native context menus to any view in your .NET MAUI application. Supports all major platforms:
-- Windows
-- Android
-- iOS
-- macOS
+Add native context menus to any view in your .NET MAUI application. Supports all major platforms: Windows, Android, iOS, macOS
 
 ## Platform Preview
 

@@ -35,18 +35,332 @@ jobs:
           msbuild -t:Restore -p:Configuration=Release
           ./pack.ps1 -PackageOutputPath $packageOutputPath
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: packages
           path: ${{ env.RESULT_DIR }}
+      - name: Build Android APK
+        run: dotnet publish sample -c Release -f net9.0-android -p:RunAOTCompilation=true -p:AndroidPackageFormat=apk
+      - name: Upload Android APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: sample/bin/Release/net9.0-android/publish
           
+      - name: Build Android Test Runner
+        run: dotnet publish tests/ui/android/UITests.Android.csproj -c Release -f net9.0 -o android-test-runner
+
+      - name: Upload Android Test Runner artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-runner
+          path: android-test-runner
+      - name: Build Windows sample
+        run: 
+          dotnet publish sample -f net9.0-windows10.0.19041.0 -r win-x64 -p:WindowsPackageType=None -p:UseMonoRuntime=false  -o windows-app
+      - name: Upload Windows sample artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-app
+          path: windows-app
+      - name: Build Windows test runner
+        run: dotnet publish tests/ui/windows -c Release -f net9.0 -o windows-test-runner
+      - name: Upload Windows test runner artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-runner
+          path: windows-test-runner
+          
+          
+  build_ios_tests:
+    runs-on: macos-15
+    needs: [build]
+    timeout-minutes: 60
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Choose XCode 16.4
+        run: |
+          ls /Applications | grep Xcode
+          sudo xcode-select -p
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+          source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          
+      - name: Install MAUI workloads
+        run: |
+          dotnet workload restore
+
+      - name: Build iOS for Simulator
+        run: dotnet build sample -c Release -f net9.0-ios -p:RuntimeIdentifier=iossimulator-arm64 -p:PublishAot=false
+      
+      - name: Build iOS Test Runner
+        run: dotnet publish tests/ui/ios/UITests.iOS.csproj -c Release -f net9.0  -o ios-test-runner 
+      
+      - name: Upload iOS Test Runner artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-runner
+          path: ios-test-runner
+      - name: Upload iOS App artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app
+          path: sample/bin/Release/net9.0-ios/iossimulator-arm64/*
+
+  run_ios_tests:
+    runs-on: macos-15
+    needs: [build_ios_tests]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      
+      - name: Choose XCode 16.4
+        run: |
+          ls /Applications | grep Xcode
+          sudo xcode-select -p
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+          source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        
+      - name: Download iOS App artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-app
+          path: ios-app
+
+      - name: Download iOS Test Runner artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-test-runner
+          path: ios-test-runner
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Install XCUITest driver
+        run: appium driver install xcuitest
+      
+      - name: Start Appium server
+        run: nohup appium -a 127.0.0.1 -p 4723 > appium_log.txt 2>&1 &
+
+      - name: Start iOS simulator
+        run: |
+          # Use iPhone SE (3rd generation) with iOS 18.5
+          DEVICE_NAME="iPhone SE (3rd generation)"
+          IOS_VER="18.5"
+          # List all simulators and grep for both version and device name
+          echo "Available simulators:"
+          xcrun simctl list devices available
+          
+          # Find the device ID using a simpler approach
+          # First try to match both iOS version and device name
+          DEVICE_ID=$(xcrun simctl list devices available | grep -A 10 "iOS $IOS_VER" | grep "$DEVICE_NAME" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          
+          # If not found, try without version filtering as fallback
+          if [ -z "$DEVICE_ID" ]; then
+            echo "Device not found with exact iOS version, falling back to any version"
+            DEVICE_ID=$(xcrun simctl list devices available | grep "$DEVICE_NAME" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          fi
+          echo "Using simulator: $DEVICE_NAME with ID: $DEVICE_ID"
+          xcrun simctl boot "$DEVICE_ID" || echo "Simulator may already be booted"
+          echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+          echo "DEVICE_NAME=$DEVICE_NAME" >> $GITHUB_ENV
+          echo "Launched simulator: $DEVICE_NAME with ID: $DEVICE_ID"
+
+      - name: Run Appium UI tests
+        run: |
+          export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots" && export APPIUM_RECORD_SCREEN="true" && export IOS_APP_PATH="$(pwd)/ios-app/APES.MAUI.Sample.app" && dotnet test ./ios-test-runner/UITests.iOS.dll --logger "trx;LogFileName=TestResults.trx"
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: |
+            **/TestResults.trx
+            **/Screenshots/*.png
+            **/Screenshots/*.mp4
+            appium_log.txt
+       
+  android_ui_tests:
+    runs-on: ubuntu-latest
+    needs: [build]
+    timeout-minutes: 30
+    steps:
+      - name: Enable KVM group permission for Linux runners
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Install UIAutomator2 driver
+        run: appium driver install uiautomator2
+      
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Download Android APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: ./android-apk
+
+      - name: Download Appium Test Runner artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-test-runner
+          path: ./android-test-runner
+
+      
+      - name: Start Appium server
+        run: nohup appium -a 127.0.0.1 -p 4723 > appium_log.txt 2>&1 &
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+
+      - name: Run Appium UI tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+              ls -alhR ./android-apk
+              adb devices
+              
+              export APPIUM_SCREENSHOTS_DIR="$(pwd)/Screenshots" && export APPIUM_RECORD_SCREEN="true" && export ANDROID_APP_PATH="$PWD/android-apk/com.apes.maui.sample-Signed.apk" && dotnet test ./android-test-runner/UITests.Android.dll --logger "trx;LogFileName=TestResults.trx"
+              
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appium-test-results
+          path: |
+            **/TestResults.trx
+            **/Screenshots/*.png
+            **/Screenshots/*.mp4
+            appium_log.txt
+
+  windows_ui_tests:
+    runs-on: windows-latest
+    needs: [build]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download Windows App artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-app
+          path: windows-app
+      - name: Download Windows Test Runner artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-test-runner
+          path: windows-test-runner
+  
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2    
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          global-json-file: global.json
+          source-url: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Install Appium
+        run: npm install -g appium
+      - name: Install Windows driver
+        run: appium driver install windows
+      - name: Enable Developer Mode
+        shell: powershell
+        run: |
+          # Enable Developer Mode
+          reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+      - name: Download FlaUI.WebDriver
+        shell: powershell
+        run: |
+          # Download FlaUI.WebDriver
+          $url = "https://github.com/FlaUI/FlaUI.WebDriver/releases/latest/download/FlaUI.WebDriver.exe"
+          $outputDir = "$env:TEMP\FlaUI"
+          $outputFile = "$outputDir\FlaUI.WebDriver.exe"
+          
+          # Create directory if it doesn't exist
+          New-Item -ItemType Directory -Force -Path "$outputDir" | Out-Null
+          
+          # Download the executable
+          Invoke-WebRequest -Uri $url -OutFile $outputFile
+          
+          # Ensure the executable has proper permissions
+          Write-Host "Downloaded FlaUI.WebDriver to $outputFile"
+
+      - name: Run Windows UI tests
+        shell: powershell
+        run: |
+          $env:APPIUM_SCREENSHOTS_DIR = "$PWD\Screenshots"
+          $env:APPIUM_RECORD_SCREEN = "true"
+          $env:WINDOWS_APP_PATH = "$PWD\windows-app\APES.MAUI.Sample.exe"
+          $env:APPIUM_LOG_FILE_PATH = "$PWD\appium_log.txt"
+          $env:FLAUI_HOST = "http://localhost:5000"
+          
+          # Start flaui driver 
+          Start-Process -FilePath "$env:TEMP\FlaUI\FlaUI.WebDriver.exe" -ArgumentList "--urls=$FLAUI_HOST" -NoNewWindow -PassThru
+
+          dotnet test ./windows-test-runner/UITests.Windows.dll --logger "trx;LogFileName=TestResults.trx"     
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-results
+          path: |
+            **/TestResults.trx
+            **/Screenshots/*.png
+            **/Screenshots/*.mp4
+            appium_log.txt
+
   publish_to_github:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ build, android_ui_tests, run_ios_tests, windows_ui_tests ]
     environment: nuget
     steps:
       - name: Download artifacts  
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: packages
           path: ${{ env.RESULT_DIR }}
@@ -58,15 +372,15 @@ jobs:
             --skip-duplicate \
             --api-key ${GITHUB_TOKEN}
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   publish_to_nuget:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ build, android_ui_tests, run_ios_tests, windows_ui_tests ]
     environment: nuget
     if: github.base_ref == '' # this would be set only on pull_request builds
     steps:
       - name: Download artifacts  
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: packages
           path: ${{ env.RESULT_DIR }}
@@ -78,5 +392,3 @@ jobs:
             --api-key ${NUGET_TOKEN} 
         env:
           NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
-            
-        

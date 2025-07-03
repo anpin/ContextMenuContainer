@@ -2,14 +2,13 @@
 // Copyright (c) 2021 Pavel Anpin
 
 using UIKit;
-#if MAUI
 using System;
 using System.Collections.Specialized;
-using APES.UI.XF.iOS;
+using APES.MAUI.iOS;
 using Microsoft.Maui;
 using Microsoft.Maui.Handlers;
 
-namespace APES.UI.XF
+namespace APES.MAUI
 {
     internal sealed class ContextMenuContainerRenderer : ContentViewHandler
     {
@@ -61,40 +60,6 @@ namespace APES.UI.XF
             NotifyCollectionChangedEventArgs e) => RefillMenuItems();
 
         private void Element_BindingContextChanged(object? sender, EventArgs e) => RefillMenuItems();
-#else
-using APES.UI.XF;
-using APES.UI.XF.iOS;
-using Xamarin.Forms;
-using Xamarin.Forms.Internals;
-using Xamarin.Forms.Platform.iOS;
-
-[assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
-
-#pragma warning disable SA1300
-namespace APES.UI.XF.iOS
-#pragma warning restore SA1300
-{
-    [Preserve(AllMembers = true)]
-    internal class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, UIView>
-    {
-        protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
-        {
-            base.OnElementChanged(e);
-            if (e.OldElement != null)
-            {
-                // do something with old element
-            }
-
-            if (e.NewElement == null || e.NewElement.Content == null)
-            {
-                return;
-            }
-
-            var childRenderer = Element.Content.GetRenderer() ?? Platform.CreateRenderer(Element.Content);
-            SetNativeControl(childRenderer.NativeView);
-            ConstructInteraction(e.NewElement);
-        }
-#endif
 
 #pragma warning disable SA1201
         private ContextMenuDelegate? _contextMenuDelegate;

@@ -6,7 +6,7 @@ using AppKit;
 using CoreGraphics;
 using Xamarin.Forms;
 
-namespace APES.UI.XF.Mac
+namespace APES.MAUI.Mac
 {
     public static class ImageHandler
     {

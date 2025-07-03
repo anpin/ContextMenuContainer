@@ -5,4 +5,4 @@ param(
 )
 $ErrorActionPreference = "Stop"
 
-msbuild .\src\APES.UI.XF.csproj -t:Build,Pack -p:Configuration=Release -p:PackageOutputPath="$PackageOutputPath"
+msbuild .\src\APES.MAUI.csproj -t:Build,Pack -p:Configuration=Release -p:PackageOutputPath="$PackageOutputPath"

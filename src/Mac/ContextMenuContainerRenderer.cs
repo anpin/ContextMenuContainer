@@ -1,15 +1,15 @@
 // MIT License
 // Copyright (c) 2021 Pavel Anpin
 
-using APES.UI.XF;
-using APES.UI.XF.Mac;
+using APES.MAUI;
+using APES.MAUI.Mac;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.MacOS;
 
 [assembly: ExportRenderer(typeof(ContextMenuContainer), typeof(ContextMenuContainerRenderer))]
 
-namespace APES.UI.XF.Mac
+namespace APES.MAUI.Mac
 {
     [Preserve(AllMembers = true)]
     internal class ContextMenuContainerRenderer : ViewRenderer<ContextMenuContainer, ContextContainerNativeView>

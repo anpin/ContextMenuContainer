@@ -7,7 +7,7 @@ using CoreGraphics;
 using Foundation;
 using Xamarin.Forms.Platform.MacOS;
 
-namespace APES.UI.XF.Mac
+namespace APES.MAUI.Mac
 {
     public sealed class ContextContainerNativeView : NSView
     {

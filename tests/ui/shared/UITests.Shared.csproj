@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+
+	<PropertyGroup>
+	  <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>   
+    <GenerateMSBuildEditorConfigFile>false</GenerateMSBuildEditorConfigFile>
+    <RootNamespace>UITests</RootNamespace>
+    <SkipGitVersion>true</SkipGitVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="**\*.cs" />
+  </ItemGroup>
+</Project>

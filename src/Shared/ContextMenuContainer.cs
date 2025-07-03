@@ -22,14 +22,6 @@ public class ContextMenuContainer : ContentView
         set => SetValue(MenuItemsProperty, value);
     }
 
-    /// <summary>
-    /// Call this in order to preserve our code during linking and allow namespace resolution in XAML.
-    /// </summary>
-    public static void Init()
-    {
-        // maybe do something here later
-    }
-
     protected override void OnBindingContextChanged()
     {
         base.OnBindingContextChanged();

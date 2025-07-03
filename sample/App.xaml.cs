@@ -10,7 +10,6 @@ public partial class App : Application
 	public App()
 	{
 		InitializeComponent();
-        ContextMenuContainer.Init();
 	}
 	
     protected override Window CreateWindow(IActivationState? activationState)

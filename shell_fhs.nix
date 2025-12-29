@@ -19,7 +19,7 @@ let
   ]);
 
   # FHS environment for installing official .NET SDK
-  dotnet-fhs = buildFHSUserEnv {
+  dotnet-fhs = buildFHSEnv {
     name = "dotnet-fhs";
     targetPkgs = pkgs: (with pkgs; [
       coreutils
@@ -64,7 +64,7 @@ let
       jdk17
       aapt
       zip
-      nuget-to-nix
+      nuget-to-json
       nixpkgs-fmt
       nil
       python3

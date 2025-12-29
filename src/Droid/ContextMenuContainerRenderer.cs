@@ -15,7 +15,7 @@ using AndroidX.AppCompat.Widget;
 using Java.Lang.Reflect;
 using AColor = Android.Graphics.Color;
 using Path = System.IO.Path;
-using DrawableWrapperX =  Android.Graphics.Drawables.InsetDrawable;
+using DrawableWrapperX = Android.Graphics.Drawables.InsetDrawable;
 using Android.Runtime;
 using Android.Util;
 using Microsoft.Maui.Dispatching;
@@ -161,7 +161,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             DeconstructInteraction();
             Element = container;
         }
-            
+
 #pragma warning disable SA1201
         private PopupMenu? _contextMenu;
 #pragma warning restore SA1201
@@ -169,7 +169,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
         private bool _timerFired;
 
         // ReSharper disable once RedundantTypeCheckInPattern
-        private bool ContextMenuIsNotEmpty => Element is ContextMenuContainer {MenuItems.Count: > 0};
+        private bool ContextMenuIsNotEmpty => Element is ContextMenuContainer { MenuItems.Count: > 0 };
 
         public override bool DispatchTouchEvent(MotionEvent? e)
         {
@@ -184,8 +184,9 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             {
                 // You can change the timespan of the long press
                 _timerFired = false;
+                var delayMs = Element?.LongPressDelay ?? 1500;
                 _timer = new MyTimer(
-                    TimeSpan.FromMilliseconds(1500),
+                    TimeSpan.FromMilliseconds(delayMs),
                     () =>
                     {
                         _timerFired = true;
@@ -289,7 +290,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             }
 
             contextAction.SetEnabled(item.IsEnabled);
-            
+
 
             if (item.Icon != null)
             {
@@ -302,7 +303,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
                 Drawable? drawable = Context?.GetDrawable(id);
                 if (drawable != null)
                 {
-                    var wrapper = new DrawableWrapperX(drawable,0);
+                    var wrapper = new DrawableWrapperX(drawable, 0);
                     if (item.IsDestructive)
                     {
                         wrapper.SetTint(AColor.Red);
@@ -316,7 +317,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
         private void FillMenuItems()
         {
             // ReSharper disable once RedundantTypeCheckInPattern
-            if (Element is ContextMenuContainer {MenuItems.Count: > 0} element)
+            if (Element is ContextMenuContainer { MenuItems.Count: > 0 } element)
             {
                 foreach (var item in element.MenuItems)
                 {
@@ -335,7 +336,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
                 if (NeedToRefillMenu || element.MenuItems?.Count != _contextMenu.Menu.Size())
                 {
                     DeconstructNativeMenu();
-                    
+
                 }
             }
 
@@ -349,9 +350,9 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
                 x => x.Text == e.Item.TitleFormatted?.ToString());
             item?.OnItemTapped();
         }
-        
+
         public bool NeedToRefillMenu { get; set; } = false;
-        
+
 
     }
 
@@ -373,7 +374,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
         public void Start()
         {
             CancellationTokenSource cts = _cancellation; // safe copy
-            DispatcherProvider.Current.GetForCurrentThread() !.StartTimer(
+            DispatcherProvider.Current.GetForCurrentThread()!.StartTimer(
 
 #pragma warning disable SA1114
                 interval: _timespan,

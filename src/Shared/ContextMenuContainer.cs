@@ -1,6 +1,7 @@
 // MIT License
 // Copyright (c) 2021 Pavel Anpin
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Maui.Controls;
 
@@ -20,6 +21,21 @@ public class ContextMenuContainer : ContentView
     {
         get => (ContextMenuItems?)GetValue(MenuItemsProperty);
         set => SetValue(MenuItemsProperty, value);
+    }
+
+    // delay(ms)
+    public static readonly BindableProperty LongPressDelayProperty =
+        BindableProperty.Create(
+            nameof(LongPressDelay),
+            typeof(int),
+            typeof(ContextMenuContainer),
+            1500,
+            validateValue: (_, v) => v is int i && i >= 0);
+
+    public int LongPressDelay
+    {
+        get => (int)GetValue(LongPressDelayProperty);
+        set => SetValue(LongPressDelayProperty, value);
     }
 
     protected override void OnBindingContextChanged()

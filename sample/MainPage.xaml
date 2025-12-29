@@ -8,6 +8,7 @@
              Title="ContextMenuContainer Demo"
              BackgroundColor="#f5f5f5"
              AutomationId="sample_page"
+             x:Name="mainPage"
              >
     
     <ContentPage.BindingContext>
@@ -27,6 +28,32 @@
             <Setter Property="Margin" Value="12,8,12,0" />
             <Setter Property="TextColor" Value="#3E3E3E" />
         </Style>
+        <DataTemplate x:Key="ListItem" x:DataType="vm:Person">
+          <c:ContextMenuContainer AutomationId="{Binding AutomationId}">
+              <c:ContextMenuContainer.MenuItems>
+                  <c:ContextMenuItem 
+                      Text="{Binding FirstName, StringFormat='Edit {0}'}"
+                      Command="{Binding ViewModel.EditPersonCommand,  Source={x:Reference  mainPage}}"
+                      CommandParameter="{Binding .}" 
+                      Icon="{Binding ViewModel.SettingsIconSource,  Source={x:Reference  mainPage}}"/>
+                  <c:ContextMenuItem 
+                      Text="{Binding FirstName, StringFormat='Delete {0}'}"
+                      IsDestructive="True"
+                      Command="{Binding ViewModel.DeletePersonCommand, Source={x:Reference  mainPage}}" 
+                      CommandParameter="{Binding .}" />
+              </c:ContextMenuContainer.MenuItems>
+              <c:ContextMenuContainer.Content>
+                  <Frame Margin="4" Padding="12" BackgroundColor="#00897B" CornerRadius="4">
+                      <Grid ColumnDefinitions="40, *">
+                          <Border StrokeShape="Ellipse" WidthRequest="32" HeightRequest="32" BackgroundColor="#004D40">
+                              <Label Text="{Binding FirstLetter}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" />
+                          </Border>
+                          <Label Grid.Column="1" Text="{Binding FullName}" TextColor="White" VerticalOptions="Center" Margin="8,0,0,0" AutomationId="{Binding NameAutomationId}" />
+                      </Grid>
+                  </Frame>
+              </c:ContextMenuContainer.Content>
+          </c:ContextMenuContainer>
+      </DataTemplate>
     </ContentPage.Resources>
     
     <ScrollView>
@@ -129,32 +156,31 @@
                 </c:ContextMenuContainer.Content>
             </c:ContextMenuContainer>
             
-            <!-- Nested controls example -->
-            <Label Text="Nested Controls" Style="{StaticResource HeaderStyle}" />
-            <c:ContextMenuContainer x:Name="container5" AutomationId="container5">
-                <c:ContextMenuContainer.MenuItems>
-                    <c:ContextMenuItem Text="Add Item" Command="{Binding AddItemCommand}" Icon="{Binding SettingsIconSource}" />
-                    <c:ContextMenuItem Text="Clear Items" Command="{Binding ClearItemsCommand}" IsDestructive="True" />
-                </c:ContextMenuContainer.MenuItems>
-                <c:ContextMenuContainer.Content>
-                    <Frame Style="{StaticResource CardStyle}" BackgroundColor="#9575CD">
-                        <StackLayout>
-                            <Label Text="Collection Example" FontSize="16" FontAttributes="Bold" TextColor="White" />
-                            <CollectionView ItemsSource="{Binding ListItems}" EmptyView="No items in the collection" HeightRequest="120">
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Frame Margin="4" Padding="8" BackgroundColor="#7E57C2" CornerRadius="4">
-                                            <Label Text="{Binding .}" TextColor="White" />
-                                        </Frame>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </StackLayout>
-                    </Frame>
-                </c:ContextMenuContainer.Content>
-            </c:ContextMenuContainer>
+
+            <!-- CollectionView with Context Menu on Each Item -->
+            <Frame Style="{StaticResource CardStyle}" BackgroundColor="#26A69A">
+              <StackLayout>
+                  <c:ContextMenuContainer x:Name="container5" AutomationId="container5">
+                    <c:ContextMenuContainer.MenuItems>
+                        <c:ContextMenuItem Text="Add Person" Command="{Binding AddItemCommand}" Icon="{Binding SettingsIconSource}" />
+                        <c:ContextMenuItem Text="Clear List" Command="{Binding ClearItemsCommand}" IsDestructive="True" />
+                    </c:ContextMenuContainer.MenuItems>
+                    <c:ContextMenuContainer.Content>  
+                      <StackLayout>
+                        <Label Text="CollectionView Per-Item ContextMenu" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                        <Label Text="Each item has its own context menu - long press or right-click on any person or on this header to access global actions" TextColor="White" />
+                        <Label AutomationId="collection_result_label" Text="{Binding CollectionViewResultText}" TextColor="White" FontAttributes="Italic" />  
+                      </StackLayout>
+                    </c:ContextMenuContainer.Content>
+                  </c:ContextMenuContainer>
+                  <CollectionView ItemsSource="{Binding ListItems}" ItemTemplate="{StaticResource ListItem}" HeightRequest="200" AutomationId="people_collection"  EmptyView="No items in the collection" />
+              </StackLayout>
+            </Frame>
+
 
             <BoxView HeightRequest="20" />
+
+
         </StackLayout>
     </ScrollView>
 </ContentPage>

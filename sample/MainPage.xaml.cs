@@ -1,5 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
-
+using  APES.MAUI.Sample.ViewModels;
 namespace APES.MAUI.Sample;
 public partial class MainPage : ContentPage
     {
@@ -7,5 +7,7 @@ public partial class MainPage : ContentPage
         {
             InitializeComponent();
         }
+        public IMainViewModel ViewModel => BindingContext as IMainViewModel;
+
     }
 

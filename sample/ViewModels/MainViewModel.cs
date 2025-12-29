@@ -8,7 +8,9 @@ using Microsoft.Maui.Controls;
 
 namespace APES.MAUI.Sample.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+
+
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -20,7 +22,62 @@ namespace APES.MAUI.Sample.ViewModels
             NotifyPropertyChanged(propertyName);
             return true;
         }
+    }
 
+     /// <summary>
+    /// Represents a person for the CollectionView example.
+    /// </summary>
+    public class Person : ViewModelBase
+    {
+        private string _firstName = string.Empty;
+        public string FirstName
+        {
+            get => _firstName;
+            set
+            {
+                SetField(ref _firstName, value);
+                NotifyPropertyChanged(nameof(FullName));
+                NotifyPropertyChanged(nameof(FirstLetter));
+                NotifyPropertyChanged(nameof(AutomationId));
+                NotifyPropertyChanged(nameof(NameAutomationId));
+            }
+        }
+
+        private string _lastName = string.Empty;
+        public string LastName
+        {
+            get => _lastName;
+            set
+            {
+                SetField(ref _lastName, value);
+                NotifyPropertyChanged(nameof(FullName));
+                NotifyPropertyChanged(nameof(AutomationId));
+                NotifyPropertyChanged(nameof(NameAutomationId));
+            }
+        }
+
+        public string FullName => $"{FirstName} {LastName}";
+        public string FirstLetter => string.IsNullOrEmpty(FirstName) ? "#" : FirstName[0].ToString().ToUpper();
+        public string AutomationId => $"person_{FirstName?.ToLower()}_{LastName?.ToLower()}";
+        public string NameAutomationId => $"person_name_{FirstName?.ToLower()}_{LastName?.ToLower()}";
+    }
+
+    public interface IMainViewModel {
+        public ICommand FirstCommand { get; }
+        public ICommand SecondCommand { get; }
+        public ICommand DynamicSectionCommand { get; }
+        public ICommand DestructiveCommand { get; }
+        public ICommand ConstructiveCommand { get; }
+        public ICommand NeverEndingCommand { get; }
+        public ICommand ToggleConditionalCommand { get; }
+        public ICommand ConditionalCommand { get; }
+        public ICommand AddItemCommand { get; }
+        public ICommand ClearItemsCommand { get; }
+        public ICommand EditPersonCommand { get; }
+        public ICommand DeletePersonCommand { get; }
+    }
+    public class MainViewModel : ViewModelBase, IMainViewModel
+    {
         #region Properties
         private string _text;
         public string Text
@@ -48,6 +105,8 @@ namespace APES.MAUI.Sample.ViewModels
         public ICommand ConditionalCommand { get; }
         public ICommand AddItemCommand { get; }
         public ICommand ClearItemsCommand { get; }
+        public ICommand EditPersonCommand { get; }
+        public ICommand DeletePersonCommand { get; }
         #endregion
 
         #region Context Menu Properties
@@ -72,8 +131,16 @@ namespace APES.MAUI.Sample.ViewModels
             set => SetField(ref _conditionalActionStatus, value);
         }
 
-        private ObservableCollection<string> _listItems = new();
-        public ObservableCollection<string> ListItems
+
+        private string _collectionViewResultText = "Right-click on a person to see actions";
+        public string CollectionViewResultText
+        {
+            get => _collectionViewResultText;
+            set => SetField(ref _collectionViewResultText, value);
+        }
+
+        private ObservableCollection<Person> _listItems = new();
+        public ObservableCollection<Person> ListItems
         {
             get => _listItems;
             set => SetField(ref _listItems, value);
@@ -95,6 +162,8 @@ namespace APES.MAUI.Sample.ViewModels
             ConditionalCommand = new Command(ConditionalAction);
             AddItemCommand = new Command(AddItem);
             ClearItemsCommand = new Command(ClearItems);
+            EditPersonCommand = new Command<Person>(EditPerson);
+            DeletePersonCommand = new Command<Person>(DeletePerson);
             _deleteIconSource = "outline_delete_black_24.png";
             SettingsIconSource = "outline_settings_black_24.png";
             
@@ -174,11 +243,49 @@ namespace APES.MAUI.Sample.ViewModels
         private void InitializeListItems()
         {
             // Add some initial items
-            ListItems.Add("Example Item 1");
-            ListItems.Add("Example Item 2");
+            // ListItems.Add(new Person { FirstName = "Thiago", LastName = "Ferreira" });
+            // ListItems.Add(new Person { FirstName = "Noor", LastName = "Abdallah" });
+            // ListItems.Add(new Person { FirstName = "Mateo", LastName = "Garcia" });
+            // ListItems.Add(new Person { FirstName = "Yuki", LastName = "Tanaka" });
+            AddItem();
+            AddItem();
+            
         }
 
-        private void AddItem() => ListItems.Add($"New Item {ListItems.Count + 1}");
+        private readonly List<(string First, string Last)> _namePool = new() {
+            ("Dmitri", "Ivanov"),       
+            ("João", "Silva"),          
+            ("Priya", "Sharma"),        
+            ("Ahmed", "Al-Sayed"),      
+            ("Anastasia", "Volkova"),   
+            ("Pedro", "Oliveira"),      
+            ("Rahul", "Verma"),         
+            ("Fatima", "Hassan"),       
+            ("Ivan", "Sokolov"),        
+            ("Ana", "Costa"),           
+            ("Ananya", "Singh"),        
+            ("Omar", "Khalid"),         
+            ("Olga", "Smirnova"),       
+            ("Maria", "Santos"),        
+            ("Rohan", "Gupta"),         
+            ("Layla", "Ibrahim"),       
+            ("Vladimir", "Popov"),      
+            ("Lucas", "Pereira"),       
+            ("Vikram", "Patel"),        
+            ("Youssef", "Mahmoud")      
+        };
+
+        private void AddItem() { 
+            var c = ListItems.Count;
+            (string First, string Last) p;
+            if(c < _namePool.Count) {
+                p = _namePool[ListItems.Count];
+            } else
+            {
+                p = ("New person", $"#{c}");
+            }
+            ListItems.Add(new Person() { FirstName = p.First, LastName = p.Last });
+        }
 
         private void ClearItems() => ListItems.Clear();
 
@@ -198,5 +305,44 @@ namespace APES.MAUI.Sample.ViewModels
 
         public FileImageSource SettingsIconSource { get; private set; }
         private readonly FileImageSource _deleteIconSource;
+
+        private void EditPerson(Person person)
+        {
+            if (person == null){
+                CollectionViewResultText = "Person was null!";
+                Logger.Error("ContextMenuContainer EditPerson person was null!");
+                return;
+            } 
+            CollectionViewResultText = $"Editing: {person. FullName} at {DateTime.Now:HH: mm:ss}";
+        }
+
+        private void DeletePerson(Person person)
+        {
+            
+
+            try 
+            {
+            if (person == null){
+                CollectionViewResultText = "Person was null!";
+                Logger.Error("ContextMenuContainer DeletePerson person was null!");
+                return;
+            } 
+            var index = ListItems.IndexOf(person);
+            if (index < 0 )
+            {
+                CollectionViewResultText = "Person was not found!";
+                Logger.Error("ContextMenuContainer DeletePerson person return index less than 0!");
+            }
+            ListItems.RemoveAt(index);
+            CollectionViewResultText = $"Deleted: {person.FullName} at {DateTime.Now:HH:mm:ss}";
+            }
+            catch(Exception ex)
+            {
+                    CollectionViewResultText = ex.Message;
+
+            }
+        }
+
+
     }
 }

@@ -26,7 +26,7 @@ let
     aapt
     llvm_18
     zip
-    nuget-to-nix
+    nuget-to-json
     nixpkgs-fmt
     nil
     jetbrains.rider

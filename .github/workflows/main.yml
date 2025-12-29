@@ -152,7 +152,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '21'
+          node-version: '24'
 
       - name: Install Appium
         run: npm install -g appium

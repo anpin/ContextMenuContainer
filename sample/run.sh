@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TFM="net9.0-android"
+TFM="net10.0-android"
 CONFIG="Debug"
 PKG="com.apes.maui.sample"   # <-- change me
 LOG="maui-logcat.log"

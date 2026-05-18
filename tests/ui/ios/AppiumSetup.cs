@@ -21,7 +21,7 @@ public class AppiumSetup
             "sample", 
             "bin",
             "Release", 
-            "net9.0-ios",
+            "net10.0-ios",
             "iossimulator-x64",
             $"{iosApplication}.app"));
     private static AppiumDriver? driver;

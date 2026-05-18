@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0;net9.0-android</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux')) == false and $([MSBuild]::IsOSPlatform('windows')) == false">$(TargetFrameworks);net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net10.0-android</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux')) == false and $([MSBuild]::IsOSPlatform('windows')) == false">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'monoandroid13.0'">21.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'net9.0-android'">29.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'net10.0-android'">29.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>APES.MAUI</RootNamespace>
@@ -57,11 +57,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
 		<DefineConstants>$(DefineConstants);MAUI</DefineConstants>
 	  <UseMaui>true</UseMaui>
   </PropertyGroup>
-	<PropertyGroup Condition=" $(TargetFramework.StartsWith('net9.0-windows')) ">
+	<PropertyGroup Condition=" $(TargetFramework.StartsWith('net10.0-windows')) ">
 		<DefineConstants>$(DefineConstants);__WINDOWS__</DefineConstants>
 	</PropertyGroup>
   <ItemGroup>
@@ -73,7 +73,7 @@
     
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
     <PackageReference Include="Microsoft.Maui.Controls" />
   </ItemGroup>
   
@@ -86,18 +86,18 @@
     <Compile Include="Mac\*.cs" />
   </ItemGroup>
     
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net9.0-android')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net10.0-android')) ">
 	    <Compile Include="Droid\*.cs" />
     </ItemGroup>
-    <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0-ios')) or $(TargetFramework.StartsWith('net9.0-maccatalyst'))">
+    <ItemGroup Condition="$(TargetFramework.StartsWith('net10.0-ios')) or $(TargetFramework.StartsWith('net10.0-maccatalyst'))">
 	    <Compile Include="iOS\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net9.0-macos')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net10.0-macos')) ">
 	    <Compile Include="Mac\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net9.0-windows')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net10.0-windows')) ">
 	    <Compile Include="UWP\*.cs" />
     </ItemGroup>
 

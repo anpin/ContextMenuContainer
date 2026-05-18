@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <RootNamespace>APES.MAUI.Tests</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
     <DefineConstants>$(DefineConstants);MAUI</DefineConstants>
   </PropertyGroup>
 
@@ -19,7 +19,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0'))">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net10.0'))">
     
   </ItemGroup>
   <ItemGroup>

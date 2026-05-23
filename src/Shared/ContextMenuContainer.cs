@@ -25,7 +25,7 @@ public class ContextMenuContainer : ContentView
     protected override void OnBindingContextChanged()
     {
         base.OnBindingContextChanged();
-        if (MenuItems != null)
+        if (MenuItems is not null)
         {
             SetBindingContextForItems(MenuItems);
         }
@@ -36,17 +36,17 @@ public class ContextMenuContainer : ContentView
         var menuItems = new ContextMenuItems();
         menuItems.CollectionChanged += (_, e) =>
         {
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
-                foreach (ContextMenuItem item in e.OldItems)
+                foreach (BindableObject item in e.OldItems)
                 {
                     item.RemoveBinding(BindingContextProperty);
                 }
             }
 
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
-                foreach (ContextMenuItem item in e.NewItems)
+                foreach (BindableObject item in e.NewItems)
                 {
                     SetInheritedBindingContext(item, bindableObject.BindingContext);
                 }
@@ -59,7 +59,7 @@ public class ContextMenuContainer : ContentView
     {
         if (oldValue is ContextMenuItems oldItems)
         {
-            foreach (ContextMenuItem item in oldItems)
+            foreach (var item in oldItems)
             {
                 item.RemoveBinding(BindingContextProperty);
             }
@@ -69,14 +69,14 @@ public class ContextMenuContainer : ContentView
 
         if (newValue is ContextMenuItems newItems)
         {
-            foreach (ContextMenuItem item in newItems)
+            foreach (var item in newItems)
             {
                 SetInheritedBindingContext(item, bindableObject.BindingContext);
             }
         }
     }
 
-    private void SetBindingContextForItems(IList<ContextMenuItem> items)
+    private void SetBindingContextForItems(IList<BaseContextMenuItem> items)
     {
         for (int i = 0; i < items.Count; i++)
         {
@@ -84,5 +84,5 @@ public class ContextMenuContainer : ContentView
         }
     }
 
-    private void SetBindingContextForItem(ContextMenuItem item) => SetInheritedBindingContext(item, BindingContext);
+    private void SetBindingContextForItem(BaseContextMenuItem item) => SetInheritedBindingContext(item, BindingContext);
 }

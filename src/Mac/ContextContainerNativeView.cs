@@ -22,7 +22,7 @@ namespace APES.MAUI.Mac
             }
 
             _menuItems = contextMenuItems;
-            if (_menuItems != null)
+            if (_menuItems is not null)
             {
                 _menuItems.CollectionChanged += MenuItems_CollectionChanged;
             }
@@ -33,17 +33,14 @@ namespace APES.MAUI.Mac
         public override void RightMouseDown(NSEvent theEvent)
         {
             HandleContextActions(theEvent);
-
             base.RightMouseDown(theEvent);
         }
 
-        private void MenuItems_CollectionChanged(
-            object? sender,
-            System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => RefillMenuItems();
+        private void MenuItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => RefillMenuItems();
 
         private NSMenu? GetContextMenu()
         {
-            if (_contextMenu != null && _menuItems != null)
+            if (_contextMenu is not null && _menuItems is not null)
             {
                 if (_menuItems.Count != _contextMenu.Count)
                 {
@@ -68,7 +65,7 @@ namespace APES.MAUI.Mac
 
         private void HandleContextActions(NSEvent theEvent)
         {
-            if (_menuItems == null)
+            if (_menuItems is null)
             {
                 return;
             }
@@ -79,7 +76,7 @@ namespace APES.MAUI.Mac
                 return;
             }
 
-            if (GetContextMenu() == null)
+            if (GetContextMenu() is null)
             {
                 ConstructNativeMenu();
                 FillMenuItems();
@@ -105,7 +102,7 @@ namespace APES.MAUI.Mac
 
         private void RefillMenuItems()
         {
-            if (_contextMenu == null)
+            if (_contextMenu is null)
             {
                 return;
             }
@@ -116,34 +113,54 @@ namespace APES.MAUI.Mac
         }
 
 #pragma warning disable SA1202
-
         // ReSharper disable once InconsistentNaming
-        public NSMenuItem ToNSMenuItem(int i, ContextMenuItem menuItem)
+        public NSMenuItem ToNSMenuItem(int i, BaseContextMenuItem menuItem)
 #pragma warning restore SA1202
         {
-            NSMenuItem nsMenuItem = new NSMenuItem();
-            nsMenuItem.AttributedTitle = new NSAttributedString(
-                menuItem.Text,
-                foregroundColor: menuItem.IsDestructive ? NSColor.Red : null);
-            nsMenuItem.Tag = i;
-            nsMenuItem.Enabled = menuItem.IsEnabled;
-            nsMenuItem.Activated += NsMenuItem_Activated;
-            nsMenuItem.ValidateMenuItem = (t) => t.Enabled;
-            var nativeIcon = menuItem.Icon?.ToNative();
-            if (nativeIcon != null)
+            switch (menuItem)
             {
-                var elementColor = menuItem.IsDestructive ? NSColor.Red :
-                    NSAppearance.CurrentAppearance.Name == NSAppearance.NameDarkAqua ? NSColor.White : NSColor.Black;
-                nsMenuItem.Image = ImageHandler.ImageTintedWithColor(nativeIcon, elementColor, new CGSize(25, 25));
-            }
+                // Separator Items
+                case ContextMenuSeparator separatorItem:
+                {
+                    return NSMenuItem.SeparatorItem;
+                }
+                
+                // Normal Items
+                case ContextMenuItem contextItem:
+                {
+                    if (string.IsNullOrEmpty(contextItem.Text))
+                    {
+                        Logger.Error("ContextMenuItem text should not be empty!");
+                        return new NSMenuItem(); // Return empty item as fallback
+                    }
 
-            return nsMenuItem;
+                    NSMenuItem nsMenuItem = new NSMenuItem();
+                    nsMenuItem.AttributedTitle = new NSAttributedString(contextItem.Text, foregroundColor: contextItem.IsDestructive ? NSColor.Red : null);
+                    nsMenuItem.Tag = i;
+                    nsMenuItem.Enabled = contextItem.IsEnabled;
+                    nsMenuItem.Activated += NsMenuItem_Activated;
+                    nsMenuItem.ValidateMenuItem = (t) => t.Enabled;
+                    
+                    var nativeIcon = contextItem.Icon?.ToNative();
+                    if (nativeIcon is not null)
+                    {
+                        var elementColor = contextItem.IsDestructive
+                            ? NSColor.Red :
+                            NSAppearance.CurrentAppearance.Name == NSAppearance.NameDarkAqua ? NSColor.White : NSColor.Black;
+                        nsMenuItem.Image = ImageHandler.ImageTintedWithColor(nativeIcon, elementColor, new CGSize(25, 25));
+                    }
+
+                    return nsMenuItem;
+                }
+                
+                default:
+                    return new NSMenuItem();
+            }
         }
 
         private void NsMenuItem_Activated(object sender, EventArgs e)
         {
-            var nsMenuItem = sender as NSMenuItem;
-            if (nsMenuItem == null)
+            if (sender is not NSMenuItem nsMenuItem)
             {
                 Logger.Error("Couldn't cast sender to NSMenuItem");
                 return;

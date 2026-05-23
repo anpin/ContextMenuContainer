@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-    <TargetFrameworks>net9.0-android</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux')) == false and $([MSBuild]::IsOSPlatform('windows')) == false">$(TargetFrameworks);net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net10.0-android;</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux')) == false and $([MSBuild]::IsOSPlatform('windows')) == false">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 	<OutputType>Exe</OutputType>
 	<RootNamespace>APES.MAUI.Sample</RootNamespace>
 	<UseMaui>true</UseMaui>
@@ -37,7 +37,7 @@
 		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>
 		<DefineConstants>__WINDOWS__</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(TargetFramework)' == 'Debug|net9.0-ios' ">
+	<PropertyGroup Condition=" '$(Configuration)|$(TargetFramework)' == 'Debug|net10.0-ios' ">
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>

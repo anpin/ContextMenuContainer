@@ -45,9 +45,9 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
         if (VirtualView is ContextMenuContainer newElement)
         {
             newElement.BindingContextChanged += Element_BindingContextChanged;
-            if (newElement.MenuItems != null)
+            if (newElement.MenuItems is not null)
             {
-                foreach (ContextMenuItem element in newElement.MenuItems)
+                foreach (var element in newElement.MenuItems)
                 {
                     element.PropertyChanged += Item_Changed;
                 }
@@ -62,15 +62,14 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
 
     protected override ContentViewGroup CreatePlatformView()
     {
-        if (VirtualView == null)
+        if (VirtualView is null)
         {
             throw new InvalidOperationException($"{nameof(VirtualView)} must be set to create a ContentViewGroup");
         }
 
         if (VirtualView is not ContextMenuContainer)
         {
-            throw new InvalidOperationException(
-                $"{nameof(VirtualView)} must be of type ContextMenuContainer, but was {VirtualView.GetType()} ");
+            throw new InvalidOperationException($"{nameof(VirtualView)} must be of type ContextMenuContainer, but was {VirtualView.GetType()} ");
         }
 
         var viewGroup = new ContainerViewGroup(Context);
@@ -88,27 +87,25 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
     private void MenuItems_CollectionChanged(
         object? sender,
         System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-
     {
-        if (e.OldItems != null)
+        if (e.OldItems is not null)
         {
-            foreach (ContextMenuItem element in e.OldItems)
+            foreach (BaseContextMenuItem item in e.OldItems)
             {
-                element.PropertyChanged -= Item_Changed;
+                item.PropertyChanged -= Item_Changed;
             }
         }
 
-        if (e.NewItems != null)
+        if (e.NewItems is not null)
         {
-            foreach (ContextMenuItem element in e.NewItems)
+            foreach (BaseContextMenuItem item in e.NewItems)
             {
-                element.PropertyChanged += Item_Changed;
+                item.PropertyChanged += Item_Changed;
             }
         }
 
         RefillMenuItems();
     }
-
 
     private void Item_Changed(object? sender, PropertyChangedEventArgs e) => ((ContainerViewGroup)PlatformView).NeedToRefillMenu = true;
 
@@ -219,7 +216,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
 
         private void DeconstructInteraction()
         {
-            if (Element != null && _contextMenu != null)
+            if (Element is not null && _contextMenu is not null)
             {
                 _contextMenu.Dismiss();
                 _contextMenu.Menu.Clear();
@@ -228,7 +225,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
 
         private void OpenContextMenu()
         {
-            if (GetContextMenu() == null)
+            if (GetContextMenu() is null)
             {
                 ConstructNativeMenu();
                 FillMenuItems();
@@ -240,13 +237,20 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
         private void ConstructNativeMenu()
         {
             var child = GetChildAt(0);
-            if (child == null)
+            if (child is null)
             {
                 return;
             }
 
             _contextMenu = new PopupMenu(Context, child);
             _contextMenu.MenuItemClick += ContextMenu_MenuItemClick;
+            
+            // Enable group dividers for separators (API 28+)
+            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.P)
+            {
+                _contextMenu.Menu.SetGroupDividerEnabled(true);
+            }
+    
             Field field = _contextMenu.Class.GetDeclaredField("mPopup");
             field.Accessible = true;
             Java.Lang.Object? menuPopupHelper = field.Get(_contextMenu);
@@ -257,7 +261,7 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
 
         private void DeconstructNativeMenu()
         {
-            if (_contextMenu == null)
+            if (_contextMenu is null)
             {
                 return;
             }
@@ -268,47 +272,70 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             NeedToRefillMenu = false;
         }
 
-        private void AddMenuItem(ContextMenuItem item)
+        private void AddMenuItem(BaseContextMenuItem item)
         {
-            if (_contextMenu == null)
+            if (_contextMenu is null)
             {
                 return;
             }
 
-            var title = new SpannableString(item.Text);
-            if (item.IsDestructive)
+            switch (item)
             {
-                title.SetSpan(new ForegroundColorSpan(AColor.Red), 0, title.Length(), 0);
-            }
-
-            var contextAction = _contextMenu.Menu.Add(title);
-            if (contextAction == null)
-            {
-                Logger.Error("We couldn't create IMenuItem with title {0}", item.Text);
-                return;
-            }
-
-            contextAction.SetEnabled(item.IsEnabled);
-            
-
-            if (item.Icon != null)
-            {
-                string name = Path.GetFileNameWithoutExtension(item.Icon.File);
-                int id = Context?.GetDrawableId(name) ?? 0;
-                if (id == 0)
+                // Separator Items
+                case ContextMenuSeparator:
                 {
-                    return;
+                    // For API < 28, create a disabled item as a visual separator
+                    var separator = _contextMenu.Menu.Add("────────");
+                    separator?.SetEnabled(false);
+                    break;
                 }
-                Drawable? drawable = Context?.GetDrawable(id);
-                if (drawable != null)
+
+                // Normal Items
+                case ContextMenuItem contextItem:
                 {
-                    var wrapper = new DrawableWrapperX(drawable,0);
-                    if (item.IsDestructive)
+                    if (string.IsNullOrEmpty(contextItem.Text))
                     {
-                        wrapper.SetTint(AColor.Red);
+                        Logger.Error("ContextMenuItem text should not be empty!");
+                        break;
                     }
 
-                    contextAction.SetIcon(wrapper);
+                    var title = new SpannableString(contextItem.Text);
+                    if (contextItem.IsDestructive)
+                    {
+                        title.SetSpan(new ForegroundColorSpan(AColor.Red), 0, title.Length(), 0);
+                    }
+
+                    var contextAction = _contextMenu.Menu.Add(title);
+                    if (contextAction is null)
+                    {
+                        Logger.Error("We couldn't create IMenuItem with title {0}", contextItem.Text);
+                        break;
+                    }
+
+                    contextAction.SetEnabled(contextItem.IsEnabled);
+                    if (contextItem.Icon != null && !string.IsNullOrWhiteSpace(contextItem.Icon.File))
+                    {
+                        string name = Path.GetFileNameWithoutExtension(contextItem.Icon.File);
+                        int id = Context?.GetDrawableId(name) ?? 0;
+                        if (id == 0)
+                        {
+                            break;
+                        }
+
+                        var drawable = Context?.GetDrawable(id);
+                        if (drawable is not null)
+                        {
+                            var wrapper = new DrawableWrapperX(drawable, 0);
+                            if (contextItem.IsDestructive)
+                            {
+                                wrapper.SetTint(AColor.Red);
+                            }
+
+                            contextAction.SetIcon(wrapper);
+                        }
+                    }
+
+                    break;
                 }
             }
         }
@@ -318,9 +345,82 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
             // ReSharper disable once RedundantTypeCheckInPattern
             if (Element is ContextMenuContainer {MenuItems.Count: > 0} element)
             {
-                foreach (var item in element.MenuItems)
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.P)
                 {
-                    AddMenuItem(item);
+                    // Use group-based separators for API 28+
+                    int currentGroupId = 0;
+            
+                    foreach (var item in element.MenuItems)
+                    {
+                        if (item is ContextMenuSeparator)
+                        {
+                            // Move to next group - this creates the visual separator
+                            currentGroupId++;
+                        }
+                        else if (item is ContextMenuItem contextItem)
+                        {
+                            AddMenuItemToGroup(contextItem, currentGroupId);
+                        }
+                    }
+                }
+                else
+                {
+                    // Fallback for API < 28
+                    foreach (var item in element.MenuItems)
+                    {
+                        AddMenuItem(item);
+                    }
+                }
+            }
+        }
+        
+        private void AddMenuItemToGroup(ContextMenuItem contextItem, int groupId)
+        {
+            if (_contextMenu is null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(contextItem.Text))
+            {
+                Logger.Error("ContextMenuItem text should not be empty!");
+                return;
+            }
+
+            var title = new SpannableString(contextItem.Text);
+            if (contextItem.IsDestructive)
+            {
+                title.SetSpan(new ForegroundColorSpan(AColor.Red), 0, title.Length(), 0);
+            }
+
+            // Add item to specific group
+            var contextAction = _contextMenu.Menu.Add(groupId, Menu.None, Menu.None, title);
+            if (contextAction is null)
+            {
+                Logger.Error("We couldn't create IMenuItem with title {0}", contextItem.Text);
+                return;
+            }
+
+            contextAction.SetEnabled(contextItem.IsEnabled);
+            if (contextItem.Icon != null && !string.IsNullOrWhiteSpace(contextItem.Icon.File))
+            {
+                string name = Path.GetFileNameWithoutExtension(contextItem.Icon.File);
+                int id = Context?.GetDrawableId(name) ?? 0;
+                if (id == 0)
+                {
+                    return;
+                }
+
+                var drawable = Context?.GetDrawable(id);
+                if (drawable is not null)
+                {
+                    var wrapper = new DrawableWrapperX(drawable, 0);
+                    if (contextItem.IsDestructive)
+                    {
+                        wrapper.SetTint(AColor.Red);
+                    }
+
+                    contextAction.SetIcon(wrapper);
                 }
             }
         }
@@ -345,16 +445,16 @@ internal sealed class ContextMenuContainerRenderer : ContentViewHandler
         private void ContextMenu_MenuItemClick(object? sender, PopupMenu.MenuItemClickEventArgs e)
         {
             // ReSharper disable once RedundantCast
-            var item = ((ContextMenuContainer?)Element)?.MenuItems?.FirstOrDefault(
-                x => x.Text == e.Item.TitleFormatted?.ToString());
+            var item = ((ContextMenuContainer?)Element)?.MenuItems?
+                .Where(x => x is ContextMenuItem)
+                .Select(x => (ContextMenuItem)x)
+                .FirstOrDefault(x => x.Text == e.Item?.TitleFormatted?.ToString());
+
             item?.OnItemTapped();
         }
-        
+
         public bool NeedToRefillMenu { get; set; } = false;
-        
-
     }
-
 
     private class MyTimer
     {

@@ -25,7 +25,7 @@ namespace APES.MAUI
                 if (VirtualView is ContextMenuContainer old)
                 {
                     old.BindingContextChanged -= Element_BindingContextChanged;
-                    if (old.MenuItems != null)
+                    if (old.MenuItems is not null)
                     {
                         old.MenuItems.CollectionChanged -= MenuItems_CollectionChanged;
                     }
@@ -37,7 +37,7 @@ namespace APES.MAUI
             if (VirtualView is ContextMenuContainer newElement)
             {
                 newElement.BindingContextChanged += Element_BindingContextChanged;
-                if (newElement.MenuItems != null)
+                if (newElement.MenuItems is not null)
                 {
                     newElement.MenuItems.CollectionChanged += MenuItems_CollectionChanged;
                 }
@@ -55,9 +55,7 @@ namespace APES.MAUI
             }
         }
 
-        private void MenuItems_CollectionChanged(
-            object? sender,
-            NotifyCollectionChangedEventArgs e) => RefillMenuItems();
+        private void MenuItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => RefillMenuItems();
 
         private void Element_BindingContextChanged(object? sender, EventArgs e) => RefillMenuItems();
 
@@ -69,7 +67,7 @@ namespace APES.MAUI
         private void DeconstructInteraction()
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (Control != null && _contextMenu != null)
+            if (Control is not null && _contextMenu is not null)
             {
                 Control.RemoveInteraction(_contextMenu);
             }
@@ -80,8 +78,7 @@ namespace APES.MAUI
             DeconstructInteraction();
             if (container.MenuItems?.Count > 0)
             {
-                _contextMenuDelegate =
-                    new ContextMenuDelegate(container.MenuItems, () => TraitCollection.UserInterfaceStyle);
+                _contextMenuDelegate = new ContextMenuDelegate(container.MenuItems, () => TraitCollection.UserInterfaceStyle);
                 _contextMenu = new UIContextMenuInteraction(_contextMenuDelegate);
                 Control.AddInteraction(_contextMenu);
             }

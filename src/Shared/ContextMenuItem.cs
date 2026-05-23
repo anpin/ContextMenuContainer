@@ -2,14 +2,13 @@
 // Copyright (c) 2021 Pavel Anpin
 
 using System.Windows.Input;
-
 using Microsoft.Maui.Controls;
 
 namespace APES.MAUI;
 
 public delegate void ItemTapped(ContextMenuItem item);
 
-public class ContextMenuItem : Element
+public class ContextMenuItem : BaseContextMenuItem
 {
     public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(ContextMenuItem));
 

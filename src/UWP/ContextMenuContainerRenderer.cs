@@ -129,55 +129,78 @@ namespace APES.MAUI
             }
         }
 
-        private void AddMenuItem(MenuFlyout contextMenu, ContextMenuItem item)
+        private void AddMenuItem(MenuFlyout contextMenu, BaseContextMenuItem item)
         {
-            var nativeItem = new MenuFlyoutItem();
-            nativeItem.SetBinding(
-                MenuFlyoutItem.TextProperty,
-                new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.Text)) });
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (ImageConverter != null)
+            if (contextMenu.Items is null)
             {
-                nativeItem.SetBinding(
-                    MenuFlyoutItem.IconProperty,
-                    new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.Icon)), Converter = ImageConverter });
+                return;
             }
 
-            nativeItem.SetBinding(
-                FrameworkElement.StyleProperty,
-                new WBinding()
-                {
-                    Path = new PropertyPath(nameof(ContextMenuItem.IsDestructive)),
-                    Converter = BoolToStyleConverter,
-                });
-            nativeItem.SetBinding(
-                WControl.IsEnabledProperty,
-                new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.IsEnabled)) });
-            nativeItem.Click += NativeItem_Click;
-            nativeItem.DataContext = item;
-            if (contextMenu.Items != null)
+            switch (item)
             {
-                contextMenu.Items.Add(nativeItem);
+                // Separator Items
+                case ContextMenuSeparator separatorItem:
+                {
+                    var separator = new MenuFlyoutSeparator();
+                    contextMenu.Items.Add(separator);
+                    break;
+                }
+        
+                // Normal Items
+                case ContextMenuItem contextItem:
+                {
+                    if (string.IsNullOrEmpty(contextItem.Text))
+                    {
+                        Logger.Error("ContextMenuItem text should not be empty!");
+                        break;
+                    }
+
+                    var nativeItem = new MenuFlyoutItem();
+                    nativeItem.SetBinding(
+                        MenuFlyoutItem.TextProperty,
+                        new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.Text)) });
+
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                    if (ImageConverter is not null)
+                    {
+                        nativeItem.SetBinding(
+                            MenuFlyoutItem.IconProperty,
+                            new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.Icon)), Converter = ImageConverter });
+                    }
+
+                    nativeItem.SetBinding(
+                        FrameworkElement.StyleProperty,
+                        new WBinding()
+                        {
+                            Path = new PropertyPath(nameof(ContextMenuItem.IsDestructive)),
+                            Converter = BoolToStyleConverter,
+                        });
+                    nativeItem.SetBinding(
+                        WControl.IsEnabledProperty,
+                        new WBinding() { Path = new PropertyPath(nameof(ContextMenuItem.IsEnabled)) });
+                    nativeItem.Click += NativeItem_Click;
+                    nativeItem.DataContext = contextItem;
+                    contextMenu.Items.Add(nativeItem);
+                    break;
+                }
             }
         }
 
         private void NativeItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuFlyoutItem;
-            if (item == null)
+            if (sender is not MenuFlyoutItem item)
             {
-                Logger.Error("Couldn't cast to MenuFlyoutItem");
+                Logger.Error("Couldn't cast to MenuFlyoutItem.");
                 return;
             }
 
-            if (item.DataContext is not ContextMenuItem context)
+            if (item.DataContext is not ContextMenuItem contextItem)
             {
-                Logger.Error("Couldn't cast MenuFlyoutItem.DataContext to ContextMenuItem");
+                Logger.Error("Couldn't cast MenuFlyoutItem.DataContext to ContextMenuItem.");
                 return;
             }
 
-            context.OnItemTapped();
+            contextItem.OnItemTapped();
         }
 
 #pragma warning disable SA1201

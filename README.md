@@ -109,7 +109,8 @@ SVG format is recommended for best cross-platform support.
 - [ ] Add highlight property
 - [ ] Add support for keyboard shortcuts
 - [ ] Improve accessibility features
-- [ ] Add support for submenus and separators
+- [ ] Add support for submenus
+- [x] Add support for separators
 - [ ] Add font icon support
 - [x] Add comprehensive unit and UI tests
 

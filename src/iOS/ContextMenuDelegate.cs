@@ -39,37 +39,79 @@ internal class ContextMenuDelegate : UIContextMenuInteractionDelegate
     public override UIContextMenuConfiguration GetConfigurationForMenu(UIContextMenuInteraction interaction, CGPoint location)
         => UIContextMenuConfiguration.Create(_identifier, _preview != null ? PreviewDelegate! : null, ConstructMenuFromItems);
 
-    private IEnumerable<UIMenuElement> ToNativeActions(IEnumerable<ContextMenuItem> sharedDefinitions)
+    private IEnumerable<UIMenuElement> ToNativeActions(IEnumerable<BaseContextMenuItem> sharedDefinitions)
     {
         var iconColor = _getCurrentTheme() == UIUserInterfaceStyle.Dark ? UIColor.White : UIColor.Black;
-        foreach (var item in sharedDefinitions)
+        var items = sharedDefinitions.ToList();
+        var groups = new List<List<ContextMenuItem>>();
+        var currentGroup = new List<ContextMenuItem>();
+
+        // Group items by separators
+        foreach (var item in items)
         {
-            if (!string.IsNullOrEmpty(item.Text))
+            switch (item)
             {
-                UIImage? nativeImage = null;
-                if (item.Icon != null && !string.IsNullOrWhiteSpace(item.Icon.File))
-                {
-                    nativeImage = new UIImage(item.Icon.File);
-                    nativeImage = nativeImage.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-                    nativeImage.ApplyTintColor(item.IsDestructive ? UIColor.Red : iconColor);
-                }
+                case ContextMenuSeparator:
+                    if (currentGroup.Count > 0)
+                    {
+                        groups.Add(currentGroup);
+                        currentGroup = new List<ContextMenuItem>();
+                    }
 
-                var nativeItem = UIAction.Create(item.Text, nativeImage, item.Text, ActionDelegate);
-                if (!item.IsEnabled)
-                {
-                    nativeItem.Attributes |= UIMenuElementAttributes.Disabled;
-                }
+                    break;
 
-                if (item.IsDestructive)
-                {
-                    nativeItem.Attributes |= UIMenuElementAttributes.Destructive;
-                }
-
-                yield return nativeItem;
+                case ContextMenuItem contextItem:
+                    currentGroup.Add(contextItem);
+                    break;
             }
-            else
+        }
+
+        // Add the last group if it has items
+        if (currentGroup.Count > 0)
+        {
+            groups.Add(currentGroup);
+        }
+
+        // Convert each group to a UIMenu with DisplayInline option
+        foreach (var group in groups)
+        {
+            var groupActions = new List<UIMenuElement>();
+
+            foreach (var contextItem in group)
             {
-                Logger.Error("ContextMenuItem text should not be empty!");
+                if (!string.IsNullOrEmpty(contextItem.Text))
+                {
+                    UIImage? nativeImage = null;
+                    if (contextItem.Icon is not null && !string.IsNullOrWhiteSpace(contextItem.Icon.File))
+                    {
+                        nativeImage = UIImage.FromBundle(contextItem.Icon.File);
+                        nativeImage = nativeImage?.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+                        nativeImage?.ApplyTintColor(contextItem.IsDestructive ? UIColor.Red : iconColor);
+                    }
+
+                    var nativeItem = UIAction.Create(contextItem.Text, nativeImage, contextItem.Text, ActionDelegate);
+                    if (!contextItem.IsEnabled)
+                    {
+                        nativeItem.Attributes |= UIMenuElementAttributes.Disabled;
+                    }
+
+                    if (contextItem.IsDestructive)
+                    {
+                        nativeItem.Attributes |= UIMenuElementAttributes.Destructive;
+                    }
+
+                    groupActions.Add(nativeItem);
+                }
+                else
+                {
+                    Logger.Error("ContextMenuItem text should not be empty!");
+                }
+            }
+
+            if (groupActions.Count > 0)
+            {
+                yield return UIMenu.Create(string.Empty, null, UIMenuIdentifier.None, UIMenuOptions.DisplayInline,
+                    groupActions.ToArray());
             }
         }
     }
@@ -78,9 +120,10 @@ internal class ContextMenuDelegate : UIContextMenuInteractionDelegate
 
     private UIMenu ConstructMenuFromItems(UIMenuElement[] suggestedActions)
     {
-        _nativeMenu = _nativeMenu == null ?
+        _nativeMenu = _nativeMenu is null ?
             UIMenu.Create(ToNativeActions(_menuItems).ToArray()) :
             _nativeMenu.GetMenuByReplacingChildren(ToNativeActions(_menuItems).ToArray());
+
         return _nativeMenu;
     }
 

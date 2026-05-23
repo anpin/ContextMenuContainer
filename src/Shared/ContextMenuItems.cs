@@ -6,23 +6,19 @@ using System.Collections.ObjectModel;
 
 namespace APES.MAUI
 {
-    public class ContextMenuItems : ObservableCollection<ContextMenuItem>
+    public class ContextMenuItems : ObservableCollection<BaseContextMenuItem>
     {
         public ContextMenuItem this[string text] => FindTextIndex(text);
 
         private ContextMenuItem FindTextIndex(string text)
         {
-            for (int j = 0; j < Items.Count; j++)
+            foreach (var item in Items)
             {
-                if (Items[j].Text == text)
-                {
-                    return Items[j];
-                }
+                if (item is ContextMenuItem contextMenuItem && contextMenuItem.Text == text)
+                    return contextMenuItem;
             }
 
-            throw new ArgumentOutOfRangeException(
-                nameof(text),
-                $"Item with  text {text} was not present");
+            throw new ArgumentOutOfRangeException(nameof(text), $"Item with text {text} was not present");
         }
     }
 }

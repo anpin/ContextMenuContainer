@@ -76,6 +76,7 @@
             <c:ContextMenuContainer x:Name="container1" AutomationId="container1">
                 <c:ContextMenuContainer.MenuItems>
                     <c:ContextMenuItem x:Name="c1_action1" AutomationId="c1_action1" Text="Action 1" Command="{Binding FirstCommand}" CommandParameter="Action 1 pressed!" />
+                    <c:ContextMenuSeparator x:Name="c1_separator" />
                     <c:ContextMenuItem x:Name="c1_action2" AutomationId="c1_action2" Text="Action with icon" Command="{Binding FirstCommand}" CommandParameter="Action with icon pressed!" Icon="{Binding SettingsIconSource}"/>
                 </c:ContextMenuContainer.MenuItems>
                 <c:ContextMenuContainer.Content>

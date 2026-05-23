@@ -17,7 +17,7 @@ namespace APES.MAUI.Mac
         protected override void OnElementChanged(ElementChangedEventArgs<ContextMenuContainer> e)
         {
             base.OnElementChanged(e);
-            if (e.NewElement == null || e.NewElement.Content == null)
+            if (e.NewElement is null || e.NewElement.Content is null)
             {
                 return;
             }

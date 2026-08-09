@@ -83,6 +83,7 @@ namespace APES.MAUI
                 _contextMenuDelegate =
                     new ContextMenuDelegate(container.MenuItems, () => TraitCollection.UserInterfaceStyle);
                 _contextMenu = new UIContextMenuInteraction(_contextMenuDelegate);
+                Control.UserInteractionEnabled = true;
                 Control.AddInteraction(_contextMenu);
             }
         }
